@@ -5,10 +5,16 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { testFirebaseConnection } from '@/lib/firebase-test'
+import { AuthProvider } from '@/components/custom/AuthProvider'
+import { ProtectedRoute } from '@/components/custom/ProtectedRoute'
+import { UserProfile } from '@/components/custom/UserProfile'
+import { FirestoreExample } from '@/components/examples/FirestoreExample'
+import { useAuth } from '@/hooks/useAuth'
 
-function App() {
+function AppContent() {
   const [count, setCount] = useState(0)
   const [inputValue, setInputValue] = useState('')
+  const { user } = useAuth()
 
   useEffect(() => {
     // Test Firebase connection on app load
@@ -27,7 +33,14 @@ function App() {
           </a>
         </div>
         
-        <h1 className="text-4xl font-bold text-center mb-8">Vite + React + Tailwind + Shadcn/ui</h1>
+        <h1 className="text-4xl font-bold text-center mb-8">Vite + React + Tailwind + Shadcn/ui + Firebase Auth</h1>
+        
+        {/* User Profile Section */}
+        {user && (
+          <div className="flex justify-center mb-8">
+            <UserProfile />
+          </div>
+        )}
         
         <div className="flex flex-col items-center gap-6">
           <div className="flex gap-4">
@@ -92,17 +105,34 @@ function App() {
 
             <Card>
               <CardHeader>
-                <CardTitle>🔥 Firebase</CardTitle>
-                <CardDescription>Backend services</CardDescription>
+                <CardTitle>🔥 Firebase Auth</CardTitle>
+                <CardDescription>Authentication system</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm">Authentication & Firestore configured (check console for status)</p>
+                <p className="text-sm">
+                  {user ? `Logged in as: ${user.email}` : 'Authentication configured'}
+                </p>
               </CardContent>
             </Card>
+          </div>
+          
+          {/* Firestore Database Example */}
+          <div className="mt-12">
+            <FirestoreExample />
           </div>
         </div>
       </div>
     </div>
+  )
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <ProtectedRoute>
+        <AppContent />
+      </ProtectedRoute>
+    </AuthProvider>
   )
 }
 

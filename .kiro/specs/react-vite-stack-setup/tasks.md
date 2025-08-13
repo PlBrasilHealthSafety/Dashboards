@@ -50,7 +50,12 @@
   - Configurar variáveis de ambiente para chaves da API
   - _Requirements: 3.1, 3.2_
 
-- [ ] 5. Implementar Firebase Authentication
+- [x] 5. Implementar Firebase Authentication
+
+
+
+
+
   - Configurar Firebase Auth no projeto
   - Criar hooks personalizados para autenticação (useAuth)
   - Implementar componentes de login/registro
@@ -58,7 +63,12 @@
   - Testar fluxo de autenticação completo
   - _Requirements: 3.3_
 
-- [ ] 6. Configurar Firestore Database
+- [x] 6. Configurar Firestore Database
+
+
+
+
+
   - Configurar regras de segurança do Firestore
   - Criar serviços para operações CRUD básicas
   - Implementar hooks para dados em tempo real
