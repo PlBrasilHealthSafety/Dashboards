@@ -8,7 +8,9 @@ import { testFirebaseConnection } from '@/lib/firebase-test'
 import { AuthProvider } from '@/components/custom/AuthProvider'
 import { ProtectedRoute } from '@/components/custom/ProtectedRoute'
 import { UserProfile } from '@/components/custom/UserProfile'
+import { ContactForm } from '@/components/custom/ContactForm'
 import { FirestoreExample } from '@/components/examples/FirestoreExample'
+import { FormExample } from '@/components/examples/FormExample'
 import { useAuth } from '@/hooks/useAuth'
 
 function AppContent() {
@@ -114,6 +116,16 @@ function AppContent() {
                 </p>
               </CardContent>
             </Card>
+          </div>
+          
+          {/* React Hook Form Examples */}
+          <div className="mt-12 space-y-8">
+            <h2 className="text-2xl font-bold text-center">React Hook Form + Zod Examples</h2>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <ContactForm />
+              <FormExample />
+            </div>
           </div>
           
           {/* Firestore Database Example */}

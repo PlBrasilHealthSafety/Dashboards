@@ -1,41 +1,36 @@
 import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { registerSchema, type RegisterFormData } from '../../lib/validations';
 
 interface RegisterFormProps {
   onToggleMode?: () => void;
 }
 
 export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const { signUp } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+  });
+
+  const onSubmit = async (data: RegisterFormData) => {
     setLoading(true);
     setError('');
 
-    if (password !== confirmPassword) {
-      setError('As senhas não coincidem');
-      setLoading(false);
-      return;
-    }
-
-    if (password.length < 6) {
-      setError('A senha deve ter pelo menos 6 caracteres');
-      setLoading(false);
-      return;
-    }
-
     try {
-      await signUp(email, password);
+      await signUp(data.email, data.password);
     } catch (error: any) {
       setError(error.message || 'Erro ao criar conta');
     } finally {
@@ -52,7 +47,22 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-2">
+            <label htmlFor="name" className="text-sm font-medium">
+              Nome
+            </label>
+            <Input
+              id="name"
+              type="text"
+              placeholder="Seu nome completo"
+              {...register('name')}
+            />
+            {errors.name && (
+              <p className="text-red-500 text-sm">{errors.name.message}</p>
+            )}
+          </div>
+
           <div className="space-y-2">
             <label htmlFor="email" className="text-sm font-medium">
               Email
@@ -60,11 +70,12 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
             <Input
               id="email"
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
               placeholder="seu@email.com"
-              required
+              {...register('email')}
             />
+            {errors.email && (
+              <p className="text-red-500 text-sm">{errors.email.message}</p>
+            )}
           </div>
           
           <div className="space-y-2">
@@ -74,12 +85,12 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
             <Input
               id="password"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              required
-              minLength={6}
+              {...register('password')}
             />
+            {errors.password && (
+              <p className="text-red-500 text-sm">{errors.password.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -89,12 +100,12 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
             <Input
               id="confirmPassword"
               type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="••••••••"
-              required
-              minLength={6}
+              {...register('confirmPassword')}
             />
+            {errors.confirmPassword && (
+              <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>
+            )}
           </div>
 
           {error && (
