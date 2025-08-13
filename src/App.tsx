@@ -1,34 +1,77 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
-import './App.css'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 function App() {
   const [count, setCount] = useState(0)
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="min-h-screen bg-background text-foreground">
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-center items-center gap-8 mb-8">
+          <a href="https://vite.dev" target="_blank" rel="noopener noreferrer">
+            <img src={viteLogo} className="h-24 w-24 hover:drop-shadow-lg transition-all" alt="Vite logo" />
+          </a>
+          <a href="https://react.dev" target="_blank" rel="noopener noreferrer">
+            <img src={reactLogo} className="h-24 w-24 hover:drop-shadow-lg transition-all animate-spin" alt="React logo" />
+          </a>
+        </div>
+        
+        <h1 className="text-4xl font-bold text-center mb-8">Vite + React + Tailwind + Shadcn/ui</h1>
+        
+        <div className="flex flex-col items-center gap-6">
+          <div className="flex gap-4">
+            <Button onClick={() => setCount((count) => count + 1)}>
+              Count is {count}
+            </Button>
+            <Button variant="outline" onClick={() => setCount(0)}>
+              Reset
+            </Button>
+            <Button variant="secondary" onClick={() => setCount((count) => count - 1)}>
+              Decrease
+            </Button>
+          </div>
+          
+          <p className="text-muted-foreground text-center max-w-md">
+            Edit <code className="bg-muted px-2 py-1 rounded text-sm">src/App.tsx</code> and save to test HMR
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+            <Card>
+              <CardHeader>
+                <CardTitle>⚡ Vite</CardTitle>
+                <CardDescription>Lightning fast build tool</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm">Next generation frontend tooling with instant HMR</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>⚛️ React</CardTitle>
+                <CardDescription>Modern UI library</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm">A JavaScript library for building user interfaces</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>🎨 Tailwind + Shadcn/ui</CardTitle>
+                <CardDescription>Beautiful components</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm">Utility-first CSS with beautiful, accessible components</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </div>
   )
 }
 
