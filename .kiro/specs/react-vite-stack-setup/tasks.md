@@ -24,7 +24,12 @@
   - Testar classes utilitárias básicas
   - _Requirements: 2.1, 2.2_
 
-- [ ] 3. Configurar Shadcn/ui
+- [x] 3. Configurar Shadcn/ui
+
+
+
+
+
   - Instalar dependências do Shadcn/ui (class-variance-authority, clsx, tailwind-merge, lucide-react)
   - Executar comando de inicialização do Shadcn/ui
   - Configurar components.json com preferências do projeto
@@ -32,7 +37,12 @@
   - Criar exemplo de uso dos componentes
   - _Requirements: 2.2, 2.3_
 
-- [ ] 4. Configurar Firebase projeto e SDK
+- [x] 4. Configurar Firebase projeto e SDK
+
+
+
+
+
   - Criar projeto Firebase no console
   - Configurar Authentication e Firestore (sem Hosting)
   - Instalar Firebase SDK

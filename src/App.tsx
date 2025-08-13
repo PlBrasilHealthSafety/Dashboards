@@ -1,11 +1,19 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { testFirebaseConnection } from '@/lib/firebase-test'
 
 function App() {
   const [count, setCount] = useState(0)
+  const [inputValue, setInputValue] = useState('')
+
+  useEffect(() => {
+    // Test Firebase connection on app load
+    testFirebaseConnection()
+  }, [])
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -34,11 +42,24 @@ function App() {
             </Button>
           </div>
           
+          <div className="w-full max-w-md space-y-2">
+            <Input 
+              placeholder="Type something here..." 
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+            />
+            {inputValue && (
+              <p className="text-sm text-muted-foreground">
+                You typed: <span className="font-medium">{inputValue}</span>
+              </p>
+            )}
+          </div>
+          
           <p className="text-muted-foreground text-center max-w-md">
             Edit <code className="bg-muted px-2 py-1 rounded text-sm">src/App.tsx</code> and save to test HMR
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
             <Card>
               <CardHeader>
                 <CardTitle>⚡ Vite</CardTitle>
@@ -66,6 +87,16 @@ function App() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm">Utility-first CSS with beautiful, accessible components</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>🔥 Firebase</CardTitle>
+                <CardDescription>Backend services</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm">Authentication & Firestore configured (check console for status)</p>
               </CardContent>
             </Card>
           </div>
