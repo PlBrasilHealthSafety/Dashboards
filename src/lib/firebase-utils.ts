@@ -1,8 +1,6 @@
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
-    signInWithPopup,
-    GoogleAuthProvider,
     signOut,
     onAuthStateChanged,
     type User,
@@ -55,19 +53,6 @@ export const signOutUser = async () => {
     }
 };
 
-export const signInWithGoogle = async () => {
-    try {
-        const provider = new GoogleAuthProvider();
-        provider.addScope('email');
-        provider.addScope('profile');
-        
-        const result = await signInWithPopup(auth, provider);
-        return result.user;
-    } catch (error) {
-        console.error('Error signing in with Google:', error);
-        throw error;
-    }
-};
 
 export const onAuthStateChange = (callback: NextOrObserver<User>) => {
     return onAuthStateChanged(auth, callback);
