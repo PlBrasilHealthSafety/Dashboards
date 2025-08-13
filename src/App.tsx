@@ -13,6 +13,7 @@ import { FirestoreExample } from '@/components/examples/FirestoreExample'
 import { FormExample } from '@/components/examples/FormExample'
 import CarouselExample from '@/components/examples/CarouselExample'
 import { ChartsExample } from '@/components/examples/ChartsExample'
+import { FramerMotionExample } from '@/components/examples/FramerMotionExample'
 import { useAuth } from '@/hooks/useAuth'
 
 function AppContent() {
@@ -138,6 +139,11 @@ function AppContent() {
           {/* Charts Examples */}
           <div className="mt-12">
             <ChartsExample />
+          </div>
+          
+          {/* Framer Motion Examples */}
+          <div className="mt-12">
+            <FramerMotionExample />
           </div>
           
           {/* Firestore Database Example */}

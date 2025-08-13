@@ -115,7 +115,12 @@
   - Criar exemplos com dados mockados
   - _Requirements: 5.2_
 
-- [ ] 10. Integrar Framer Motion
+- [x] 10. Integrar Framer Motion
+
+
+
+
+
   - Instalar Framer Motion
   - Criar componentes de animação reutilizáveis
   - Implementar animações de página (page transitions)
@@ -123,7 +128,12 @@
   - Criar animações de hover e interação
   - _Requirements: 5.3_
 
-- [ ] 11. Configurar Vercel para deploy
+- [x] 11. Configurar Vercel para deploy
+
+
+
+
+
   - Instalar Vercel CLI
   - Configurar vercel.json para otimizações
   - Configurar variáveis de ambiente no Vercel
@@ -132,6 +142,10 @@
   - _Requirements: 3.4_
 
 - [ ] 12. Otimizar estrutura do projeto
+
+
+
+
   - Organizar componentes em pastas lógicas (ui/, custom/, layout/)
   - Criar barrel exports (index.ts) para imports limpos
   - Configurar path aliases no TypeScript (@/components, @/lib, etc.)
