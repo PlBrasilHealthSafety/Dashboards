@@ -89,7 +89,12 @@
   - Criar componentes de formulário reutilizáveis
   - _Requirements: 4.1, 4.2, 4.3_
 
-- [ ] 8. Integrar Swiper.js
+- [x] 8. Integrar Swiper.js
+
+
+
+
+
   - Instalar Swiper.js e dependências
   - Criar componente Carousel reutilizável
   - Configurar estilos CSS para Swiper
@@ -97,7 +102,12 @@
   - Tornar componente responsivo
   - _Requirements: 5.1_
 
-- [ ] 9. Integrar Recharts
+- [x] 9. Integrar Recharts
+
+
+
+
+
   - Instalar Recharts
   - Criar componentes de gráficos básicos (LineChart, BarChart, PieChart)
   - Configurar temas e cores consistentes com design system

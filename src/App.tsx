@@ -11,6 +11,8 @@ import { UserProfile } from '@/components/custom/UserProfile'
 import { ContactForm } from '@/components/custom/ContactForm'
 import { FirestoreExample } from '@/components/examples/FirestoreExample'
 import { FormExample } from '@/components/examples/FormExample'
+import CarouselExample from '@/components/examples/CarouselExample'
+import { ChartsExample } from '@/components/examples/ChartsExample'
 import { useAuth } from '@/hooks/useAuth'
 
 function AppContent() {
@@ -126,6 +128,16 @@ function AppContent() {
               <ContactForm />
               <FormExample />
             </div>
+          </div>
+          
+          {/* Carousel Examples */}
+          <div className="mt-12">
+            <CarouselExample />
+          </div>
+          
+          {/* Charts Examples */}
+          <div className="mt-12">
+            <ChartsExample />
           </div>
           
           {/* Firestore Database Example */}
