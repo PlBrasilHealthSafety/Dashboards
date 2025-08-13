@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { PageTransition } from '@/components/custom'
+import { PageTransition, ProtectedRoute, PublicRoute } from '@/components/custom'
 import { AppLayout } from '@/components/layout'
 
 // Lazy load all pages for code splitting
@@ -23,50 +23,96 @@ export function AppRoutes() {
   return (
     <Suspense fallback={<LoadingFallback />}>
       <Routes>
-        <Route path="/" element={<AppLayout />}>
-          <Route index element={<Navigate to="/home" replace />} />
+        {/* Root redirect */}
+        <Route index element={<Navigate to="/auth" replace />} />
+        
+        {/* Public auth route */}
+        <Route
+          path="/auth"
+          element={
+            <PublicRoute>
+              <PageTransition>
+                <AuthPage />
+              </PageTransition>
+            </PublicRoute>
+          }
+        />
+        
+        {/* Protected routes with AppLayout */}
+        <Route 
+          path="/home" 
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route
-            path="home"
+            index
             element={
               <PageTransition>
                 <HomePage />
               </PageTransition>
             }
           />
+        </Route>
+        
+        <Route 
+          path="/components" 
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route
-            path="components"
+            index
             element={
               <PageTransition>
                 <ComponentsPage />
               </PageTransition>
             }
           />
+        </Route>
+        
+        <Route 
+          path="/database" 
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route
-            path="database"
+            index
             element={
               <PageTransition>
                 <DatabasePage />
               </PageTransition>
             }
           />
+        </Route>
+        
+        <Route 
+          path="/forms" 
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route
-            path="forms"
+            index
             element={
               <PageTransition>
                 <FormsPage />
               </PageTransition>
             }
           />
-          <Route
-            path="auth"
-            element={
-              <PageTransition>
-                <AuthPage />
-              </PageTransition>
-            }
-          />
-          <Route path="*" element={<Navigate to="/home" replace />} />
         </Route>
+        
+        {/* Fallback redirect */}
+        <Route path="*" element={<Navigate to="/auth" replace />} />
       </Routes>
     </Suspense>
   )

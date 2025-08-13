@@ -1,12 +1,13 @@
 import { useState, useEffect, createContext, useContext } from 'react';
 import type { User } from 'firebase/auth';
-import { onAuthStateChange, signInUser, createUser, signOutUser } from '../lib/firebase-utils';
+import { onAuthStateChange, signInUser, createUser, signOutUser, signInWithGoogle } from '../lib/firebase-utils';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<User>;
   signUp: (email: string, password: string) => Promise<User>;
+  signInWithGoogle: () => Promise<User>;
   signOut: () => Promise<void>;
 }
 
@@ -55,6 +56,15 @@ export const useAuthActions = () => {
     }
   };
 
+  const handleSignInWithGoogle = async (): Promise<User> => {
+    try {
+      const user = await signInWithGoogle();
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const signOut = async (): Promise<void> => {
     try {
       await signOutUser();
@@ -63,7 +73,7 @@ export const useAuthActions = () => {
     }
   };
 
-  return { signIn, signUp, signOut };
+  return { signIn, signUp, signInWithGoogle: handleSignInWithGoogle, signOut };
 };
 
 export { AuthContext };

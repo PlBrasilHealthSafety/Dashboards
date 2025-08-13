@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '../../hooks/useAuth';
@@ -15,6 +16,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const navigate = useNavigate();
   const { signUp } = useAuth();
 
   const {
@@ -31,6 +33,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
 
     try {
       await signUp(data.email, data.password);
+      // Redirecionar para home após cadastro bem-sucedido
+      navigate('/home');
     } catch (error: any) {
       setError(error.message || 'Erro ao criar conta');
     } finally {

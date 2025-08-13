@@ -7,13 +7,14 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const { user, loading } = useAuthState();
-  const { signIn, signUp, signOut } = useAuthActions();
+  const { signIn, signUp, signInWithGoogle, signOut } = useAuthActions();
 
   const value: AuthContextType = {
     user,
     loading,
     signIn,
     signUp,
+    signInWithGoogle,
     signOut,
   };
 
