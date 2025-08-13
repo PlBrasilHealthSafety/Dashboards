@@ -1,17 +1,5 @@
 import { type Timestamp } from 'firebase/firestore';
 
-// User profile model
-export interface UserProfile {
-  id: string;
-  uid: string; // Firebase Auth UID
-  email: string;
-  displayName: string;
-  photoURL?: string;
-  bio?: string;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
-}
-
 // Post model
 export interface Post {
   id: string;

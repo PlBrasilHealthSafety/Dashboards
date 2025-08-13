@@ -1,3 +1,3 @@
-// Custom hooks barrel export
+// Hooks barrel export
 export { useAuth } from './useAuth'
-export { useFirestore } from './useFirestore'
+export { useFirestoreCRUD, useCollection, useDocument } from './useFirestore'

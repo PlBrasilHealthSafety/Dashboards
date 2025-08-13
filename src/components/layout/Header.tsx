@@ -2,7 +2,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 
 export function Header() {
-  const { user, logout } = useAuth()
+  const { user, signOut } = useAuth()
 
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -13,7 +13,7 @@ export function Header() {
             <span className="text-sm text-muted-foreground">
               {user.email}
             </span>
-            <Button variant="outline" size="sm" onClick={logout}>
+            <Button variant="outline" size="sm" onClick={signOut}>
               Logout
             </Button>
           </div>

@@ -1,12 +1,12 @@
 import { FirestoreService } from './firestore-services';
 import type { 
-  UserProfile, 
   Post, 
   Comment, 
   Category, 
   Analytics, 
   Notification 
 } from './firestore-models';
+import type { UserProfile } from './types';
 
 // Collection services - pre-configured for each data model
 export const userProfileService = new FirestoreService<UserProfile>('users');
@@ -35,7 +35,8 @@ export const firestoreHelpers = {
       email,
       displayName,
       bio: '',
-      photoURL: ''
+      photoURL: '',
+      role: 'user' as const
     };
     
     return await userProfileService.create(userData);

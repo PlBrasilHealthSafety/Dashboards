@@ -1,4 +1,5 @@
-import { ContactForm, FormExample } from '@/components/custom'
+import { ContactForm } from '@/components/custom'
+import { AdvancedFormExample } from '@/components/examples'
 
 export function FormsPage() {
   return (
@@ -7,7 +8,7 @@ export function FormsPage() {
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <ContactForm />
-        <FormExample />
+        <AdvancedFormExample />
       </div>
     </div>
   )

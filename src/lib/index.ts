@@ -1,8 +1,10 @@
-// Library utilities barrel export
+// Library barrel export
+export { auth, db } from './firebase'
+export { default as app } from './firebase'
+export * from './firebase-utils'
+export * from './firestore-collections'
+export * from './firestore-models'
+export * from './firestore-services'
 export * from './types'
 export * from './utils'
 export * from './validations'
-export * from './firebase-utils'
-export * from './firestore-services'
-export * from './firestore-models'
-export * from './firestore-collections'
