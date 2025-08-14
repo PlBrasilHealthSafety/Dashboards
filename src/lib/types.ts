@@ -19,12 +19,14 @@ export interface FirestoreDocument {
   updatedAt: Timestamp;
 }
 
-// User profile document for PLBrasil Health&Safety
+// Example user profile document
 export interface UserProfile extends FirestoreDocument {
   uid: string;
   email: string;
   displayName?: string;
   photoURL?: string;
+  // Supported roles in the app
+  // 'diretoria' can see all sectors; 'medicina' and 'comercial' see only their own
   role: 'diretoria' | 'medicina' | 'comercial';
 }
 
