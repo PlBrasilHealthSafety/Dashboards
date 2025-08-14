@@ -19,13 +19,13 @@ export interface FirestoreDocument {
   updatedAt: Timestamp;
 }
 
-// Example user profile document
+// User profile document for PLBrasil Health&Safety
 export interface UserProfile extends FirestoreDocument {
   uid: string;
   email: string;
   displayName?: string;
   photoURL?: string;
-  role: 'user' | 'admin';
+  role: 'diretoria' | 'medicina' | 'comercial';
 }
 
 // Example collection document types
