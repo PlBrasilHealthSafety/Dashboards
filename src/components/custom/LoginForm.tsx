@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -14,6 +15,7 @@ interface LoginFormProps {
 export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   
   const navigate = useNavigate();
   const { signIn } = useAuth();
@@ -26,6 +28,42 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
     resolver: zodResolver(loginSchema),
   });
 
+  // Função para traduzir erros do Firebase
+  const translateFirebaseError = (errorMessage: string): string => {
+    const errorTranslations: Record<string, string> = {
+      'auth/invalid-credential': 'Email ou senha incorretos. Verifique suas credenciais e tente novamente.',
+      'auth/user-not-found': 'Usuário não encontrado. Verifique o email informado.',
+      'auth/wrong-password': 'Senha incorreta. Tente novamente.',
+      'auth/invalid-email': 'Email inválido. Verifique o formato do email.',
+      'auth/user-disabled': 'Esta conta foi desabilitada. Entre em contato com o suporte.',
+      'auth/too-many-requests': 'Muitas tentativas de login. Tente novamente em alguns minutos.',
+      'auth/network-request-failed': 'Erro de conexão. Verifique sua internet e tente novamente.',
+      'auth/weak-password': 'Senha muito fraca. Use pelo menos 6 caracteres.',
+      'auth/email-already-in-use': 'Este email já está sendo usado por outra conta.',
+      'auth/operation-not-allowed': 'Operação não permitida. Entre em contato com o suporte.',
+      'auth/requires-recent-login': 'Por segurança, faça login novamente para continuar.',
+    };
+
+    // Procurar por códigos de erro específicos
+    for (const [firebaseError, translation] of Object.entries(errorTranslations)) {
+      if (errorMessage.includes(firebaseError)) {
+        return translation;
+      }
+    }
+
+    // Verificar padrões comuns
+    if (errorMessage.toLowerCase().includes('network')) {
+      return 'Erro de conexão. Verifique sua internet e tente novamente.';
+    }
+    
+    if (errorMessage.toLowerCase().includes('timeout')) {
+      return 'Tempo limite excedido. Tente novamente.';
+    }
+
+    // Mensagem genérica para erros não mapeados
+    return 'Erro ao fazer login. Verifique suas credenciais e tente novamente.';
+  };
+
   const onSubmit = async (data: LoginFormData) => {
     setLoading(true);
     setError('');
@@ -35,7 +73,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
       // Redirecionar para home após login bem-sucedido
       navigate('/home');
     } catch (error: any) {
-      setError(error.message || 'Erro ao fazer login');
+      const friendlyError = translateFirebaseError(error.message || 'Erro desconhecido');
+      setError(friendlyError);
     } finally {
       setLoading(false);
     }
@@ -77,13 +116,27 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
           <label htmlFor="password" className="text-sm font-medium text-foreground">
             Senha
           </label>
-          <Input
-            id="password"
-            type="password"
-            placeholder="••••••••"
-            className="h-11 border-2 focus:border-primary placeholder:text-muted-foreground/60"
-            {...register('password')}
-          />
+          <div className="relative">
+            <Input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              className="h-11 border-2 focus:border-primary placeholder:text-muted-foreground/60 pr-12"
+              {...register('password')}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
+          </div>
           {errors.password && (
             <p className="text-destructive text-sm">{errors.password.message}</p>
           )}
