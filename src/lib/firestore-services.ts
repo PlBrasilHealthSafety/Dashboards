@@ -19,7 +19,7 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 import type { UserProfile } from './types';
-import { UserProfileService } from './user-profile-service';
+
 
 // Generic CRUD service class
 export class FirestoreService<T extends DocumentData> {
@@ -154,5 +154,6 @@ export const queryConstraints = {
 
 // Backward-compatible helper to avoid runtime errors where older code imported from this module
 export async function getUserProfile(uid: string): Promise<UserProfile | null> {
-  return UserProfileService.getUserProfile(uid);
+  const userService = new FirestoreService<UserProfile>('users');
+  return userService.getById(uid);
 }

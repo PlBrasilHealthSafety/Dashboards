@@ -1,7 +1,13 @@
 import { useMemo } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Carousel } from '@/components/custom/Carousel'
-import { ChartsExample } from '@/components/examples/ChartsExample'
+import { ExecutiveLayoutDashboard } from '@/components/custom/ExecutiveLayoutDashboard'
+import { 
+  MedicalOverviewSlide, 
+  WeeklyTrendSlide, 
+  GoalsVsActualSlide, 
+  IndicatorsSlide,
+  AnnualAnalysisSlide
+} from '@/components/custom/MedicalDashboard'
 import { useAuth } from '@/hooks/useAuth'
 import { useDocument } from '@/hooks/useFirestore'
 
@@ -14,83 +20,92 @@ export function HomePage() {
   const role: Role = profile?.role || 'diretoria'
 
   const carouselItems = useMemo(() => {
-    const baseSlides = [
-      { id: 1, content: <ChartsExample /> },
-      { id: 2, content: <ChartsExample /> },
-      { id: 3, content: <ChartsExample /> },
-      { id: 4, content: <ChartsExample /> },
-      { id: 5, content: <ChartsExample /> },
-      { id: 6, content: <ChartsExample /> },
-      { id: 7, content: <ChartsExample /> },
-      { id: 8, content: <ChartsExample /> },
+    // 8 slides diferentes, cada um com 30 segundos
+    const slides = [
+      { id: 1, content: <MedicalOverviewSlide /> },
+      { id: 2, content: <WeeklyTrendSlide /> },
+      { id: 3, content: <GoalsVsActualSlide /> },
+      { id: 4, content: <IndicatorsSlide /> },
+      { id: 5, content: <AnnualAnalysisSlide /> },
+      { id: 6, content: <MedicalOverviewSlide /> },
+      { id: 7, content: <WeeklyTrendSlide /> },
+      { id: 8, content: <GoalsVsActualSlide /> },
     ]
-    return baseSlides
+    return slides
   }, [])
 
-  return (
-    <div className="relative">
-      <div className="absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] h-72 w-72 rounded-full bg-teal-500/20 blur-3xl" />
-        <div className="absolute bottom-[-10%] right-[-10%] h-96 w-96 rounded-full bg-indigo-500/20 blur-3xl" />
-        <div className="absolute inset-0 bg-[radial-gradient(65%_65%_at_50%_0%,rgba(56,189,248,0.10)_0%,rgba(255,255,255,0)_60%)]" />
+  // Se for perfil de direção, mostra layout executivo completo
+  if (role === 'diretoria') {
+    return (
+      <div className="relative">
+        {/* Carousel centralizado no topo */}
+        <div className="flex justify-center p-6">
+          <div className="w-full max-w-5xl">
+            <Carousel
+              items={carouselItems}
+              className="rounded-2xl shadow-2xl overflow-hidden"
+              slidesPerView={1}
+              spaceBetween={0}
+              loop
+              centeredSlides
+              showNavigation
+              showPagination
+              autoplay={{ 
+                delay: 30000, // 30 segundos por slide
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Dashboard executivo completo */}
+        <ExecutiveLayoutDashboard />
       </div>
+    )
+  }
 
-      <div className="space-y-6">
-        <div className="text-center">
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Bem-vinda(o) ao seu painel</h2>
-          <p className="text-sm text-muted-foreground mt-2">Visualização de métricas {role === 'diretoria' ? 'de todos os setores' : `do setor de ${role}`}</p>
+  // Para outros perfis, layout mais simples
+  return (
+    <div className="relative min-h-screen bg-gray-50">
+      <div className="p-6">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+            Dashboard {role === 'medicina' ? 'Medicina' : 'Comercial'}
+          </h1>
+          <p className="text-gray-600 mt-2">
+            Métricas específicas do setor de {role}
+          </p>
         </div>
 
-        <div className="mx-auto w-full max-w-6xl">
-          <Carousel
-            items={carouselItems}
-            className="rounded-xl bg-background/50 shadow-lg p-2"
-            slidesPerView={1}
-            spaceBetween={16}
-            loop
-            centeredSlides
-            showNavigation
-            showPagination
-            autoplay={{ delay: 3750, disableOnInteraction: false }}
-            // 8 slides in 30s -> ~3750ms per slide
-          />
+        {/* Carousel centralizado */}
+        <div className="flex justify-center mb-8">
+          <div className="w-full max-w-5xl">
+            <Carousel
+              items={carouselItems}
+              className="rounded-2xl shadow-2xl overflow-hidden"
+              slidesPerView={1}
+              spaceBetween={0}
+              loop
+              centeredSlides
+              showNavigation
+              showPagination
+              autoplay={{ 
+                delay: 30000, // 30 segundos por slide
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true
+              }}
+            />
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {(role === 'diretoria' || role === 'medicina') && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Métricas - Medicina</CardTitle>
-                <CardDescription>Indicadores do setor de saúde</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ChartsExample />
-              </CardContent>
-            </Card>
-          )}
-
-          {(role === 'diretoria' || role === 'comercial') && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Métricas - Comercial</CardTitle>
-                <CardDescription>Indicadores do setor comercial</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ChartsExample />
-              </CardContent>
-            </Card>
-          )}
-
-          {role === 'diretoria' && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Visão Geral - Direção</CardTitle>
-                <CardDescription>Sumário de todos os setores</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ChartsExample />
-              </CardContent>
-            </Card>
+        {/* Dashboard específico do setor */}
+        <div className="max-w-7xl mx-auto">
+          {role === 'medicina' ? (
+            <MedicalOverviewSlide />
+          ) : (
+            <GoalsVsActualSlide />
           )}
         </div>
       </div>
