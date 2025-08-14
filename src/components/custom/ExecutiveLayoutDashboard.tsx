@@ -50,7 +50,7 @@ export const ExecutiveLayoutDashboard = () => {
               >
                 PLBrasil Health & Safety
               </span>
-              {' '}• Visão Executiva
+              {' '}• Visão da Direção
             </h2>
             <p className="text-xs text-muted-foreground">Consolidado de metas e indicadores por setor</p>
           </div>

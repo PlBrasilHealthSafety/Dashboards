@@ -1,6 +1,7 @@
 import { useAuth } from '@/hooks/useAuth'
 import { useState, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
+import { User } from 'lucide-react'
 
 export function Header() {
   const { user, signOut } = useAuth()
@@ -15,28 +16,26 @@ export function Header() {
   }, [])
 
   return (
-    <header className="relative border-b overflow-hidden">
-      {/* Deep teal gradient background with subtle brand glows */}
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,#0c1f22_0%,#0f2d33_100%)]" />
-      <div className="absolute inset-0 pointer-events-none">
-        {/* Left spotlight to highlight logo */}
-        <div className="absolute -left-24 top-0 h-64 w-96 bg-[radial-gradient(closest-side,rgba(0,162,152,0.35),transparent_70%)] blur-2xl" />
-        {/* Right accent */}
-        <div className="absolute right-0 top-0 h-72 w-96 bg-[radial-gradient(closest-side,rgba(29,60,68,0.35),transparent_70%)] blur-2xl" />
-      </div>
-      <div className="relative z-10 max-w-[1600px] mx-auto px-6 py-4 flex items-center gap-6">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-md">
+      <div className="absolute inset-0 bg-white" />
+      <div className="relative z-10 w-full px-6 py-4 flex items-center">
         <div className="flex items-center gap-4">
-          <div className="rounded-md ring-1 ring-[#00A298]/30 bg-black/30 p-1 shadow-[0_0_20px_rgba(0,162,152,0.35)]">
-            <img src={logoSrc} onError={handleLogoError} alt="PLBrasil" className="h-9 sm:h-11 w-auto select-none drop-shadow-[0_2px_12px_rgba(0,162,152,0.35)]" draggable={false} />
+          <div className="rounded-md ring-1 ring-[#00A298]/40 bg-white p-2 shadow-lg">
+            <img src={logoSrc} onError={handleLogoError} alt="PLBrasil" className="h-8 sm:h-10 w-auto select-none" draggable={false} />
           </div>
-          <h1 className="text-[22px] sm:text-2xl font-extrabold tracking-tight bg-clip-text text-transparent" style={{ backgroundImage: 'linear-gradient(90deg, #26d9cc, #0f3a40)' }}>
+          <h1 className="text-[22px] sm:text-2xl font-extrabold tracking-tight text-slate-800">
             Health & Safety Dashboard
           </h1>
         </div>
         {user && (
-          <div className="ml-auto flex items-center gap-4">
-            <span className="text-sm text-white/85 hidden sm:block">{user.email}</span>
-            <Button variant="outline" size="sm" className="border-white/20 hover:border-white/30" onClick={signOut}>
+          <div className="absolute right-6 flex items-center gap-3">
+            <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200">
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#00A298]/10 border border-[#00A298]/30">
+                <User className="w-4 h-4 text-[#00A298]" />
+              </div>
+              <span className="text-sm font-medium text-slate-700 hidden sm:block">{user.email}</span>
+            </div>
+            <Button variant="outline" size="sm" className="border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400" onClick={signOut}>
               Logout
             </Button>
           </div>
