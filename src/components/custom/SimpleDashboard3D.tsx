@@ -1,7 +1,7 @@
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { Suspense, useState } from 'react'
-import { SimpleBarChart, SimplePieChart, SimpleMetrics } from './SimpleThreeJS'
+import { SimpleBarChart, SimplePieChart, SimpleMetrics, SimpleDashboardGrid } from './SimpleThreeJS'
 
 function Lights() {
   return (
@@ -85,232 +85,92 @@ export function SimpleDashboard3D() {
         <Suspense fallback={null}>
           <Lights />
           
-          {/* Cantos superiores da tela - expandidos */}
+          {/* Cantos - Componentes maiores e menos quantidade */}
           <SimpleBarChart 
-            position={[-20, 14, -6]} 
+            position={[-18, 12, -8]} 
             isAnimationStarted={isAnimationStarted}
-            orbitRadius={4}
-            orbitSpeed={0.3}
-            scale={1.2}
+            orbitRadius={6}
+            orbitSpeed={0.2}
+            scale={2.5}
             delayMultiplier={0}
           />
           <SimplePieChart 
-            position={[20, 14, -7]} 
+            position={[18, 12, -10]} 
             isAnimationStarted={isAnimationStarted}
-            orbitRadius={5}
-            orbitSpeed={-0.2}
-            scale={1.3}
-            delayMultiplier={0.5}
-          />
-          
-          {/* Cantos inferiores da tela - expandidos */}
-          <SimpleMetrics 
-            position={[-20, -14, -8]} 
-            isAnimationStarted={isAnimationStarted}
-            orbitRadius={3.5}
-            orbitSpeed={0.4}
-            scale={1.1}
+            orbitRadius={7}
+            orbitSpeed={-0.15}
+            scale={2.8}
             delayMultiplier={1}
           />
-          <SimpleBarChart 
-            position={[20, -14, -5]} 
+          <SimpleDashboardGrid 
+            position={[-18, -12, -12]} 
             isAnimationStarted={isAnimationStarted}
-            orbitRadius={4.5}
-            orbitSpeed={-0.25}
-            scale={1.0}
-            delayMultiplier={1.5}
-          />
-          
-          {/* Bordas laterais esquerda - expandidas */}
-          <SimplePieChart 
-            position={[-25, 0, -9]} 
-            isAnimationStarted={isAnimationStarted}
-            orbitRadius={3.8}
-            orbitSpeed={0.35}
-            scale={1.1}
+            orbitRadius={5.5}
+            orbitSpeed={0.25}
+            scale={2.2}
             delayMultiplier={2}
           />
           <SimpleMetrics 
-            position={[-22, 7, -9]} 
+            position={[18, -12, -6]} 
             isAnimationStarted={isAnimationStarted}
-            orbitRadius={5.2}
-            orbitSpeed={-0.15}
-            scale={0.9}
-            delayMultiplier={2.5}
-          />
-          <SimpleBarChart 
-            position={[-23, -7, -4]} 
-            isAnimationStarted={isAnimationStarted}
-            orbitRadius={3.2}
-            orbitSpeed={0.45}
-            scale={0.8}
+            orbitRadius={6.5}
+            orbitSpeed={-0.18}
+            scale={2.0}
             delayMultiplier={3}
           />
           
-          {/* Bordas laterais direita - expandidas */}
-          <SimpleBarChart 
-            position={[25, 3, -10]} 
-            isAnimationStarted={isAnimationStarted}
-            orbitRadius={4.8}
-            orbitSpeed={-0.18}
-            scale={1.2}
-            delayMultiplier={3.5}
-          />
+          {/* Laterais - Componentes distribuídos */}
           <SimplePieChart 
-            position={[22, -4, -6]} 
+            position={[-25, 0, -15]} 
             isAnimationStarted={isAnimationStarted}
-            orbitRadius={4.2}
-            orbitSpeed={-0.28}
-            scale={1.05}
+            orbitRadius={8}
+            orbitSpeed={0.12}
+            scale={2.4}
             delayMultiplier={4}
           />
-          <SimpleMetrics 
-            position={[23, 8, -8]} 
+          <SimpleBarChart 
+            position={[25, 0, -8]} 
             isAnimationStarted={isAnimationStarted}
-            orbitRadius={4.6}
-            orbitSpeed={0.26}
-            scale={1.0}
-            delayMultiplier={4.5}
-          />
-          
-          {/* Borda superior - expandida */}
-          <SimplePieChart 
-            position={[-10, 16, -11]} 
-            isAnimationStarted={isAnimationStarted}
-            orbitRadius={5.5}
-            orbitSpeed={0.22}
-            scale={0.85}
+            orbitRadius={7.5}
+            orbitSpeed={-0.14}
+            scale={2.6}
             delayMultiplier={5}
           />
-          <SimpleBarChart 
-            position={[0, 17, -5]} 
+          
+          {/* Centro-fundo - Componentes de apoio */}
+          <SimpleDashboardGrid 
+            position={[0, 8, -20]} 
             isAnimationStarted={isAnimationStarted}
-            orbitRadius={2.8}
-            orbitSpeed={-0.42}
-            scale={1.15}
-            delayMultiplier={5.5}
-          />
-          <SimpleMetrics 
-            position={[10, 16, -12]} 
-            isAnimationStarted={isAnimationStarted}
-            orbitRadius={5.8}
-            orbitSpeed={0.16}
-            scale={0.75}
+            orbitRadius={9}
+            orbitSpeed={0.08}
+            scale={1.8}
             delayMultiplier={6}
           />
-          
-          {/* Borda inferior - expandida */}
-          <SimpleBarChart 
-            position={[-7, -16, -6]} 
+          <SimpleMetrics 
+            position={[0, -8, -18]} 
             isAnimationStarted={isAnimationStarted}
-            orbitRadius={3.9}
-            orbitSpeed={-0.38}
-            scale={0.9}
-            delayMultiplier={6.5}
-          />
-          <SimplePieChart 
-            position={[7, -16, -14]} 
-            isAnimationStarted={isAnimationStarted}
-            orbitRadius={4.9}
-            orbitSpeed={-0.21}
-            scale={0.8}
+            orbitRadius={8.5}
+            orbitSpeed={-0.1}
+            scale={2.1}
             delayMultiplier={7}
           />
-          <SimpleMetrics 
-            position={[0, -17, -15]} 
-            isAnimationStarted={isAnimationStarted}
-            orbitRadius={4.4}
-            orbitSpeed={0.29}
-            scale={0.75}
-            delayMultiplier={7.5}
-          />
           
-          {/* Componentes de fundo distantes - reposicionados */}
+          {/* Componentes próximos para profundidade */}
           <SimpleBarChart 
-            position={[15, 10, -15]} 
+            position={[12, 6, -4]} 
             isAnimationStarted={isAnimationStarted}
-            orbitRadius={6.2}
-            orbitSpeed={-0.12}
-            scale={0.7}
+            orbitRadius={4}
+            orbitSpeed={0.35}
+            scale={3.0}
             delayMultiplier={8}
           />
           <SimplePieChart 
-            position={[-15, -10, -16]} 
+            position={[-12, -6, -3]} 
             isAnimationStarted={isAnimationStarted}
-            orbitRadius={6.5}
-            orbitSpeed={0.14}
-            scale={0.6}
-            delayMultiplier={8.5}
-          />
-          <SimpleMetrics 
-            position={[13, -9, -17]} 
-            isAnimationStarted={isAnimationStarted}
-            orbitRadius={5.7}
-            orbitSpeed={-0.17}
-            scale={0.7}
+            orbitRadius={4.5}
+            orbitSpeed={-0.4}
+            scale={3.2}
             delayMultiplier={9}
-          />
-          
-          {/* Componentes próximos espalhados - melhor distribuição */}
-          <SimpleBarChart 
-            position={[8, 4, -3]} 
-            isAnimationStarted={isAnimationStarted}
-            orbitRadius={3.8}
-            orbitSpeed={0.52}
-            scale={1.3}
-            delayMultiplier={9.5}
-          />
-          <SimplePieChart 
-            position={[-8, -5, -2]} 
-            isAnimationStarted={isAnimationStarted}
-            orbitRadius={3.5}
-            orbitSpeed={-0.58}
-            scale={1.4}
-            delayMultiplier={10}
-          />
-          <SimpleMetrics 
-            position={[4, 9, -4]} 
-            isAnimationStarted={isAnimationStarted}
-            orbitRadius={4.0}
-            orbitSpeed={0.48}
-            scale={1.2}
-            delayMultiplier={10.5}
-          />
-          
-          {/* Componentes adicionais para cobertura completa */}
-          <SimpleBarChart 
-            position={[-13, 4, -13]} 
-            isAnimationStarted={isAnimationStarted}
-            orbitRadius={5.1}
-            orbitSpeed={0.19}
-            scale={0.65}
-            delayMultiplier={11}
-          />
-          <SimplePieChart 
-            position={[12, -8, -7]} 
-            isAnimationStarted={isAnimationStarted}
-            orbitRadius={4.7}
-            orbitSpeed={0.32}
-            scale={0.95}
-            delayMultiplier={11.5}
-          />
-          
-          {/* Componentes extras para cobertura uniforme */}
-          <SimpleMetrics 
-            position={[-18, 10, -10]} 
-            isAnimationStarted={isAnimationStarted}
-            orbitRadius={4.3}
-            orbitSpeed={-0.22}
-            scale={0.8}
-            delayMultiplier={12}
-          />
-          <SimpleBarChart 
-            position={[18, -12, -8]} 
-            isAnimationStarted={isAnimationStarted}
-            orbitRadius={3.9}
-            orbitSpeed={0.35}
-            scale={0.85}
-            delayMultiplier={12.5}
           />
           
           <OrbitControls 

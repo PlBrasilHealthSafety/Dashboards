@@ -323,3 +323,105 @@ export function SimpleMetrics({
     </group>
   )
 }
+
+export function SimpleDashboardGrid({ 
+  position, 
+  isAnimationStarted, 
+  orbitRadius = 3, 
+  orbitSpeed = 0.3, 
+  scale = 1,
+  delayMultiplier = 0
+}: ComponentProps) {
+  const groupRef = useRef<Group>(null)
+  const [opacity, setOpacity] = useState(0)
+  const [animationProgress, setAnimationProgress] = useState(0)
+  const [dynamicScale, setDynamicScale] = useState(scale)
+  const basePosition = useRef<Vector3>(new Vector3(...position))
+  
+  useEffect(() => {
+    if (isAnimationStarted) {
+      const delay = delayMultiplier * 200
+      
+      const timer = setTimeout(() => {
+        const startTime = Date.now()
+        const duration = 1700 + Math.random() * 900
+        
+        const animate = () => {
+          const elapsed = Date.now() - startTime
+          const progress = Math.min(elapsed / duration, 1)
+          
+          const easeOutCubic = 1 - Math.pow(1 - progress, 3)
+          
+          setAnimationProgress(easeOutCubic)
+          setOpacity(easeOutCubic * 1.0)
+          
+          if (progress < 1) {
+            requestAnimationFrame(animate)
+          }
+        }
+        
+        animate()
+      }, delay)
+      
+      return () => clearTimeout(timer)
+    }
+  }, [isAnimationStarted, delayMultiplier])
+
+  useFrame((state) => {
+    if (groupRef.current && isAnimationStarted && animationProgress > 0.3) {
+      const time = state.clock.elapsedTime
+      
+      // Movimento orbital suave
+      const orbitX = Math.cos(time * orbitSpeed * 1.1) * orbitRadius * 0.9
+      const orbitY = Math.sin(time * orbitSpeed * 0.9) * (orbitRadius * 0.5)
+      const orbitZ = Math.sin(time * orbitSpeed * 0.7) * (orbitRadius * 0.3)
+      
+      // Calcular posição atual e escala dinâmica
+      const currentX = basePosition.current.x + orbitX * animationProgress
+      const currentY = basePosition.current.y + orbitY * animationProgress
+      const currentZ = basePosition.current.z + orbitZ * animationProgress
+      
+      setDynamicScale(calculateDynamicScale(currentX, currentY, currentZ, scale))
+      
+      // Rotações sutis
+      groupRef.current.rotation.x = Math.sin(time * 0.3) * 0.2
+      groupRef.current.rotation.y = time * 0.15
+      groupRef.current.rotation.z = Math.cos(time * 0.4) * 0.1
+      
+      groupRef.current.position.set(currentX, currentY, currentZ)
+    }
+  })
+
+  // Grid de dashboard 3x3
+  const gridCells = []
+  const colors = ['#2E86AB', '#6A994E', '#F18F01', '#C73E1D', '#A23B72']
+  
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      gridCells.push({
+        position: [(i - 1) * 0.7, (j - 1) * 0.7, 0],
+        color: colors[(i + j) % colors.length],
+        height: 0.3 + Math.random() * 0.4
+      })
+    }
+  }
+
+  return (
+    <group ref={groupRef} scale={dynamicScale}>
+      {gridCells.map((cell, index) => (
+        <mesh key={index} position={cell.position as [number, number, number]}>
+          <boxGeometry args={[0.5, 0.5, cell.height]} />
+          <meshStandardMaterial 
+            color={cell.color}
+            transparent
+            opacity={opacity}
+            emissive={cell.color}
+            emissiveIntensity={0.45}
+            roughness={0.3}
+            metalness={0.2}
+          />
+        </mesh>
+      ))}
+    </group>
+  )
+}
