@@ -69,3 +69,5 @@ export { PageTransition } from './PageTransition'
 // Dashboard components
 export { ExecutiveLayoutDashboard } from './ExecutiveLayoutDashboard'
 export * from './MedicalDashboard'
+export * from './HeroSlides'
+export { DetailedSectorAnalysis } from './DetailedSectorAnalysis'
