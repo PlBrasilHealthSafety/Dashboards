@@ -1,6 +1,7 @@
 import { useState, useEffect, createContext, useContext } from 'react';
 import type { User } from 'firebase/auth';
 import { onAuthStateChange, signInUser, createUser, signOutUser, signInWithGoogle } from '../lib/firebase-utils';
+import { UserProfileService } from '../lib/user-profile-service';
 
 interface AuthContextType {
   user: User | null;
@@ -26,9 +27,23 @@ export const useAuthState = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChange((user) => {
-      setUser(user);
+    const unsubscribe = onAuthStateChange(async (authUser) => {
+      setUser(authUser);
       setLoading(false);
+
+      // Garantir perfil do usuário existente após autenticação
+      if (authUser?.uid && authUser.email) {
+        try {
+          await UserProfileService.ensureUserProfile(
+            authUser.uid,
+            authUser.email,
+            authUser.displayName || undefined,
+          );
+        } catch (err) {
+          // Evitar quebrar a UI por erros de permissão/latência
+          console.warn('Não foi possível garantir o perfil do usuário no carregamento:', err);
+        }
+      }
     });
 
     return unsubscribe;
@@ -41,6 +56,12 @@ export const useAuthActions = () => {
   const signIn = async (email: string, password: string): Promise<User> => {
     try {
       const user = await signInUser(email, password);
+      // Criar/garantir perfil imediatamente após login
+      try {
+        await UserProfileService.ensureUserProfile(user.uid, user.email || '', user.displayName || undefined);
+      } catch (err) {
+        console.warn('Falha ao garantir perfil após login:', err);
+      }
       return user;
     } catch (error) {
       throw error;
@@ -50,6 +71,12 @@ export const useAuthActions = () => {
   const signUp = async (email: string, password: string): Promise<User> => {
     try {
       const user = await createUser(email, password);
+      // Criar perfil padrão ao registrar
+      try {
+        await UserProfileService.ensureUserProfile(user.uid, user.email || '', user.displayName || undefined);
+      } catch (err) {
+        console.warn('Falha ao garantir perfil após registro:', err);
+      }
       return user;
     } catch (error) {
       throw error;
@@ -59,6 +86,12 @@ export const useAuthActions = () => {
   const handleSignInWithGoogle = async (): Promise<User> => {
     try {
       const user = await signInWithGoogle();
+      // Garantir perfil para login via Google
+      try {
+        await UserProfileService.ensureUserProfile(user.uid, user.email || '', user.displayName || undefined);
+      } catch (err) {
+        console.warn('Falha ao garantir perfil após login com Google:', err);
+      }
       return user;
     } catch (error) {
       throw error;

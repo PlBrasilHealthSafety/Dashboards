@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
-import { UserProfile } from '@/lib/types'
-import { getUserProfile } from '@/lib/firestore-services'
+import type { UserProfile } from '@/lib/types'
+import { UserProfileService } from '@/lib/user-profile-service'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Pagination, Autoplay, EffectFade } from 'swiper/modules'
 import { DirectorDashboard } from '@/components/custom/DirectorDashboard'
@@ -31,13 +31,17 @@ export function HomePage() {
     const fetchUserProfile = async () => {
       if (user) {
         try {
-          const profile = await getUserProfile(user.uid)
+          const profile = await UserProfileService.ensureUserProfile(
+            user.uid,
+            user.email || '',
+            user.displayName || undefined,
+          )
           if (profile) {
             setUserProfile(profile)
             setCurrentView(profile.role)
           }
         } catch (error) {
-          console.error('Erro ao buscar perfil do usuário:', error)
+          console.error('Erro ao garantir perfil do usuário:', error)
         }
       }
       setLoading(false)

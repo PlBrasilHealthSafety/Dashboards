@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp, type FieldValue } from 'firebase/firestore';
 import { db } from './firebase';
 import type { UserProfile } from './types';
 
@@ -13,14 +13,22 @@ export class UserProfileService {
     try {
       const userRef = doc(db, 'users', uid);
       
-      const profileData: Omit<UserProfile, 'id'> = {
+      const profileData: {
+        uid: string
+        email: string
+        displayName?: string
+        photoURL?: string
+        role: 'diretoria' | 'medicina' | 'comercial'
+        createdAt: FieldValue
+        updatedAt: FieldValue
+      } = {
         uid,
         email,
-        displayName: displayName || null,
-        photoURL: null,
+        displayName: displayName ?? undefined,
+        photoURL: undefined,
         role,
         createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
       };
 
       await setDoc(userRef, profileData, { merge: true });
@@ -58,8 +66,8 @@ export class UserProfileService {
       
       await updateDoc(userRef, {
         ...updates,
-        updatedAt: serverTimestamp()
-      });
+        updatedAt: serverTimestamp(),
+      } as any);
       
       console.log('Perfil de usuário atualizado:', uid);
     } catch (error) {
@@ -75,18 +83,43 @@ export class UserProfileService {
     displayName?: string
   ): Promise<UserProfile> {
     try {
-      let profile = await this.getUserProfile(uid);
-      
-      if (!profile) {
-        // Se não existe, criar com role padrão 'diretoria'
-        await this.createUserProfile(uid, email, displayName, 'diretoria');
+      let profile: UserProfile | null = null;
+
+      // Primeiro tenta buscar; se falhar por permissão, vamos criar e buscar novamente
+      try {
         profile = await this.getUserProfile(uid);
+      } catch (err: any) {
+        const maybeCode = (err && (err.code || err?.name)) as string | undefined;
+        if (!maybeCode || (maybeCode && maybeCode.includes('permission'))) {
+          // Ignora para tentar criar abaixo
+          console.warn('Leitura do perfil falhou, tentando criar e refazer leitura...', err);
+        } else {
+          throw err;
+        }
       }
-      
+
+      if (!profile) {
+        // Se não existe (ou leitura falhou), criar com role padrão 'diretoria'
+        await this.createUserProfile(uid, email, displayName, 'diretoria');
+        // Tentar buscar novamente, se ainda falhar apenas retorna objeto mínimo
+        try {
+          profile = await this.getUserProfile(uid);
+        } catch (err) {
+          console.warn('Releitura do perfil após criação falhou. Retornando perfil mínimo.', err);
+          profile = {
+            id: uid,
+            uid,
+            email,
+            displayName,
+            role: 'diretoria',
+          } as UserProfile;
+        }
+      }
+
       if (!profile) {
         throw new Error('Não foi possível criar ou recuperar perfil de usuário');
       }
-      
+
       return profile;
     } catch (error) {
       console.error('Erro ao garantir perfil de usuário:', error);

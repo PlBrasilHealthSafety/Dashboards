@@ -1,15 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { UserProfile } from '@/lib/types'
-import { getUserProfile } from '@/lib/firestore-services'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Avatar, AvatarFallback, AvatarImage } from '@/components/ui'
+import type { UserProfile } from '@/lib/types'
+import { UserProfileService } from '@/lib/user-profile-service'
 
 export function Header() {
   const { user, signOut } = useAuth()
@@ -18,7 +12,7 @@ export function Header() {
 
   useEffect(() => {
     if (user) {
-      getUserProfile(user.uid).then(profile => {
+      UserProfileService.getUserProfile(user.uid).then((profile: UserProfile | null) => {
         if (profile) {
           setUserProfile(profile)
           setCurrentView(profile.role)
