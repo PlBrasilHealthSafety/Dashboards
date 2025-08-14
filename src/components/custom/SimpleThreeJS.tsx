@@ -194,10 +194,10 @@ export function SimplePieChart({
       
       setDynamicScale(calculateDynamicScale(currentX, currentY, currentZ, scale))
       
-      // Rotações contínuas
+      // Rotações limitadas para evitar bug visual
       groupRef.current.rotation.z = time * 0.3
-      groupRef.current.rotation.x = Math.sin(time * 0.5) * 0.2
-      groupRef.current.rotation.y = Math.cos(time * 0.4) * 0.3
+      groupRef.current.rotation.x = Math.sin(time * 0.5) * 0.15  // Limitado
+      groupRef.current.rotation.y = Math.cos(time * 0.4) * 0.1   // Muito limitado
       
       groupRef.current.position.set(currentX, currentY, currentZ)
     }
@@ -222,6 +222,7 @@ export function SimplePieChart({
               emissiveIntensity={0.5}
               roughness={0.2}
               metalness={0.2}
+              side={2}
             />
           </mesh>
         )
@@ -324,7 +325,7 @@ export function SimpleMetrics({
   )
 }
 
-export function SimpleDashboardGrid({ 
+export function SimpleLineChart({ 
   position, 
   isAnimationStarted, 
   orbitRadius = 3, 
@@ -371,10 +372,10 @@ export function SimpleDashboardGrid({
     if (groupRef.current && isAnimationStarted && animationProgress > 0.3) {
       const time = state.clock.elapsedTime
       
-      // Movimento orbital suave
-      const orbitX = Math.cos(time * orbitSpeed * 1.1) * orbitRadius * 0.9
-      const orbitY = Math.sin(time * orbitSpeed * 0.9) * (orbitRadius * 0.5)
-      const orbitZ = Math.sin(time * orbitSpeed * 0.7) * (orbitRadius * 0.3)
+      // Movimento orbital fluido
+      const orbitX = Math.cos(time * orbitSpeed * 1.2) * orbitRadius * 0.8
+      const orbitY = Math.sin(time * orbitSpeed * 0.8) * (orbitRadius * 0.6)
+      const orbitZ = Math.sin(time * orbitSpeed * 0.6) * (orbitRadius * 0.4)
       
       // Calcular posição atual e escala dinâmica
       const currentX = basePosition.current.x + orbitX * animationProgress
@@ -384,44 +385,72 @@ export function SimpleDashboardGrid({
       setDynamicScale(calculateDynamicScale(currentX, currentY, currentZ, scale))
       
       // Rotações sutis
-      groupRef.current.rotation.x = Math.sin(time * 0.3) * 0.2
-      groupRef.current.rotation.y = time * 0.15
-      groupRef.current.rotation.z = Math.cos(time * 0.4) * 0.1
+      groupRef.current.rotation.x = Math.sin(time * 0.4) * 0.2
+      groupRef.current.rotation.y = time * 0.2
+      groupRef.current.rotation.z = Math.cos(time * 0.3) * 0.15
       
       groupRef.current.position.set(currentX, currentY, currentZ)
     }
   })
 
-  // Grid de dashboard 3x3
-  const gridCells = []
-  const colors = ['#2E86AB', '#6A994E', '#F18F01', '#C73E1D', '#A23B72']
-  
-  for (let i = 0; i < 3; i++) {
-    for (let j = 0; j < 3; j++) {
-      gridCells.push({
-        position: [(i - 1) * 0.7, (j - 1) * 0.7, 0],
-        color: colors[(i + j) % colors.length],
-        height: 0.3 + Math.random() * 0.4
-      })
-    }
-  }
+  // Dados do line chart
+  const dataPoints = [
+    { x: -2.5, y: 0.3, color: '#2E86AB' },
+    { x: -1.5, y: 0.8, color: '#6A994E' },
+    { x: -0.5, y: 0.5, color: '#F18F01' },
+    { x: 0.5, y: 1.2, color: '#C73E1D' },
+    { x: 1.5, y: 0.9, color: '#A23B72' },
+    { x: 2.5, y: 1.4, color: '#577590' },
+  ]
 
   return (
     <group ref={groupRef} scale={dynamicScale}>
-      {gridCells.map((cell, index) => (
-        <mesh key={index} position={cell.position as [number, number, number]}>
-          <boxGeometry args={[0.5, 0.5, cell.height]} />
+      {/* Pontos do gráfico */}
+      {dataPoints.map((point, index) => (
+        <mesh key={`point-${index}`} position={[point.x, point.y, 0]}>
+          <sphereGeometry args={[0.15, 8, 8]} />
           <meshStandardMaterial 
-            color={cell.color}
+            color={point.color}
             transparent
             opacity={opacity}
-            emissive={cell.color}
-            emissiveIntensity={0.45}
-            roughness={0.3}
-            metalness={0.2}
+            emissive={point.color}
+            emissiveIntensity={0.6}
+            roughness={0.2}
+            metalness={0.3}
           />
         </mesh>
       ))}
+      
+      {/* Linhas conectando os pontos */}
+      {dataPoints.slice(0, -1).map((point, index) => {
+        const nextPoint = dataPoints[index + 1]
+        const midX = (point.x + nextPoint.x) / 2
+        const midY = (point.y + nextPoint.y) / 2
+        const length = Math.sqrt(
+          Math.pow(nextPoint.x - point.x, 2) + 
+          Math.pow(nextPoint.y - point.y, 2)
+        )
+        const angle = Math.atan2(nextPoint.y - point.y, nextPoint.x - point.x)
+        
+        return (
+          <mesh 
+            key={`line-${index}`} 
+            position={[midX, midY, 0]}
+            rotation={[0, 0, angle]}
+          >
+            <cylinderGeometry args={[0.04, 0.04, length, 8]} />
+            <meshStandardMaterial 
+              color={point.color}
+              transparent
+              opacity={opacity * 0.8}
+              emissive={point.color}
+              emissiveIntensity={0.3}
+              roughness={0.3}
+              metalness={0.2}
+            />
+          </mesh>
+        )
+      })}
     </group>
   )
 }

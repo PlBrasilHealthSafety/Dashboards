@@ -1,7 +1,7 @@
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { Suspense, useState } from 'react'
-import { SimpleBarChart, SimplePieChart, SimpleMetrics, SimpleDashboardGrid } from './SimpleThreeJS'
+import { SimpleBarChart, SimplePieChart, SimpleMetrics, SimpleLineChart } from './SimpleThreeJS'
 
 function Lights() {
   return (
@@ -102,7 +102,7 @@ export function SimpleDashboard3D() {
             scale={2.8}
             delayMultiplier={1}
           />
-          <SimpleDashboardGrid 
+          <SimpleLineChart 
             position={[-18, -12, -12]} 
             isAnimationStarted={isAnimationStarted}
             orbitRadius={5.5}
@@ -138,7 +138,7 @@ export function SimpleDashboard3D() {
           />
           
           {/* Centro-fundo - Componentes de apoio */}
-          <SimpleDashboardGrid 
+          <SimpleLineChart 
             position={[0, 8, -20]} 
             isAnimationStarted={isAnimationStarted}
             orbitRadius={9}
