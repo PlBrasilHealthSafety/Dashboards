@@ -43,7 +43,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
 
 
   return (
-    <div className="p-8">
+    <div className="p-8 bg-gradient-to-br from-white via-[#AECECB]/10 to-[#00A298]/5 backdrop-blur-sm border border-white/20 rounded-2xl shadow-2xl">
       {/* Logo */}
       <div className="flex justify-center mb-8">
         <div className="relative w-32 h-32">
