@@ -300,9 +300,9 @@ export function SimpleMetrics({
   })
 
   const metrics = [
-    { position: [0, 0, 0], color: '#2E86AB' },      // Azul - métrica principal
-    { position: [1.5, 0, 0], color: '#6A994E' },    // Verde - métrica positiva
-    { position: [-1.5, 0, 0], color: '#577590' },   // Azul acinzentado - métrica secundária
+    { position: [0, 0, 0], color: '#C73E1D' },      // Vermelho - atenção/alertas
+    { position: [1.5, 0, 0], color: '#6A994E' },    // Verde - sucesso/crescimento
+    { position: [-1.5, 0, 0], color: '#F18F01' },   // Laranja - destaque/mudança
   ]
 
   return (
