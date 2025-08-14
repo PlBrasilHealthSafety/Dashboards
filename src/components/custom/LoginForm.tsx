@@ -16,6 +16,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   
   const navigate = useNavigate();
   const { signIn } = useAuth();
@@ -69,7 +70,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
     setError('');
 
     try {
-      await signIn(data.email, data.password);
+      await signIn(data.email, data.password, rememberMe);
       // Redirecionar para home após login bem-sucedido
       navigate('/home');
     } catch (error: any) {
@@ -147,6 +148,19 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
             <p className="text-destructive text-sm">{error}</p>
           </div>
         )}
+
+        <div className="flex items-center space-x-2">
+          <input
+            id="remember-me"
+            type="checkbox"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+            className="h-4 w-4 rounded border-2 border-input text-primary focus:ring-1 focus:ring-primary"
+          />
+          <label htmlFor="remember-me" className="text-sm text-foreground cursor-pointer">
+            Lembrar de mim
+          </label>
+        </div>
 
         <div className="pt-4">
           <Button type="submit" className="w-full h-11 text-base font-medium" disabled={loading}>

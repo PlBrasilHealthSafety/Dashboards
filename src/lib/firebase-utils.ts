@@ -3,6 +3,9 @@ import {
     signInWithEmailAndPassword,
     signOut,
     onAuthStateChanged,
+    setPersistence,
+    browserLocalPersistence,
+    browserSessionPersistence,
     type User,
     type NextOrObserver
 } from 'firebase/auth';
@@ -40,6 +43,21 @@ export const signInUser = async (email: string, password: string) => {
         return userCredential.user;
     } catch (error) {
         console.error('Error signing in:', error);
+        throw error;
+    }
+};
+
+export const signInUserWithPersistence = async (email: string, password: string, rememberMe: boolean = false) => {
+    try {
+        // Configurar persistência baseada na escolha do usuário
+        const persistence = rememberMe ? browserLocalPersistence : browserSessionPersistence;
+        await setPersistence(auth, persistence);
+        
+        // Fazer login após configurar persistência
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        return userCredential.user;
+    } catch (error) {
+        console.error('Error signing in with persistence:', error);
         throw error;
     }
 };
