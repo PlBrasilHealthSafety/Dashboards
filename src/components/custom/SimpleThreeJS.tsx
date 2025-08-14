@@ -42,11 +42,11 @@ export function SimpleBarChart({
   const basePosition = useRef<Vector3>(new Vector3(...position))
 
   const data = [
-    { value: 80, color: '#00A298' },
-    { value: 65, color: '#1D3C44' },
-    { value: 90, color: '#AECECB' },
-    { value: 45, color: '#00A298' },
-    { value: 75, color: '#1D3C44' },
+    { value: 80, color: '#2E86AB' },  // Azul profundo - dados estáveis
+    { value: 65, color: '#6A994E' },  // Verde - crescimento
+    { value: 90, color: '#F18F01' },  // Laranja - destaque
+    { value: 45, color: '#C73E1D' },  // Vermelho - atenção
+    { value: 75, color: '#A23B72' },  // Magenta - diferenciação
   ]
 
   useEffect(() => {
@@ -65,7 +65,7 @@ export function SimpleBarChart({
           const easeOutCubic = 1 - Math.pow(1 - progress, 3)
           
           setAnimationProgress(easeOutCubic)
-          setOpacity(easeOutCubic * 0.7)
+          setOpacity(easeOutCubic * 1.0)
           
           if (progress < 1) {
             requestAnimationFrame(animate)
@@ -118,7 +118,7 @@ export function SimpleBarChart({
             transparent 
             opacity={opacity}
             emissive={item.color}
-            emissiveIntensity={0.15}
+            emissiveIntensity={0.4}
             roughness={0.3}
             metalness={0.1}
           />
@@ -143,10 +143,10 @@ export function SimplePieChart({
   const basePosition = useRef<Vector3>(new Vector3(...position))
   
   const segments = [
-    { angle: 90, color: '#00A298' },
-    { angle: 120, color: '#1D3C44' },
-    { angle: 80, color: '#AECECB' },
-    { angle: 70, color: '#00A298' },
+    { angle: 90, color: '#2E86AB' },   // Azul profundo - principal
+    { angle: 120, color: '#6A994E' },  // Verde - sucesso
+    { angle: 80, color: '#F18F01' },   // Laranja - atenção
+    { angle: 70, color: '#A23B72' },   // Magenta - categoria especial
   ]
 
   useEffect(() => {
@@ -164,7 +164,7 @@ export function SimplePieChart({
           const easeOutCubic = 1 - Math.pow(1 - progress, 3)
           
           setAnimationProgress(easeOutCubic)
-          setOpacity(easeOutCubic * 0.8)
+          setOpacity(easeOutCubic * 1.0)
           
           if (progress < 1) {
             requestAnimationFrame(animate)
@@ -219,7 +219,7 @@ export function SimplePieChart({
               transparent
               opacity={opacity}
               emissive={segment.color}
-              emissiveIntensity={0.2}
+              emissiveIntensity={0.5}
               roughness={0.2}
               metalness={0.2}
             />
@@ -259,7 +259,7 @@ export function SimpleMetrics({
           const easeOutCubic = 1 - Math.pow(1 - progress, 3)
           
           setAnimationProgress(easeOutCubic)
-          setOpacity(easeOutCubic * 0.75)
+          setOpacity(easeOutCubic * 1.0)
           
           if (progress < 1) {
             requestAnimationFrame(animate)
@@ -299,9 +299,9 @@ export function SimpleMetrics({
   })
 
   const metrics = [
-    { position: [0, 0, 0], color: '#00A298' },
-    { position: [1.5, 0, 0], color: '#1D3C44' },
-    { position: [-1.5, 0, 0], color: '#AECECB' },
+    { position: [0, 0, 0], color: '#2E86AB' },      // Azul - métrica principal
+    { position: [1.5, 0, 0], color: '#6A994E' },    // Verde - métrica positiva
+    { position: [-1.5, 0, 0], color: '#577590' },   // Azul acinzentado - métrica secundária
   ]
 
   return (
@@ -314,7 +314,7 @@ export function SimpleMetrics({
             transparent
             opacity={opacity}
             emissive={metric.color}
-            emissiveIntensity={0.25}
+            emissiveIntensity={0.6}
             roughness={0.4}
             metalness={0.15}
           />
