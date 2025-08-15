@@ -304,20 +304,6 @@ export function SimplePieChart({
               />
             </mesh>
             
-            {/* Camada de glow */}
-            <mesh rotation={[Math.PI / 2, 0, 0]} scale={[1.1, 1.1, 1]}>
-              <ringGeometry args={[0.35, radius + 0.15, 16, 1, startAngle, (segment.angle * Math.PI) / 180]} />
-              <meshStandardMaterial 
-                color={segment.color}
-                transparent
-                opacity={opacity * 0.4}
-                emissive={segment.color}
-                emissiveIntensity={1.4 + pulseIntensity * 0.8}
-                roughness={0.8}
-                metalness={0.2}
-                side={2}
-              />
-            </mesh>
             
             {/* Wireframe tecnológico */}
             <mesh rotation={[Math.PI / 2, 0, 0]}>
