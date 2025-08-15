@@ -95,7 +95,8 @@ export const Carousel: React.FC<CarouselProps> = ({
         breakpoints={breakpoints}
         onSlideChange={onSlideChange}
         onSwiper={onSwiper}
-        className="carousel-swiper"
+        className="carousel-swiper h-full"
+        style={{ height: '100%' }}
       >
         {items.map((item) => (
           <SwiperSlide key={item.id} className="carousel-slide">

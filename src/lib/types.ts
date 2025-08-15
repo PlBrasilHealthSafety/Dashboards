@@ -25,7 +25,9 @@ export interface UserProfile extends FirestoreDocument {
   email: string;
   displayName?: string;
   photoURL?: string;
-  role: 'user' | 'admin';
+  // Supported roles in the app
+  // 'diretoria' can see all sectors; 'medicina' and 'comercial' see only their own
+  role: 'diretoria' | 'medicina' | 'comercial';
 }
 
 // Example collection document types
