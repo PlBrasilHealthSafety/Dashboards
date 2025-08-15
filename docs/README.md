@@ -7,6 +7,14 @@ This directory contains comprehensive documentation for the React + Firebase app
 ### Setup Guides
 - **[FIREBASE_SETUP.md](./FIREBASE_SETUP.md)** - Complete Firebase project setup guide
 - **[FIRESTORE_SETUP.md](./FIRESTORE_SETUP.md)** - Firestore database configuration and usage
+- **[GOOGLE_AUTH_SETUP.md](./GOOGLE_AUTH_SETUP.md)** - Google Authentication configuration
+- **[VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md)** - Vercel deployment guide
+- **[DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md)** - Pre-deployment checklist
+
+### Development Guides
+- **[DEVELOPMENT_WORKFLOW.md](./DEVELOPMENT_WORKFLOW.md)** - Complete development workflow guide
+- **[COMPONENTS_GUIDE.md](./COMPONENTS_GUIDE.md)** - Comprehensive components documentation
+- **[QUICK_START.md](./QUICK_START.md)** - Quick start guide for new developers
 
 ## Quick Start
 
@@ -18,9 +26,15 @@ This directory contains comprehensive documentation for the React + Firebase app
 
 ```
 docs/
-├── README.md              # This file - documentation overview
-├── FIREBASE_SETUP.md      # Firebase project setup and configuration
-└── FIRESTORE_SETUP.md     # Firestore database setup and usage
+├── README.md                    # This file - documentation overview
+├── FIREBASE_SETUP.md            # Firebase project setup and configuration
+├── FIRESTORE_SETUP.md           # Firestore database setup and usage
+├── GOOGLE_AUTH_SETUP.md         # Google Authentication setup
+├── VERCEL_DEPLOYMENT.md         # Vercel deployment guide
+├── DEPLOYMENT_CHECKLIST.md      # Pre-deployment checklist
+├── DEVELOPMENT_WORKFLOW.md      # Complete development workflow
+├── COMPONENTS_GUIDE.md          # Components documentation
+└── QUICK_START.md               # Quick start guide
 ```
 
 ## Key Topics Covered

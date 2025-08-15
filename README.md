@@ -25,6 +25,8 @@ Um projeto completo e moderno de dashboard com React, TypeScript, Vite e integra
 - **Framer Motion** - Animações declarativas
 - **Swiper.js** - Carrosséis responsivos
 - **Recharts** - Gráficos e visualizações
+- **Three.js + React Three Fiber** - Gráficos 3D
+- **@react-three/drei** - Utilitários para Three.js
 - **Lucide React** - Ícones modernos
 
 ### Backend e Database
@@ -111,61 +113,101 @@ npm test            # Executa testes (não configurado ainda)
 dashboards/
 ├── src/
 │   ├── components/
-│   │   ├── ui/           # Componentes Shadcn/ui
+│   │   ├── ui/           # Componentes Shadcn/ui base
 │   │   ├── custom/       # Componentes customizados
-│   │   ├── layout/       # Layout (Header, Footer, etc)
-│   │   └── examples/     # Exemplos de uso
+│   │   │   ├── Auth*.tsx # Componentes de autenticação
+│   │   │   ├── *Dashboard.tsx # Dashboards especializados
+│   │   │   ├── *Form.tsx # Formulários customizados
+│   │   │   └── Animated*.tsx # Componentes animados
+│   │   ├── layout/       # Layout (Header, Footer, Sidebar)
+│   │   └── examples/     # Exemplos de uso e demos
 │   ├── pages/            # Páginas da aplicação
+│   │   ├── HomePage.tsx  # Página inicial
+│   │   ├── *Page.tsx     # Páginas específicas
+│   │   └── TVDashboard.tsx # Dashboard para TV
 │   ├── routes/           # Configuração de rotas
 │   ├── hooks/            # Custom hooks
+│   │   ├── useAuth.ts    # Hook de autenticação
+│   │   └── useFirestore.ts # Hook do Firestore
 │   ├── lib/              # Utilitários e configurações
-│   │   ├── firebase.ts   # Configuração Firebase
+│   │   ├── firebase*.ts  # Configuração Firebase
+│   │   ├── firestore-*.ts # Serviços Firestore
 │   │   ├── types.ts      # Types globais
-│   │   └── validations.ts # Schemas de validação
-│   ├── styles/           # Estilos globais
+│   │   ├── validations.ts # Schemas Zod
+│   │   └── utils.ts      # Utilitários gerais
+│   ├── styles/           # Estilos adicionais
+│   │   └── carousel.css  # Estilos do carrossel
 │   └── main.tsx          # Entry point
-├── public/               # Assets públicos
-├── docs/                 # Documentação adicional
-└── scripts/              # Scripts de automação
+├── public/               # Assets públicos e logos
+├── docs/                 # Documentação detalhada
+├── scripts/              # Scripts de automação
+│   ├── setup-vercel-env.js # Setup Vercel
+│   └── verify-deployment.js # Verificação deploy
+└── .kiro/                # Configuração Kiro IDE
+    ├── hooks/            # Hooks do agente
+    ├── specs/            # Especificações
+    └── steering/         # Regras de direcionamento
 ```
 
 ## 🎯 Features Implementadas
 
 ### 🔐 Autenticação
 - Login/Registro com Firebase Auth
-- Proteção de rotas
-- Gerenciamento de sessão
-- Perfil de usuário
+- Proteção de rotas (ProtectedRoute/PublicRoute)
+- Gerenciamento de sessão com AuthProvider
+- Perfil de usuário completo
+- Hooks customizados (useAuth)
 
 ### 🎨 Componentes UI
-- Sistema de design consistente
-- Componentes reutilizáveis
-- Dark/Light mode ready
-- Totalmente responsivo
+- Sistema de design Shadcn/ui (New York style)
+- Componentes reutilizáveis e acessíveis
+- Dark/Light mode ready com CSS variables
+- Layout responsivo com AppLayout
+- Header, Footer e Sidebar modulares
 
-### 📊 Visualizações
-- Gráficos interativos (linha, barra, pizza)
-- Carrosséis customizáveis
-- Animações suaves
-- Transições de página
+### 📊 Visualizações e Dashboards
+- Gráficos interativos com Recharts (linha, barra, pizza)
+- Dashboard 3D com Three.js e React Three Fiber
+- Dashboard médico especializado
+- Dashboard executivo com análise setorial
+- Carrosséis customizáveis com Swiper.js
+- Slides para TV Dashboard
+
+### 🎬 Animações
+- Framer Motion para animações declarativas
+- Componentes animados de entrada/saída
+- Transições de página suaves
+- Animações interativas
+- PageTransition wrapper
 
 ### 📝 Formulários
+- React Hook Form + Zod validation
+- Formulários de contato e autenticação
+- Campos customizados (FormField, SimpleFormField)
 - Validação em tempo real
 - Mensagens de erro claras
-- Suporte a múltiplos tipos
-- Integração com backend
 
-### 🗄️ Database
-- CRUD completo com Firestore
-- Real-time updates
-- Queries otimizadas
-- Type-safe operations
+### 🗄️ Database e Backend
+- Firebase v12 com Firestore
+- CRUD completo com hooks customizados
+- Real-time updates com useFirestore
+- Modelos de dados tipados
+- Serviços organizados por coleção
+- Regras de segurança configuradas
+
+### 🏗️ Arquitetura
+- Estrutura modular bem organizada
+- Separação clara de responsabilidades
+- Hooks customizados reutilizáveis
+- Tipos TypeScript centralizados
+- Utilitários e validações separados
 
 ### ⚡ Performance
-- Code splitting automático
+- Code splitting automático por vendor
 - Lazy loading de rotas
-- Otimização de bundles
+- Otimização de bundles com Vite
 - Cache inteligente
+- Chunks manuais otimizados
 
 ## 🚀 Deploy
 
@@ -192,8 +234,17 @@ npm run build
 
 ## 📚 Documentação Adicional
 
+### Configuração e Setup
 - [Configuração do Firebase](./docs/FIREBASE_SETUP.md)
 - [Setup do Firestore](./docs/FIRESTORE_SETUP.md)
+- [Configuração Google Auth](./docs/GOOGLE_AUTH_SETUP.md)
+- [Guia de Início Rápido](./docs/QUICK_START.md)
+
+### Desenvolvimento
+- [Workflow de Desenvolvimento](./docs/DEVELOPMENT_WORKFLOW.md)
+- [Guia de Componentes](./docs/COMPONENTS_GUIDE.md)
+
+### Deploy e Produção
 - [Deploy no Vercel](./docs/VERCEL_DEPLOYMENT.md)
 - [Checklist de Deploy](./docs/DEPLOYMENT_CHECKLIST.md)
 
@@ -202,26 +253,60 @@ npm run build
 ### Autenticação
 ```typescript
 import { useAuth } from '@/hooks/useAuth'
+import { AuthProvider } from '@/components/custom/AuthProvider'
+import { ProtectedRoute } from '@/components/custom/ProtectedRoute'
+
+function App() {
+  return (
+    <AuthProvider>
+      <ProtectedRoute>
+        <Dashboard />
+      </ProtectedRoute>
+    </AuthProvider>
+  )
+}
 
 function MyComponent() {
-  const { user, signIn, signOut } = useAuth()
+  const { user, signIn, signOut, loading } = useAuth()
   
-  // Use o usuário autenticado
-  if (user) {
-    return <div>Olá, {user.email}!</div>
-  }
+  if (loading) return <div>Carregando...</div>
+  if (user) return <div>Olá, {user.email}!</div>
+  
+  return <LoginForm onSubmit={signIn} />
 }
 ```
 
-### Firestore CRUD
+### Firestore com Hooks
 ```typescript
-import { useFirestoreCRUD } from '@/hooks/useFirestore'
+import { useFirestore } from '@/hooks/useFirestore'
 
-function MyComponent() {
-  const { create, update, remove } = useFirestoreCRUD('posts')
+function PostsList() {
+  const { 
+    documents: posts, 
+    loading, 
+    error,
+    addDocument,
+    updateDocument,
+    deleteDocument 
+  } = useFirestore('posts')
   
-  // Criar documento
-  await create({ title: 'Novo Post', content: '...' })
+  const handleCreate = async (data) => {
+    await addDocument({ ...data, createdAt: new Date() })
+  }
+  
+  if (loading) return <div>Carregando posts...</div>
+  if (error) return <div>Erro: {error.message}</div>
+  
+  return (
+    <div>
+      {posts.map(post => (
+        <Card key={post.id}>
+          <h3>{post.title}</h3>
+          <p>{post.content}</p>
+        </Card>
+      ))}
+    </div>
+  )
 }
 ```
 
@@ -229,21 +314,70 @@ function MyComponent() {
 ```typescript
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
+import { contactFormSchema } from '@/lib/validations'
+import { FormField } from '@/components/custom/FormField'
 
-const schema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8)
-})
-
-function MyForm() {
-  const { register, handleSubmit } = useForm({
-    resolver: zodResolver(schema)
+function ContactForm() {
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    resolver: zodResolver(contactFormSchema)
   })
   
-  // Use o formulário validado
+  const onSubmit = async (data) => {
+    // Processar dados do formulário
+    console.log(data)
+  }
+  
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <FormField
+        label="Email"
+        type="email"
+        {...register('email')}
+        error={errors.email?.message}
+      />
+      <FormField
+        label="Mensagem"
+        type="textarea"
+        {...register('message')}
+        error={errors.message?.message}
+      />
+      <Button type="submit">Enviar</Button>
+    </form>
+  )
 }
 ```
+
+### Dashboard 3D
+```typescript
+import { SimpleDashboard3D } from '@/components/custom/SimpleDashboard3D'
+
+function Dashboard() {
+  return (
+    <div className="h-screen">
+      <SimpleDashboard3D />
+    </div>
+  )
+}
+```
+
+### Animações com Framer Motion
+```typescript
+import { motion } from 'framer-motion'
+import { PageTransition } from '@/components/custom/PageTransition'
+
+function AnimatedPage() {
+  return (
+    <PageTransition>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1>Página Animada</h1>
+      </motion.div>
+    </PageTransition>
+  )
+}
 
 ## 🤝 Contribuindo
 

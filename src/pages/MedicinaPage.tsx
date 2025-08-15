@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
 import { Carousel } from '@/components/custom/Carousel'
-import { 
-  MedicalOverviewSlide, 
-  WeeklyTrendSlide, 
-  GoalsVsActualSlide, 
+import {
+  MedicalOverviewSlide,
+  WeeklyTrendSlide,
+  GoalsVsActualSlide,
   IndicatorsSlide,
   AnnualAnalysisSlide
 } from '@/components/custom/MedicalDashboard'
@@ -49,7 +49,7 @@ export function MedicinaPage() {
     <div className="relative min-h-screen bg-transparent">
       {/* Padrão de fundo sutil PLBrasil para tela toda */}
       <div className="fixed inset-0 -z-10 pointer-events-none bg-[radial-gradient(circle_at_30%_20%,rgba(0,162,152,0.08)_0%,transparent_50%),radial-gradient(circle_at_80%_80%,rgba(29,60,68,0.06)_0%,transparent_50%),radial-gradient(circle_at_40%_60%,rgba(174,206,203,0.04)_0%,transparent_30%)]"></div>
-      
+
       <div className="relative p-6">
         {/* Header */}
         <div className="text-center mb-8">
@@ -82,7 +82,7 @@ export function MedicinaPage() {
                     centeredSlides
                     showNavigation
                     showPagination
-                    autoplay={{ 
+                    autoplay={{
                       delay: 30000, // 30 segundos por slide
                       disableOnInteraction: false,
                       pauseOnMouseEnter: true
@@ -275,7 +275,7 @@ export function MedicinaPage() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                     <XAxis dataKey="mes" stroke="#64748b" fontSize={12} />
                     <YAxis stroke="#64748b" fontSize={12} />
-                    <Tooltip 
+                    <Tooltip
                       contentStyle={{
                         backgroundColor: 'white',
                         border: '1px solid #e2e8f0',
@@ -284,18 +284,18 @@ export function MedicinaPage() {
                       }}
                     />
                     <Legend />
-                    <Line 
-                      type="monotone" 
-                      dataKey="realizados" 
-                      stroke="#00A298" 
+                    <Line
+                      type="monotone"
+                      dataKey="realizados"
+                      stroke="#00A298"
                       strokeWidth={3}
                       dot={{ fill: '#00A298', strokeWidth: 2, r: 4 }}
                       name="Exames Realizados"
                     />
-                    <Line 
-                      type="monotone" 
-                      dataKey="agendados" 
-                      stroke="#1D3C44" 
+                    <Line
+                      type="monotone"
+                      dataKey="agendados"
+                      stroke="#1D3C44"
                       strokeWidth={2}
                       strokeDasharray="5 5"
                       dot={{ fill: '#1D3C44', strokeWidth: 1, r: 3 }}
