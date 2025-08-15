@@ -42,11 +42,11 @@ export function SimpleBarChart({
   const basePosition = useRef<Vector3>(new Vector3(...position))
 
   const data = [
-    { value: 80, color: '#2E86AB' },  // Azul profundo - dados estáveis
-    { value: 65, color: '#6A994E' },  // Verde - crescimento
-    { value: 90, color: '#F18F01' },  // Laranja - destaque
-    { value: 45, color: '#C73E1D' },  // Vermelho - atenção
-    { value: 75, color: '#A23B72' },  // Magenta - diferenciação
+    { value: 80, color: '#00A298' },  // Verde PLBrasil - elementos principais
+    { value: 65, color: '#1D3C44' },  // Verde Escuro - contraste e hierarquia
+    { value: 90, color: '#AECECB' },  // Verde Água - destaques suaves
+    { value: 45, color: '#00A298' },  // Verde PLBrasil - repetição para harmonia
+    { value: 75, color: '#1D3C44' },  // Verde Escuro - diferenciação
   ]
 
   useEffect(() => {
@@ -143,10 +143,10 @@ export function SimplePieChart({
   const basePosition = useRef<Vector3>(new Vector3(...position))
   
   const segments = [
-    { angle: 90, color: '#2E86AB' },   // Azul profundo - principal
-    { angle: 120, color: '#6A994E' },  // Verde - sucesso
-    { angle: 80, color: '#F18F01' },   // Laranja - atenção
-    { angle: 70, color: '#A23B72' },   // Magenta - categoria especial
+    { angle: 90, color: '#00A298' },   // Verde PLBrasil - principal
+    { angle: 120, color: '#1D3C44' },  // Verde Escuro - contraste
+    { angle: 80, color: '#AECECB' },   // Verde Água - destaques suaves
+    { angle: 70, color: '#00A298' },   // Verde PLBrasil - harmonia
   ]
 
   useEffect(() => {
@@ -300,9 +300,9 @@ export function SimpleMetrics({
   })
 
   const metrics = [
-    { position: [0, 0, 0], color: '#C73E1D' },      // Vermelho - atenção/alertas
-    { position: [1.5, 0, 0], color: '#6A994E' },    // Verde - sucesso/crescimento
-    { position: [-1.5, 0, 0], color: '#F18F01' },   // Laranja - destaque/mudança
+    { position: [0, 0, 0], color: '#00A298' },      // Verde PLBrasil - principal
+    { position: [1.5, 0, 0], color: '#1D3C44' },    // Verde Escuro - contraste
+    { position: [-1.5, 0, 0], color: '#AECECB' },   // Verde Água - destaques suaves
   ]
 
   return (
@@ -395,12 +395,12 @@ export function SimpleLineChart({
 
   // Dados do line chart
   const dataPoints = [
-    { x: -2.5, y: 0.3, color: '#2E86AB' },
-    { x: -1.5, y: 0.8, color: '#6A994E' },
-    { x: -0.5, y: 0.5, color: '#F18F01' },
-    { x: 0.5, y: 1.2, color: '#C73E1D' },
-    { x: 1.5, y: 0.9, color: '#A23B72' },
-    { x: 2.5, y: 1.4, color: '#577590' },
+    { x: -2.5, y: 0.3, color: '#00A298' },
+    { x: -1.5, y: 0.8, color: '#1D3C44' },
+    { x: -0.5, y: 0.5, color: '#AECECB' },
+    { x: 0.5, y: 1.2, color: '#00A298' },
+    { x: 1.5, y: 0.9, color: '#1D3C44' },
+    { x: 2.5, y: 1.4, color: '#AECECB' },
   ]
 
   return (
