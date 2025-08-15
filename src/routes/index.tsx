@@ -69,6 +69,61 @@ export function AppRoutes() {
             }
           />
         </Route>
+
+        {/* Rotas específicas por tipo de usuário */}
+        <Route 
+          path="/direcao" 
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route
+            index
+            element={
+              <PageTransition>
+                <HomePage />
+              </PageTransition>
+            }
+          />
+        </Route>
+
+        <Route 
+          path="/medicina" 
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route
+            index
+            element={
+              <PageTransition>
+                <HomePage />
+              </PageTransition>
+            }
+          />
+        </Route>
+
+        <Route 
+          path="/comercial" 
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route
+            index
+            element={
+              <PageTransition>
+                <HomePage />
+              </PageTransition>
+            }
+          />
+        </Route>
         
         <Route 
           path="/components" 

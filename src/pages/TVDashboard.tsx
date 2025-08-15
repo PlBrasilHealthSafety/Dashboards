@@ -11,9 +11,12 @@ import {
 import { BrandHeroSlideOne, BrandHeroSlideTwo, BrandHeroSlideThree } from '@/components/custom/HeroSlides'
 import { TVPieChartSlide, TVBarChartSlide, TVGoalsChartSlide } from '@/components/custom/TVChartSlides'
 import { X } from 'lucide-react'
+import { useAuth } from '@/hooks/useAuth'
+import { getUserRoute } from '@/lib/utils'
 
 export function TVDashboard() {
   const navigate = useNavigate()
+  const { user } = useAuth()
 
   const carouselItems = useMemo(() => {
     // 11 slides: 8 slides de imagens/conteúdo + 3 gráficos limpos
@@ -37,7 +40,8 @@ export function TVDashboard() {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        navigate('/home')
+        const userRoute = getUserRoute(user?.email || null)
+        navigate(userRoute)
       }
     }
 
@@ -51,7 +55,10 @@ export function TVDashboard() {
     <div className="fixed inset-0 bg-black overflow-hidden">
       {/* Botão flutuante discreto para voltar */}
       <button
-        onClick={() => navigate('/home')}
+        onClick={() => {
+          const userRoute = getUserRoute(user?.email || null)
+          navigate(userRoute)
+        }}
         className="fixed top-4 right-4 z-50 bg-black/20 hover:bg-black/40 text-white rounded-full p-3 opacity-70 hover:opacity-100 transition-all duration-300 group"
         title="Pressione ESC ou clique para voltar ao dashboard"
       >

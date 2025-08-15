@@ -6,6 +6,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { registerSchema, type RegisterFormData } from '../../lib/validations';
+import { getUserRoute } from '@/lib/utils';
 
 interface RegisterFormProps {
   onToggleMode?: () => void;
@@ -31,9 +32,10 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
     setError('');
 
     try {
-      await signUp(data.email, data.password);
-      // Redirecionar para home após cadastro bem-sucedido
-      navigate('/home');
+      const user = await signUp(data.email, data.password);
+      // Redirecionar para a rota específica do usuário após cadastro bem-sucedido
+      const userRoute = getUserRoute(user.email);
+      navigate(userRoute);
     } catch (error: any) {
       setError(error.message || 'Erro ao criar conta');
     } finally {
