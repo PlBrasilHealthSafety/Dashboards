@@ -5,6 +5,9 @@ import { AppLayout } from '@/components/layout'
 
 // Lazy load all pages for code splitting
 const HomePage = lazy(() => import('@/pages/HomePage').then(module => ({ default: module.HomePage })))
+const DirecaoPage = lazy(() => import('@/pages/DirecaoPage').then(module => ({ default: module.DirecaoPage })))
+const MedicinaPage = lazy(() => import('@/pages/MedicinaPage').then(module => ({ default: module.MedicinaPage })))
+const ComercialPage = lazy(() => import('@/pages/ComercialPage').then(module => ({ default: module.ComercialPage })))
 const TVDashboard = lazy(() => import('@/pages/TVDashboard').then(module => ({ default: module.TVDashboard })))
 const ComponentsPage = lazy(() => import('@/pages/ComponentsPage').then(module => ({ default: module.ComponentsPage })))
 const DatabasePage = lazy(() => import('@/pages/DatabasePage').then(module => ({ default: module.DatabasePage })))
@@ -83,7 +86,7 @@ export function AppRoutes() {
             index
             element={
               <PageTransition>
-                <HomePage />
+                <DirecaoPage />
               </PageTransition>
             }
           />
@@ -101,7 +104,7 @@ export function AppRoutes() {
             index
             element={
               <PageTransition>
-                <HomePage />
+                <MedicinaPage />
               </PageTransition>
             }
           />
@@ -119,7 +122,7 @@ export function AppRoutes() {
             index
             element={
               <PageTransition>
-                <HomePage />
+                <ComercialPage />
               </PageTransition>
             }
           />
