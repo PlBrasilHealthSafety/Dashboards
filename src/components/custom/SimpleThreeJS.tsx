@@ -411,16 +411,35 @@ export function NeuralNetwork({
   const [opacity, setOpacity] = useState(0)
   const [animationProgress, setAnimationProgress] = useState(0)
   const [dynamicScale, setDynamicScale] = useState(scale)
-  const [gentlePulse, setGentlePulse] = useState(0)
-  const [dataFlow, setDataFlow] = useState(0)
+  const [pulseIntensity, setPulseIntensity] = useState(0)
   const basePosition = useRef<Vector3>(new Vector3(...position))
   
-  // Estrutura neural mais realista com menos camadas e neurônios organizados
-  const layers = [
-    { neurons: 5, y: 1.0, color: '#00A298', name: 'Input Layer' },     // Camada de entrada
-    { neurons: 8, y: 0.3, color: '#1D3C44', name: 'Hidden Layer 1' },  // Camada oculta 1
-    { neurons: 6, y: -0.3, color: '#AECECB', name: 'Hidden Layer 2' }, // Camada oculta 2
-    { neurons: 3, y: -1.0, color: '#00A298', name: 'Output Layer' },   // Camada de saída
+  // Estrutura simplificada de rede neural
+  const neuralLayers = [
+    { 
+      neurons: 4, 
+      position: [-1.0, 0, 0], 
+      color: '#00A298', 
+      radius: 0.08
+    },
+    { 
+      neurons: 6, 
+      position: [-0.3, 0, 0], 
+      color: '#1D3C44', 
+      radius: 0.06
+    },
+    { 
+      neurons: 4, 
+      position: [0.4, 0, 0], 
+      color: '#AECECB', 
+      radius: 0.07
+    },
+    { 
+      neurons: 3, 
+      position: [1.1, 0, 0], 
+      color: '#00A298', 
+      radius: 0.09
+    }
   ]
 
   useEffect(() => {
@@ -429,19 +448,16 @@ export function NeuralNetwork({
       
       const timer = setTimeout(() => {
         const startTime = Date.now()
-        const duration = 3500 + Math.random() * 1500 // Animação mais lenta
+        const duration = 1800 + Math.random() * 800
         
         const animate = () => {
           const elapsed = Date.now() - startTime
           const progress = Math.min(elapsed / duration, 1)
           
-          // Animação suave de fade-in
-          const easeInOut = progress < 0.5 
-            ? 2 * progress * progress 
-            : 1 - Math.pow(-2 * progress + 2, 2) / 2
+          const easeOutCubic = 1 - Math.pow(1 - progress, 3)
           
-          setAnimationProgress(easeInOut)
-          setOpacity(Math.min(progress * 0.9, 0.9)) // Opacidade máxima reduzida
+          setAnimationProgress(easeOutCubic)
+          setOpacity(Math.min(progress * 0.8, 0.8))
           
           if (progress < 1) {
             requestAnimationFrame(animate)
@@ -459,10 +475,10 @@ export function NeuralNetwork({
     if (groupRef.current && isAnimationStarted && animationProgress > 0.1) {
       const time = state.clock.elapsedTime
       
-      // Movimento orbital muito suave
-      const orbitX = Math.sin(time * orbitSpeed * 0.3) * orbitRadius * 0.8
-      const orbitY = Math.sin(time * orbitSpeed * 0.2) * (orbitRadius * 0.6)
-      const orbitZ = Math.cos(time * orbitSpeed * 0.25) * (orbitRadius * 0.3)
+      // Movimento orbital suave
+      const orbitX = Math.sin(time * orbitSpeed) * orbitRadius * 0.7
+      const orbitY = Math.sin(time * orbitSpeed * 0.6) * (orbitRadius * 0.5)
+      const orbitZ = Math.cos(time * orbitSpeed * 0.8) * (orbitRadius * 0.3)
       
       const currentX = basePosition.current.x + orbitX * animationProgress
       const currentY = basePosition.current.y + orbitY * animationProgress
@@ -470,68 +486,57 @@ export function NeuralNetwork({
       
       setDynamicScale(calculateDynamicScale(currentX, currentY, currentZ, scale))
       
-      // Rotações muito suaves
-      groupRef.current.rotation.x = Math.sin(time * 0.1) * 0.15
-      groupRef.current.rotation.y = time * 0.05
-      groupRef.current.rotation.z = Math.cos(time * 0.08) * 0.1
+      // Rotação suave
+      groupRef.current.rotation.y = time * 0.1
+      groupRef.current.rotation.x = Math.sin(time * 0.2) * 0.05
       
-      // Pulso gentil e lento
-      const pulse = (Math.sin(time * 1.2) + 1) * 0.5
-      setGentlePulse(pulse * 0.4)
-      
-      // Fluxo de dados suave
-      const flow = (Math.sin(time * 0.8 + Math.PI/3) + 1) * 0.5
-      setDataFlow(flow * 0.6)
+      // Pulso sutil
+      const pulse = (Math.sin(time * 2) + 1) * 0.5
+      setPulseIntensity(pulse * 0.3)
       
       groupRef.current.position.set(currentX, currentY, currentZ)
     }
   })
 
   // Função para calcular posições dos neurônios
-  const getNeuronPositions = (layer: typeof layers[0], layerIndex: number) => {
+  const getNeuronPositions = (layer: typeof neuralLayers[0]) => {
     const positions: [number, number, number][] = []
-    const spacing = layer.neurons > 1 ? 2.0 / (layer.neurons - 1) : 0
-    const startX = layer.neurons > 1 ? -1.0 : 0
+    const spacing = layer.neurons > 1 ? 1.0 / (layer.neurons - 1) : 0
+    const startY = layer.neurons > 1 ? -0.5 : 0
     
     for (let i = 0; i < layer.neurons; i++) {
       positions.push([
-        startX + (i * spacing),
-        layer.y,
-        layerIndex * 0.05 // Menor variação em Z
+        layer.position[0],
+        startY + (i * spacing),
+        layer.position[2]
       ])
     }
     return positions
   }
 
-  // Conexões mais esparsas e organizadas
+  // Criar conexões simples entre camadas
   const getConnections = () => {
     const connections: {
       from: [number, number, number]
       to: [number, number, number]
-      strength: number
-      active: boolean
+      opacity: number
     }[] = []
     
-    for (let layerIndex = 0; layerIndex < layers.length - 1; layerIndex++) {
-      const currentLayer = layers[layerIndex]
-      const nextLayer = layers[layerIndex + 1]
+    for (let layerIndex = 0; layerIndex < neuralLayers.length - 1; layerIndex++) {
+      const currentLayer = neuralLayers[layerIndex]
+      const nextLayer = neuralLayers[layerIndex + 1]
       
-      const currentPositions = getNeuronPositions(currentLayer, layerIndex)
-      const nextPositions = getNeuronPositions(nextLayer, layerIndex + 1)
+      const currentPositions = getNeuronPositions(currentLayer)
+      const nextPositions = getNeuronPositions(nextLayer)
       
-      // Conexões mais seletivas - apenas 25% das conexões
-      currentPositions.forEach((fromPos, fromIndex) => {
-        nextPositions.forEach((toPos, toIndex) => {
-          // Criar conexões com padrão mais realista
-          const connectionProbability = 0.25 + (Math.abs(fromIndex - toIndex) < 3 ? 0.15 : 0)
-          if (Math.random() < connectionProbability) {
-            connections.push({
-              from: fromPos,
-              to: toPos,
-              strength: 0.4 + Math.random() * 0.4,
-              active: Math.random() > 0.7 // Apenas algumas conexões ativas por vez
-            })
-          }
+      currentPositions.forEach((fromPos) => {
+        nextPositions.forEach((toPos) => {
+          // Conectar todos os neurônios com opacidade variável
+          connections.push({
+            from: fromPos,
+            to: toPos,
+            opacity: 0.2 + Math.random() * 0.4
+          })
         })
       })
     }
@@ -543,7 +548,7 @@ export function NeuralNetwork({
   return (
     <group ref={groupRef} scale={dynamicScale}>
       
-      {/* Conexões neurais sutis */}
+      {/* Conexões neurais simples */}
       {connections.map((connection, index) => {
         const [fromX, fromY, fromZ] = connection.from
         const [toX, toY, toZ] = connection.to
@@ -564,146 +569,65 @@ export function NeuralNetwork({
           toZ - fromZ
         )
         
-        const activityBoost = connection.active ? (0.3 + dataFlow * 0.4) : 0.1
-        
         return (
           <mesh 
             key={`connection-${index}`}
             position={[midX, midY, midZ]}
             rotation={[0, rotationY, rotationZ]}
           >
-            <cylinderGeometry args={[
-              0.003 * connection.strength,
-              0.003 * connection.strength,
-              length,
-              4
-            ]} />
+            <cylinderGeometry args={[0.004, 0.004, length, 4]} />
             <meshStandardMaterial 
               color={'#1D3C44'}
               transparent
-              opacity={opacity * (0.2 + activityBoost)}
+              opacity={opacity * connection.opacity}
               emissive={'#1D3C44'}
-              emissiveIntensity={0.3 + activityBoost * 0.8}
-              roughness={0.3}
-              metalness={0.4}
+              emissiveIntensity={0.3 + pulseIntensity * 0.2}
+              roughness={0.5}
+              metalness={0.3}
             />
           </mesh>
         )
       })}
       
-      {/* Neurônios com design mais elegante */}
-      {layers.map((layer, layerIndex) => {
-        const neuronPositions = getNeuronPositions(layer, layerIndex)
+      {/* Neurônios simples */}
+      {neuralLayers.map((layer, layerIndex) => {
+        const neuronPositions = getNeuronPositions(layer)
         
         return neuronPositions.map((pos, neuronIndex) => {
           const [x, y, z] = pos
-          // Atividade neuronal muito mais sutil
-          const neuronActivity = (Math.sin(Date.now() * 0.0008 + neuronIndex * 0.5) + 1) * 0.5
-          const isActive = neuronActivity > 0.6
           
           return (
             <group key={`neuron-${layerIndex}-${neuronIndex}`} position={[x, y, z]}>
-              {/* Núcleo do neurônio principal */}
+              {/* Neurônio principal */}
               <mesh>
-                <sphereGeometry args={[0.05 + gentlePulse * 0.01, 12, 12]} />
+                <sphereGeometry args={[layer.radius, 12, 12]} />
                 <meshStandardMaterial 
                   color={layer.color}
                   transparent
                   opacity={opacity * 0.8}
                   emissive={layer.color}
-                  emissiveIntensity={0.4 + gentlePulse * 0.3}
-                  roughness={0.2}
-                  metalness={0.6}
+                  emissiveIntensity={0.4 + pulseIntensity * 0.2}
+                  roughness={0.3}
+                  metalness={0.5}
                 />
               </mesh>
               
-              {/* Glow sutil do neurônio */}
-              <mesh scale={[1.8, 1.8, 1.8]}>
-                <sphereGeometry args={[0.05, 8, 8]} />
-                <meshStandardMaterial 
+              {/* Anel sutil ao redor */}
+              <mesh scale={[1.3, 1.3, 1.3]}>
+                <sphereGeometry args={[layer.radius, 8, 8]} />
+                <meshBasicMaterial 
                   color={layer.color}
+                  wireframe={true}
                   transparent
-                  opacity={opacity * 0.15}
-                  emissive={layer.color}
-                  emissiveIntensity={0.6 + gentlePulse * 0.4}
-                  roughness={0.9}
-                  metalness={0.1}
+                  opacity={opacity * 0.3}
                 />
               </mesh>
-              
-              {/* Pulso de ativação sutil */}
-              {isActive && (
-                <mesh scale={[1.4 + neuronActivity * 0.3, 1.4 + neuronActivity * 0.3, 1.4 + neuronActivity * 0.3]}>
-                  <sphereGeometry args={[0.06, 8, 8]} />
-                  <meshStandardMaterial 
-                    color={layer.color}
-                    transparent
-                    opacity={opacity * 0.3 * neuronActivity}
-                    emissive={layer.color}
-                    emissiveIntensity={1.0 * neuronActivity}
-                    roughness={0.8}
-                    metalness={0.2}
-                  />
-                </mesh>
-              )}
             </group>
           )
         })
       })}
       
-      {/* Partículas de dados muito sutis */}
-      {[0, 1, 2].map((index) => {
-        const angle = (index / 3) * Math.PI * 2
-        const radius = 1.2 + Math.sin(index * 1.5) * 0.1
-        const height = Math.sin(Date.now() * 0.0005 + index) * 0.4
-        
-        return (
-          <mesh 
-            key={`data-particle-${index}`}
-            position={[
-              Math.cos(angle) * radius,
-              height,
-              Math.sin(angle) * radius
-            ]}
-          >
-            <sphereGeometry args={[0.01, 6, 6]} />
-            <meshStandardMaterial 
-              color={'#AECECB'}
-              transparent
-              opacity={opacity * (0.4 + gentlePulse * 0.2)}
-              emissive={'#AECECB'}
-              emissiveIntensity={0.8 + gentlePulse * 0.4}
-              roughness={0.3}
-              metalness={0.5}
-            />
-          </mesh>
-        )
-      })}
-      
-      {/* Sinais neurais muito lentos */}
-      {connections.filter(c => c.active).slice(0, 3).map((connection, index) => {
-        const [fromX, fromY] = connection.from
-        const [toX, toY] = connection.to
-        const progress = (Date.now() * 0.0003 + index * 1.0) % 1
-        const signalX = fromX + (toX - fromX) * progress
-        const signalY = fromY + (toY - fromY) * progress
-        
-        return (
-          <mesh 
-            key={`signal-${index}`}
-            position={[signalX, signalY, 0.05]}
-          >
-            <sphereGeometry args={[0.008, 6, 6]} />
-            <meshStandardMaterial 
-              color={'#00A298'}
-              transparent
-              opacity={opacity * 0.6}
-              emissive={'#00A298'}
-              emissiveIntensity={1.2 + dataFlow * 0.5}
-            />
-          </mesh>
-        )
-      })}
+
     </group>
   )
 }
