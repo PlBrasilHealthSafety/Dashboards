@@ -5,6 +5,9 @@ import { AppLayout } from '@/components/layout'
 
 // Lazy load all pages for code splitting
 const HomePage = lazy(() => import('@/pages/HomePage').then(module => ({ default: module.HomePage })))
+const DirecaoPage = lazy(() => import('@/pages/DirecaoPage').then(module => ({ default: module.DirecaoPage })))
+const MedicinaPage = lazy(() => import('@/pages/MedicinaPage').then(module => ({ default: module.MedicinaPage })))
+const ComercialPage = lazy(() => import('@/pages/ComercialPage').then(module => ({ default: module.ComercialPage })))
 const TVDashboard = lazy(() => import('@/pages/TVDashboard').then(module => ({ default: module.TVDashboard })))
 const ComponentsPage = lazy(() => import('@/pages/ComponentsPage').then(module => ({ default: module.ComponentsPage })))
 const DatabasePage = lazy(() => import('@/pages/DatabasePage').then(module => ({ default: module.DatabasePage })))
@@ -65,6 +68,61 @@ export function AppRoutes() {
             element={
               <PageTransition>
                 <HomePage />
+              </PageTransition>
+            }
+          />
+        </Route>
+
+        {/* Rotas específicas por tipo de usuário */}
+        <Route 
+          path="/direcao" 
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route
+            index
+            element={
+              <PageTransition>
+                <DirecaoPage />
+              </PageTransition>
+            }
+          />
+        </Route>
+
+        <Route 
+          path="/medicina" 
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route
+            index
+            element={
+              <PageTransition>
+                <MedicinaPage />
+              </PageTransition>
+            }
+          />
+        </Route>
+
+        <Route 
+          path="/comercial" 
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route
+            index
+            element={
+              <PageTransition>
+                <ComercialPage />
               </PageTransition>
             }
           />

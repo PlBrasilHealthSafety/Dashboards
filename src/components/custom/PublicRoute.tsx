@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { getUserRoute } from '@/lib/utils';
 
 interface PublicRouteProps {
   children: React.ReactNode;
@@ -17,9 +18,10 @@ export const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
     );
   }
 
-  // Se o usuário já está autenticado, redireciona para home
+  // Se o usuário já está autenticado, redireciona para a rota específica do usuário
   if (user) {
-    return <Navigate to="/home" replace />;
+    const userRoute = getUserRoute(user.email);
+    return <Navigate to={userRoute} replace />;
   }
 
   return <>{children}</>;

@@ -7,6 +7,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { loginSchema, type LoginFormData } from '../../lib/validations';
+import { getUserRoute } from '@/lib/utils';
 
 interface LoginFormProps {
   onToggleMode?: () => void;
@@ -70,9 +71,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
     setError('');
 
     try {
-      await signIn(data.email, data.password, rememberMe);
-      // Redirecionar para home após login bem-sucedido
-      navigate('/home');
+      const user = await signIn(data.email, data.password, rememberMe);
+      // Redirecionar para a rota específica do usuário após login bem-sucedido
+      const userRoute = getUserRoute(user.email);
+      navigate(userRoute);
     } catch (error: any) {
       const friendlyError = translateFirebaseError(error.message || 'Erro desconhecido');
       setError(friendlyError);
