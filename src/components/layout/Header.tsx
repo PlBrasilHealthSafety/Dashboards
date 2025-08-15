@@ -1,10 +1,12 @@
 import { useAuth } from '@/hooks/useAuth'
 import { useState, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { User } from 'lucide-react'
+import { User, Monitor } from 'lucide-react'
 
 export function Header() {
   const { user, signOut } = useAuth()
+  const navigate = useNavigate()
   const [logoSrc, setLogoSrc] = useState<string>('/plbrasil-logo.svg')
   const handleLogoError = useCallback(() => {
     setLogoSrc(prev => {
@@ -35,6 +37,16 @@ export function Header() {
               </div>
               <span className="text-sm font-medium text-slate-700 hidden sm:block">{user.email}</span>
             </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="border-[#00A298]/30 text-[#00A298] hover:bg-[#00A298]/10 hover:border-[#00A298]/50"
+              onClick={() => navigate('/tv-dashboard')}
+              title="Ver no Modo TV"
+            >
+              <Monitor className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">Modo TV</span>
+            </Button>
             <Button variant="outline" size="sm" className="border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400" onClick={signOut}>
               Logout
             </Button>

@@ -5,6 +5,7 @@ import { AppLayout } from '@/components/layout'
 
 // Lazy load all pages for code splitting
 const HomePage = lazy(() => import('@/pages/HomePage').then(module => ({ default: module.HomePage })))
+const TVDashboard = lazy(() => import('@/pages/TVDashboard').then(module => ({ default: module.TVDashboard })))
 const ComponentsPage = lazy(() => import('@/pages/ComponentsPage').then(module => ({ default: module.ComponentsPage })))
 const DatabasePage = lazy(() => import('@/pages/DatabasePage').then(module => ({ default: module.DatabasePage })))
 const FormsPage = lazy(() => import('@/pages/FormsPage').then(module => ({ default: module.FormsPage })))
@@ -35,6 +36,18 @@ export function AppRoutes() {
                 <AuthPage />
               </PageTransition>
             </PublicRoute>
+          }
+        />
+        
+        {/* TV Dashboard - fullscreen without layout */}
+        <Route
+          path="/tv-dashboard"
+          element={
+            <ProtectedRoute>
+              <PageTransition>
+                <TVDashboard />
+              </PageTransition>
+            </ProtectedRoute>
           }
         />
         
