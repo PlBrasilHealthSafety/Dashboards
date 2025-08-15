@@ -1,7 +1,7 @@
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { Suspense, useState } from 'react'
-import { SimpleBarChart, SimplePieChart, SimpleMetrics, SimpleLineChart } from './SimpleThreeJS'
+import { SimpleBarChart, SimplePieChart, NeuralNetwork, HolographicDashboard } from './SimpleThreeJS'
 
 function Lights() {
   return (
@@ -102,15 +102,7 @@ export function SimpleDashboard3D() {
             scale={3.0}
             delayMultiplier={1}
           />
-          <SimpleLineChart 
-            position={[-20, -10, -12]} 
-            isAnimationStarted={isAnimationStarted}
-            orbitRadius={5.5}
-            orbitSpeed={0.25}
-            scale={2.5}
-            delayMultiplier={2}
-          />
-          <SimpleMetrics 
+          <NeuralNetwork 
             position={[20, -10, -6]} 
             isAnimationStarted={isAnimationStarted}
             orbitRadius={6.5}
@@ -118,24 +110,15 @@ export function SimpleDashboard3D() {
             scale={2.2}
             delayMultiplier={3}
           />
-          
-          {/* Centro-fundo - Componentes de apoio */}
-          <SimpleLineChart 
-            position={[0, 0, -25]} 
+          <HolographicDashboard 
+            position={[-20, -10, -8]} 
             isAnimationStarted={isAnimationStarted}
-            orbitRadius={10}
-            orbitSpeed={0.08}
-            scale={2.0}
+            orbitRadius={7}
+            orbitSpeed={0.16}
+            scale={2.4}
             delayMultiplier={4}
           />
-          <SimpleBarChart 
-            position={[0, -15, -15]} 
-            isAnimationStarted={isAnimationStarted}
-            orbitRadius={8}
-            orbitSpeed={-0.12}
-            scale={2.3}
-            delayMultiplier={5}
-          />
+          
           
           <OrbitControls 
             enableZoom={false} 
