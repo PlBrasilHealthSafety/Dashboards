@@ -94,7 +94,7 @@ export function SimpleDashboard3D() {
             scale={2.8}
             delayMultiplier={0}
           />
-          <SimplePieChart 
+          <HolographicDashboard 
             position={[20, 10, -10]} 
             isAnimationStarted={isAnimationStarted}
             orbitRadius={7}
@@ -106,11 +106,11 @@ export function SimpleDashboard3D() {
             position={[20, -10, -6]} 
             isAnimationStarted={isAnimationStarted}
             orbitRadius={6.5}
-            orbitSpeed={-0.18}
+            orbitSpeed={0.2}
             scale={2.2}
             delayMultiplier={3}
           />
-          <HolographicDashboard 
+          <SimplePieChart 
             position={[-20, -10, -8]} 
             isAnimationStarted={isAnimationStarted}
             orbitRadius={7}
