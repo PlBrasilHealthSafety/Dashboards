@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { registerSchema, type RegisterFormData } from '../../lib/validations';
 
 interface RegisterFormProps {
@@ -43,96 +42,108 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle>Cadastro</CardTitle>
-        <CardDescription>
-          Crie sua conta para começar a usar a aplicação
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="name" className="text-sm font-medium">
-              Nome
-            </label>
-            <Input
-              id="name"
-              type="text"
-              placeholder="Seu nome completo"
-              {...register('name')}
-            />
-            {errors.name && (
-              <p className="text-red-500 text-sm">{errors.name.message}</p>
-            )}
-          </div>
+    <div className="p-8">
+      {/* Logo */}
+      <div className="flex justify-center mb-8">
+        <div className="relative w-32 h-32">
+          <img 
+            src="/Logo-PlBrasilHealth.png" 
+            alt="PLBrasil Health&Safety" 
+            className="w-full h-full object-contain drop-shadow-lg"
+          />
+        </div>
+      </div>
 
-          <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium">
-              Email
-            </label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="seu@email.com"
-              {...register('email')}
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm">{errors.email.message}</p>
-            )}
-          </div>
-          
-          <div className="space-y-2">
-            <label htmlFor="password" className="text-sm font-medium">
-              Senha
-            </label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              {...register('password')}
-            />
-            {errors.password && (
-              <p className="text-red-500 text-sm">{errors.password.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="confirmPassword" className="text-sm font-medium">
-              Confirmar Senha
-            </label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              placeholder="••••••••"
-              {...register('confirmPassword')}
-            />
-            {errors.confirmPassword && (
-              <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>
-            )}
-          </div>
-
-          {error && (
-            <div className="text-red-500 text-sm">{error}</div>
+      {/* Form */}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <div className="space-y-2">
+          <label htmlFor="name" className="text-sm font-medium text-foreground">
+            Nome
+          </label>
+          <Input
+            id="name"
+            type="text"
+            placeholder="Seu nome completo"
+            className="h-11 border-2 focus:border-primary placeholder:text-muted-foreground/60"
+            {...register('name')}
+          />
+          {errors.name && (
+            <p className="text-destructive text-sm">{errors.name.message}</p>
           )}
+        </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
+        <div className="space-y-2">
+          <label htmlFor="email" className="text-sm font-medium text-foreground">
+            Email
+          </label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="seu@email.com"
+            className="h-11 border-2 focus:border-primary placeholder:text-muted-foreground/60"
+            {...register('email')}
+          />
+          {errors.email && (
+            <p className="text-destructive text-sm">{errors.email.message}</p>
+          )}
+        </div>
+        
+        <div className="space-y-2">
+          <label htmlFor="password" className="text-sm font-medium text-foreground">
+            Senha
+          </label>
+          <Input
+            id="password"
+            type="password"
+            placeholder="••••••••"
+            className="h-11 border-2 focus:border-primary placeholder:text-muted-foreground/60"
+            {...register('password')}
+          />
+          {errors.password && (
+            <p className="text-destructive text-sm">{errors.password.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
+            Confirmar Senha
+          </label>
+          <Input
+            id="confirmPassword"
+            type="password"
+            placeholder="••••••••"
+            className="h-11 border-2 focus:border-primary placeholder:text-muted-foreground/60"
+            {...register('confirmPassword')}
+          />
+          {errors.confirmPassword && (
+            <p className="text-destructive text-sm">{errors.confirmPassword.message}</p>
+          )}
+        </div>
+
+        {error && (
+          <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3">
+            <p className="text-destructive text-sm">{error}</p>
+          </div>
+        )}
+
+        <div className="pt-4">
+          <Button type="submit" className="w-full h-11 text-base font-medium" disabled={loading}>
             {loading ? 'Criando conta...' : 'Criar conta'}
           </Button>
+        </div>
 
-          {onToggleMode && (
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={onToggleMode}
-                className="text-sm text-blue-600 hover:underline"
-              >
-                Já tem uma conta? Faça login
-              </button>
-            </div>
-          )}
-        </form>
-      </CardContent>
-    </Card>
+        {onToggleMode && (
+          <div className="text-center pt-4">
+            <button
+              type="button"
+              onClick={onToggleMode}
+              className="text-sm text-primary hover:underline transition-colors"
+            >
+              Já tem uma conta? Faça login
+            </button>
+          </div>
+        )}
+      </form>
+    </div>
   );
 };

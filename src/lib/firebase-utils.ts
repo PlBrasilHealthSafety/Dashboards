@@ -1,10 +1,11 @@
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
-    signInWithPopup,
-    GoogleAuthProvider,
     signOut,
     onAuthStateChanged,
+    setPersistence,
+    browserLocalPersistence,
+    browserSessionPersistence,
     type User,
     type NextOrObserver
 } from 'firebase/auth';
@@ -46,6 +47,21 @@ export const signInUser = async (email: string, password: string) => {
     }
 };
 
+export const signInUserWithPersistence = async (email: string, password: string, rememberMe: boolean = false) => {
+    try {
+        // Configurar persistência baseada na escolha do usuário
+        const persistence = rememberMe ? browserLocalPersistence : browserSessionPersistence;
+        await setPersistence(auth, persistence);
+        
+        // Fazer login após configurar persistência
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        return userCredential.user;
+    } catch (error) {
+        console.error('Error signing in with persistence:', error);
+        throw error;
+    }
+};
+
 export const signOutUser = async () => {
     try {
         await signOut(auth);
@@ -55,19 +71,6 @@ export const signOutUser = async () => {
     }
 };
 
-export const signInWithGoogle = async () => {
-    try {
-        const provider = new GoogleAuthProvider();
-        provider.addScope('email');
-        provider.addScope('profile');
-        
-        const result = await signInWithPopup(auth, provider);
-        return result.user;
-    } catch (error) {
-        console.error('Error signing in with Google:', error);
-        throw error;
-    }
-};
 
 export const onAuthStateChange = (callback: NextOrObserver<User>) => {
     return onAuthStateChanged(auth, callback);

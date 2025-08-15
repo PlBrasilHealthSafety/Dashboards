@@ -1,13 +1,12 @@
 import { useState, useEffect, createContext, useContext } from 'react';
 import type { User } from 'firebase/auth';
-import { onAuthStateChange, signInUser, createUser, signOutUser, signInWithGoogle } from '../lib/firebase-utils';
+import { onAuthStateChange, signInUser, signInUserWithPersistence, createUser, signOutUser } from '../lib/firebase-utils';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<User>;
+  signIn: (email: string, password: string, rememberMe?: boolean) => Promise<User>;
   signUp: (email: string, password: string) => Promise<User>;
-  signInWithGoogle: () => Promise<User>;
   signOut: () => Promise<void>;
 }
 
@@ -38,9 +37,9 @@ export const useAuthState = () => {
 };
 
 export const useAuthActions = () => {
-  const signIn = async (email: string, password: string): Promise<User> => {
+  const signIn = async (email: string, password: string, rememberMe: boolean = false): Promise<User> => {
     try {
-      const user = await signInUser(email, password);
+      const user = await signInUserWithPersistence(email, password, rememberMe);
       return user;
     } catch (error) {
       throw error;
@@ -56,14 +55,6 @@ export const useAuthActions = () => {
     }
   };
 
-  const handleSignInWithGoogle = async (): Promise<User> => {
-    try {
-      const user = await signInWithGoogle();
-      return user;
-    } catch (error) {
-      throw error;
-    }
-  };
 
   const signOut = async (): Promise<void> => {
     try {
@@ -73,7 +64,7 @@ export const useAuthActions = () => {
     }
   };
 
-  return { signIn, signUp, signInWithGoogle: handleSignInWithGoogle, signOut };
+  return { signIn, signUp, signOut };
 };
 
 export { AuthContext };
