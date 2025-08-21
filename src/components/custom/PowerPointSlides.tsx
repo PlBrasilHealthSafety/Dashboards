@@ -8,12 +8,12 @@ interface ImageSlideProps {
 
 function ImageSlide({ imagePath, altText }: ImageSlideProps) {
   return (
-    <div className="relative h-full w-full bg-white flex items-center justify-center overflow-hidden">
+    <div className="relative h-full w-full bg-white overflow-hidden">
       <img 
         src={imagePath}
         alt={altText}
-        className="max-w-full max-h-full object-contain"
-        style={{ maxWidth: '100%', maxHeight: '100%' }}
+        className="w-full h-full object-fill"
+        style={{ width: '100%', height: '100%' }}
       />
     </div>
   )

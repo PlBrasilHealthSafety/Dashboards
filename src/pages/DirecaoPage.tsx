@@ -83,7 +83,7 @@ export function DirecaoPage() {
           {/* Carousel centralizado em formato wide */}
           <div className="flex justify-center mt-12">
             <div className="w-full">
-              <div className="w-full rounded-2xl shadow-2xl overflow-hidden bg-white aspect-[16/8]">
+              <div className="w-full rounded-2xl shadow-2xl overflow-hidden bg-white aspect-[1920/1080]">
                 <Carousel
                   items={carouselItems}
                   className="w-full h-full"
