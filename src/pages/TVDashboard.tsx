@@ -10,6 +10,16 @@ import {
 } from '@/components/custom/MedicalDashboard'
 import { BrandHeroSlideOne, BrandHeroSlideTwo, BrandHeroSlideThree } from '@/components/custom/HeroSlides'
 import { TVPieChartSlide, TVBarChartSlide, TVGoalsChartSlide } from '@/components/custom/TVChartSlides'
+import { 
+  PowerPointSlide1, 
+  PowerPointSlide2, 
+  PowerPointSlide3, 
+  PowerPointSlide4, 
+  PowerPointSlide5, 
+  PowerPointSlide6, 
+  PowerPointSlide7, 
+  PowerPointSlide8 
+} from '@/components/custom/PowerPointSlides'
 import { X } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { getUserRoute } from '@/lib/utils'
@@ -19,16 +29,16 @@ export function TVDashboard() {
   const { user } = useAuth()
 
   const carouselItems = useMemo(() => {
-    // 11 slides: 8 slides de imagens/conteúdo + 3 gráficos limpos
+    // 11 slides: 8 slides de PowerPoint + 3 gráficos limpos
     const slides = [
-      { id: 1, content: <BrandHeroSlideOne /> },
-      { id: 2, content: <MedicalOverviewSlide /> },
-      { id: 3, content: <WeeklyTrendSlide /> },
-      { id: 4, content: <BrandHeroSlideTwo /> },
-      { id: 5, content: <GoalsVsActualSlide /> },
-      { id: 6, content: <IndicatorsSlide /> },
-      { id: 7, content: <BrandHeroSlideThree /> },
-      { id: 8, content: <AnnualAnalysisSlide /> },
+      { id: 1, content: <PowerPointSlide1 /> },
+      { id: 2, content: <PowerPointSlide2 /> },
+      { id: 3, content: <PowerPointSlide3 /> },
+      { id: 4, content: <PowerPointSlide4 /> },
+      { id: 5, content: <PowerPointSlide5 /> },
+      { id: 6, content: <PowerPointSlide6 /> },
+      { id: 7, content: <PowerPointSlide7 /> },
+      { id: 8, content: <PowerPointSlide8 /> },
       { id: 9, content: <TVPieChartSlide /> }, // Gráfico 1 - Pizza: Distribuição por Setor
       { id: 10, content: <TVBarChartSlide /> }, // Gráfico 2 - Barras: Performance Mensal
       { id: 11, content: <TVGoalsChartSlide /> }, // Gráfico 3 - Barras: Metas vs Realizado

@@ -9,6 +9,16 @@ import {
   AnnualAnalysisSlide
 } from '@/components/custom/MedicalDashboard'
 import { BrandHeroSlideOne, BrandHeroSlideTwo, BrandHeroSlideThree } from '@/components/custom/HeroSlides'
+import { 
+  PowerPointSlide1, 
+  PowerPointSlide2, 
+  PowerPointSlide3, 
+  PowerPointSlide4, 
+  PowerPointSlide5, 
+  PowerPointSlide6, 
+  PowerPointSlide7, 
+  PowerPointSlide8 
+} from '@/components/custom/PowerPointSlides'
 import { DetailedSectorAnalysis } from '@/components/custom/DetailedSectorAnalysis'
 
 import {
@@ -33,16 +43,16 @@ const evolucaoTrimestralData = [
 export function DirecaoPage() {
 
   const carouselItems = useMemo(() => {
-    // 11 slides diferentes: 8 de conteúdo + 3 gráficos específicos
+    // 11 slides: 8 slides de PowerPoint + 3 gráficos específicos
     const slides = [
-      { id: 1, content: <BrandHeroSlideOne /> },
-      { id: 2, content: <MedicalOverviewSlide /> },
-      { id: 3, content: <WeeklyTrendSlide /> },
-      { id: 4, content: <BrandHeroSlideTwo /> },
-      { id: 5, content: <GoalsVsActualSlide /> },
-      { id: 6, content: <IndicatorsSlide /> },
-      { id: 7, content: <BrandHeroSlideThree /> },
-      { id: 8, content: <AnnualAnalysisSlide /> },
+      { id: 1, content: <PowerPointSlide1 /> },
+      { id: 2, content: <PowerPointSlide2 /> },
+      { id: 3, content: <PowerPointSlide3 /> },
+      { id: 4, content: <PowerPointSlide4 /> },
+      { id: 5, content: <PowerPointSlide5 /> },
+      { id: 6, content: <PowerPointSlide6 /> },
+      { id: 7, content: <PowerPointSlide7 /> },
+      { id: 8, content: <PowerPointSlide8 /> },
       { id: 9, content: <GoalsVsActualSlide /> }, // Gráfico de setores
       { id: 10, content: <WeeklyTrendSlide /> }, // Gráfico de barras
       { id: 11, content: <IndicatorsSlide /> }, // Dashboard de métricas
@@ -73,7 +83,7 @@ export function DirecaoPage() {
           {/* Carousel centralizado em formato wide */}
           <div className="flex justify-center mt-12">
             <div className="w-full">
-              <div className="w-full rounded-2xl shadow-2xl overflow-hidden bg-white aspect-[16/6]">
+              <div className="w-full rounded-2xl shadow-2xl overflow-hidden bg-white aspect-[16/8]">
                 <Carousel
                   items={carouselItems}
                   className="w-full h-full"
