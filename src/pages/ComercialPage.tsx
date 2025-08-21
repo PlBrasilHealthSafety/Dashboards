@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { Carousel } from '@/components/custom/Carousel'
+import { ScrollToTopButton } from '@/components/ui/scroll-to-top-button'
 import { 
   MedicalOverviewSlide, 
   WeeklyTrendSlide, 
@@ -316,6 +317,8 @@ export function ComercialPage() {
           </div>
         </div>
       </div>
+      
+      <ScrollToTopButton />
     </div>
   )
 }

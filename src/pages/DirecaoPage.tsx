@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { Carousel } from '@/components/custom/Carousel'
+import { ScrollToTopButton } from '@/components/ui/scroll-to-top-button'
 import { ExecutiveLayoutDashboard } from '@/components/custom/ExecutiveLayoutDashboard'
 import { 
   MedicalOverviewSlide, 
@@ -177,6 +178,8 @@ export function DirecaoPage() {
           </div>
         </div>
       </div>
+      
+      <ScrollToTopButton />
     </div>
   )
 }

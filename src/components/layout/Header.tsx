@@ -25,7 +25,7 @@ export function Header() {
           <div className="rounded-md ring-1 ring-[#00A298]/40 bg-white p-2 shadow-lg">
             <img src={logoSrc} onError={handleLogoError} alt="PLBrasil" className="h-8 sm:h-10 w-auto select-none" draggable={false} />
           </div>
-          <h1 className="text-[22px] sm:text-2xl font-extrabold tracking-tight text-slate-800">
+          <h1 className="text-[22px] sm:text-2xl font-extrabold tracking-tight animate-slideInFromLeft bg-gradient-to-r from-[#00A298] via-[#0B5C5B] to-[#1D3C44] bg-clip-text text-transparent">
             Health & Safety Dashboard
           </h1>
         </div>
