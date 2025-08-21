@@ -18,14 +18,14 @@ export function Header() {
   }, [])
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-md">
-      <div className="absolute inset-0 bg-white" />
+    <header className="relative w-full z-10 border-b border-gray-200 shadow-md">
+      <div className="absolute inset-0 bg-gradient-to-r from-[#00A298]/10 via-white to-[#1D3C44]/10" />
       <div className="relative z-10 w-full px-6 py-4 flex items-center">
         <div className="flex items-center gap-4">
           <div className="rounded-md ring-1 ring-[#00A298]/40 bg-white p-2 shadow-lg">
             <img src={logoSrc} onError={handleLogoError} alt="PLBrasil" className="h-8 sm:h-10 w-auto select-none" draggable={false} />
           </div>
-          <h1 className="text-[22px] sm:text-2xl font-extrabold tracking-tight animate-slideInFromLeft bg-gradient-to-r from-[#00A298] via-[#0B5C5B] to-[#1D3C44] bg-clip-text text-transparent">
+          <h1 className="text-[22px] sm:text-2xl font-extrabold tracking-tight animate-slideInFromRight bg-gradient-to-r from-[#00A298] via-[#0B5C5B] to-[#1D3C44] bg-clip-text text-transparent">
             Health & Safety Dashboard
           </h1>
         </div>
