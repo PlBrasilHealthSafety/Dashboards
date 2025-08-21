@@ -124,12 +124,7 @@ export function HomePage() {
               </div>
             </div>
 
-            {/* Título abaixo do slide */}
-            <div className="text-center mt-6 mb-10">
-              <h3 className="text-lg font-semibold text-foreground">
-                PLBrasil Health & Safety • Panorama de Performance
-              </h3>
-            </div>
+            
           </div>
         </div>
 
