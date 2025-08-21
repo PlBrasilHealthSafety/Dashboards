@@ -54,10 +54,10 @@ export function ComercialPage() {
       <div className="relative p-6">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-[#00A298] via-[#0B5C5B] to-[#1D3C44] bg-clip-text text-transparent">
             Dashboard Comercial
           </h1>
-          <p className="text-gray-600 mt-2">
+          <p className="text-[#1D3C44]/80 mt-2">
             Métricas específicas do setor comercial
           </p>
         </div>
