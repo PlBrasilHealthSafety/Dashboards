@@ -82,7 +82,7 @@ export function ComercialPage() {
             {/* Carousel centralizado */}
             <div className="flex justify-center">
               <div className="w-full">
-                <div className="w-full rounded-2xl shadow-2xl overflow-hidden bg-white aspect-[1920/1080]">
+                <div className="w-full rounded-2xl shadow-2xl overflow-hidden bg-white aspect-[20/9]">
                   <Carousel
                     items={carouselItems}
                     className="w-full h-full"
