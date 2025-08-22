@@ -20,7 +20,8 @@ export class ContratosService extends FirestoreService<Contrato> {
     return this.create({
       titulo,
       descricao,
-      userId
+      userId,
+      displayedOnTV: false
     });
   }
 

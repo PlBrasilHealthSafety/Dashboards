@@ -14,16 +14,15 @@ import {
   PowerPointSlide8 
 } from '@/components/custom/PowerPointSlides'
 import { ContratoNotificationOverlay } from '@/components/custom/ContratoNotificationOverlay'
-import { useContratoNotifications } from '@/contexts/ContratoNotificationContext'
 import { X } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { getUserRoute } from '@/lib/utils'
+import type { Contrato } from '@/lib/types'
 
 export function TVDashboard() {
   const navigate = useNavigate()
   const { user } = useAuth()
-  const { notifications, removeNotification } = useContratoNotifications()
-  const [currentNotification, setCurrentNotification] = useState<typeof notifications[0] | null>(null)
+  const [currentContrato, setCurrentContrato] = useState<(Contrato & { id: string }) | null>(null)
 
   const carouselItems = useMemo(() => {
     // 11 slides: 8 slides de PowerPoint + 3 gráficos limpos
@@ -43,14 +42,43 @@ export function TVDashboard() {
     return slides
   }, [])
 
-  // Gerenciar notificações de contratos
+  // Listener em tempo real para novos contratos
   useEffect(() => {
-    if (notifications.length > 0 && !currentNotification) {
-      // Pegar a notificação mais recente
-      const latestNotification = notifications[notifications.length - 1]
-      setCurrentNotification(latestNotification)
+    let unsubscribe: (() => void) | undefined
+
+    const setupListener = async () => {
+      try {
+        const { collection, query, where, orderBy, onSnapshot, limit } = await import('firebase/firestore')
+        const { db } = await import('@/lib/firebase')
+
+        // Escutar contratos que ainda não foram exibidos na TV
+        const q = query(
+          collection(db, 'contratos'),
+          where('displayedOnTV', '==', false),
+          orderBy('createdAt', 'desc'),
+          limit(1)
+        )
+
+        unsubscribe = onSnapshot(q, (snapshot) => {
+          if (!snapshot.empty && !currentContrato) {
+            const doc = snapshot.docs[0]
+            const contrato = { id: doc.id, ...doc.data() } as Contrato & { id: string }
+            setCurrentContrato(contrato)
+          }
+        })
+      } catch (error) {
+        console.error('Erro ao configurar listener de contratos:', error)
+      }
     }
-  }, [notifications, currentNotification])
+
+    setupListener()
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe()
+      }
+    }
+  }, [currentContrato])
 
   // Listener para tecla ESC
   useEffect(() => {
@@ -67,10 +95,23 @@ export function TVDashboard() {
     }
   }, [navigate])
 
-  const handleNotificationComplete = () => {
-    if (currentNotification) {
-      removeNotification(currentNotification.id)
-      setCurrentNotification(null)
+  const handleNotificationComplete = async () => {
+    if (currentContrato) {
+      try {
+        // Marcar contrato como exibido na TV
+        const { doc, updateDoc } = await import('firebase/firestore')
+        const { db } = await import('@/lib/firebase')
+        
+        await updateDoc(doc(db, 'contratos', currentContrato.id), {
+          displayedOnTV: true,
+          updatedAt: new Date()
+        })
+        
+        setCurrentContrato(null)
+      } catch (error) {
+        console.error('Erro ao marcar contrato como exibido:', error)
+        setCurrentContrato(null)
+      }
     }
   }
 
@@ -113,9 +154,13 @@ export function TVDashboard() {
       </div>
 
       {/* Overlay de notificação de contrato */}
-      {currentNotification && (
+      {currentContrato && (
         <ContratoNotificationOverlay
-          contrato={currentNotification.contrato}
+          contrato={{
+            titulo: currentContrato.titulo,
+            descricao: currentContrato.descricao,
+            userId: currentContrato.userId
+          }}
           onComplete={handleNotificationComplete}
         />
       )}

@@ -43,6 +43,7 @@ export interface Contrato extends FirestoreDocument {
   titulo: string;
   descricao: string;
   userId: string;
+  displayedOnTV: boolean;
 }
 
 // Firebase configuration type
