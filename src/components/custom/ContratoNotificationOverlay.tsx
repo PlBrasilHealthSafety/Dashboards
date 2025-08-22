@@ -12,16 +12,42 @@ interface ContratoNotificationOverlayProps {
 }
 
 export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNotificationOverlayProps) {
-  const [phase, setPhase] = useState<'video' | 'info'>('video')
+  const [phase, setPhase] = useState<'waiting' | 'video' | 'info'>('waiting')
+  const [countdown, setCountdown] = useState(60) // 60 segundos = 1 minuto
 
   useEffect(() => {
-    // Após 7 segundos (duração do vídeo), mudar para a fase de informações
-    const videoTimer = setTimeout(() => {
-      setPhase('info')
-    }, 7000)
+    // Delay de 1 minuto antes do vídeo
+    const waitingTimer = setTimeout(() => {
+      setPhase('video')
+    }, 60000) // 1 minuto
 
-    return () => clearTimeout(videoTimer)
+    // Countdown para mostrar o tempo restante
+    const countdownInterval = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(countdownInterval)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => {
+      clearTimeout(waitingTimer)
+      clearInterval(countdownInterval)
+    }
   }, [])
+
+  useEffect(() => {
+    if (phase === 'video') {
+      // Após 7 segundos (duração do vídeo), mudar para a fase de informações
+      const videoTimer = setTimeout(() => {
+        setPhase('info')
+      }, 7000)
+
+      return () => clearTimeout(videoTimer)
+    }
+  }, [phase])
 
   useEffect(() => {
     if (phase === 'info') {
@@ -36,6 +62,42 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
 
   return (
     <div className="fixed inset-0 z-[9999] bg-black flex items-center justify-center">
+      {phase === 'waiting' && (
+        <div className="w-full h-full flex items-center justify-center">
+          <div className="text-center">
+            <div className="mb-8">
+              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#00A298] to-[#1D3C44] flex items-center justify-center shadow-2xl mx-auto mb-6">
+                <FileText className="w-12 h-12 text-white" />
+              </div>
+              <h1 className="text-4xl font-bold text-white mb-4">
+                Novo Contrato Detectado!
+              </h1>
+              <p className="text-xl text-gray-300">
+                Preparando apresentação...
+              </p>
+            </div>
+            
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
+              <div className="text-6xl font-bold text-[#00A298] mb-2">
+                {countdown}
+              </div>
+              <p className="text-white text-lg">
+                segundos restantes
+              </p>
+            </div>
+            
+            <div className="mt-8">
+              <div className="w-32 h-2 bg-white/20 rounded-full mx-auto overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-[#00A298] to-[#1D3C44] rounded-full transition-all duration-1000"
+                  style={{ width: `${((60 - countdown) / 60) * 100}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {phase === 'video' && (
         <div className="w-full h-full flex items-center justify-center">
           <iframe
@@ -71,11 +133,11 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
               <div className="w-32 h-2 bg-gradient-to-r from-[#00A298] to-[#1D3C44] mx-auto rounded-full"></div>
             </div>
 
-            {/* Card principal com as informações */}
-            <div className="bg-gradient-to-br from-white via-gray-50 to-gray-100 rounded-3xl shadow-2xl p-12 border border-gray-200 animate-in fade-in slide-in-from-bottom duration-1000 delay-300">
+            {/* Card principal com as informações - Centralizado */}
+            <div className="bg-gradient-to-br from-white via-gray-50 to-gray-100 rounded-3xl shadow-2xl p-12 border border-gray-200 animate-in fade-in slide-in-from-bottom duration-1000 delay-300 text-center">
               {/* Razão Social */}
               <div className="mb-10">
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center justify-center gap-3 mb-4">
                   <div className="w-3 h-3 rounded-full bg-[#00A298]"></div>
                   <h2 className="text-2xl font-semibold text-gray-600 uppercase tracking-wider">
                     Razão Social
@@ -88,7 +150,7 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
 
               {/* Nome Fantasia */}
               <div className="mb-10">
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center justify-center gap-3 mb-4">
                   <div className="w-3 h-3 rounded-full bg-[#00A298]"></div>
                   <h2 className="text-2xl font-semibold text-gray-600 uppercase tracking-wider">
                     Nome Fantasia
@@ -101,7 +163,7 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
 
               {/* Data de Início do Contrato */}
               <div className="mb-10">
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center justify-center gap-3 mb-4">
                   <div className="w-3 h-3 rounded-full bg-[#00A298]"></div>
                   <h2 className="text-2xl font-semibold text-gray-600 uppercase tracking-wider">
                     Data de Início do Contrato
@@ -114,39 +176,6 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
                     year: 'numeric'
                   })}
                 </p>
-              </div>
-
-              {/* Informações adicionais */}
-              <div className="grid grid-cols-2 gap-8 pt-8 border-t border-gray-300">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#00A298]/20 to-[#1D3C44]/20 flex items-center justify-center">
-                    <Calendar className="w-6 h-6 text-[#00A298]" />
-                  </div>
-                  <div>
-                    <p className="text-lg font-medium text-gray-600">Data de Criação</p>
-                    <p className="text-2xl font-bold text-[#1D3C44]">
-                      {new Date().toLocaleDateString('pt-BR', {
-                        day: '2-digit',
-                        month: 'long',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#00A298]/20 to-[#1D3C44]/20 flex items-center justify-center">
-                    <User className="w-6 h-6 text-[#00A298]" />
-                  </div>
-                  <div>
-                    <p className="text-lg font-medium text-gray-600">Status</p>
-                    <p className="text-2xl font-bold text-[#00A298]">
-                      Ativo
-                    </p>
-                  </div>
-                </div>
               </div>
             </div>
 
