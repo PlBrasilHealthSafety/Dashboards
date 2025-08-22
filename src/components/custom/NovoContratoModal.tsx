@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { X, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/useAuth'
-import { contratosService } from '@/lib/contratos-service'
+// import { contratosService } from '@/lib/contratos-service' // Não usado no momento
+import { useContratoNotifications } from '@/contexts/ContratoNotificationContext'
 
 interface NovoContratoModalProps {
   isOpen: boolean
@@ -11,6 +12,7 @@ interface NovoContratoModalProps {
 
 export function NovoContratoModal({ isOpen, onClose }: NovoContratoModalProps) {
   const { user } = useAuth()
+  const { addNotification } = useContratoNotifications()
   const [titulo, setTitulo] = useState('')
   const [descricao, setDescricao] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -68,6 +70,13 @@ export function NovoContratoModal({ isOpen, onClose }: NovoContratoModalProps) {
       
       const docRef = await addDoc(collection(db, 'contratos'), docData)
       console.log('Documento criado com ID:', docRef.id)
+      
+      // Enviar notificação para o modo TV
+      addNotification({
+        titulo: titulo.trim(),
+        descricao: descricao.trim(),
+        userId: user.uid
+      })
       
       // Limpar campos e fechar modal
       setTitulo('')
