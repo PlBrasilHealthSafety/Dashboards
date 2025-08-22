@@ -76,9 +76,6 @@ export function MedicinaPage() {
         <div className="py-6">
           <div className="max-w-7xl mx-auto px-4">
             {/* Título acima do slide */}
-            <div className="text-center mb-4">
-              <p className="text-sm text-muted-foreground">Apresentação resumida de KPIs</p>
-            </div>
 
             {/* Carousel centralizado */}
             <div className="flex justify-center">
