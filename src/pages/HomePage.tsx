@@ -1,11 +1,7 @@
 import { useMemo } from 'react'
 import { Carousel } from '@/components/custom/Carousel'
 import { ExecutiveLayoutDashboard } from '@/components/custom/ExecutiveLayoutDashboard'
-import {
-  WeeklyTrendSlide,
-  GoalsVsActualSlide,
-  IndicatorsSlide
-} from '@/components/custom/MedicalDashboard'
+
 
 import { 
   PowerPointSlide1, 
@@ -59,7 +55,7 @@ export function HomePage() {
       (profile?.role || 'diretoria')
 
   const carouselItems = useMemo(() => {
-    // 11 slides: 8 slides de PowerPoint + 3 gráficos específicos
+    // 8 slides de PowerPoint
     const slides = [
       { id: 1, content: <PowerPointSlide1 /> },
       { id: 2, content: <PowerPointSlide2 /> },
@@ -69,9 +65,6 @@ export function HomePage() {
       { id: 6, content: <PowerPointSlide6 /> },
       { id: 7, content: <PowerPointSlide7 /> },
       { id: 8, content: <PowerPointSlide8 /> },
-      { id: 9, content: <GoalsVsActualSlide /> }, // Gráfico de setores
-      { id: 10, content: <WeeklyTrendSlide /> }, // Gráfico de barras
-      { id: 11, content: <IndicatorsSlide /> }, // Dashboard de métricas
     ]
     return slides
   }, [])
@@ -480,11 +473,18 @@ export function HomePage() {
                 <h2 className="text-2xl font-bold text-slate-800">Dashboard Comercial</h2>
               </div>
               <p className="text-slate-600 mb-8 text-lg">Métricas e indicadores do setor comercial</p>
-              <GoalsVsActualSlide />
+              <p className="text-slate-500 text-center py-8">Dashboard comercial em desenvolvimento</p>
             </div>
           ) : (
             // Para diretoria, mantém o dashboard padrão
-            <GoalsVsActualSlide />
+            <div className="bg-white rounded-xl p-8 shadow-lg border">
+              <div className="flex items-center gap-2 mb-6">
+                <div className="w-4 h-4 rounded-full bg-blue-500"></div>
+                <h2 className="text-2xl font-bold text-slate-800">Dashboard Diretoria</h2>
+              </div>
+              <p className="text-slate-600 mb-8 text-lg">Visão executiva e indicadores estratégicos</p>
+              <p className="text-slate-500 text-center py-8">Dashboard executivo em desenvolvimento</p>
+            </div>
           )}
         </div>
       </div>

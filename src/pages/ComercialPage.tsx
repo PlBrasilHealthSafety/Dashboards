@@ -1,11 +1,7 @@
 import { useMemo } from 'react'
 import { Carousel } from '@/components/custom/Carousel'
 import { ScrollToTopButton } from '@/components/ui/scroll-to-top-button'
-import {
-  WeeklyTrendSlide,
-  GoalsVsActualSlide,
-  IndicatorsSlide
-} from '@/components/custom/MedicalDashboard'
+
 import {
   PowerPointSlide1,
   PowerPointSlide2,
@@ -36,7 +32,7 @@ import {
 export function ComercialPage() {
 
   const carouselItems = useMemo(() => {
-    // 11 slides: 8 slides de PowerPoint + 3 gráficos específicos
+    // 8 slides de PowerPoint
     const slides = [
       { id: 1, content: <PowerPointSlide1 /> },
       { id: 2, content: <PowerPointSlide2 /> },
@@ -46,9 +42,6 @@ export function ComercialPage() {
       { id: 6, content: <PowerPointSlide6 /> },
       { id: 7, content: <PowerPointSlide7 /> },
       { id: 8, content: <PowerPointSlide8 /> },
-      { id: 9, content: <GoalsVsActualSlide /> }, // Gráfico de setores
-      { id: 10, content: <WeeklyTrendSlide /> }, // Gráfico de barras
-      { id: 11, content: <IndicatorsSlide /> }, // Dashboard de métricas
     ]
     return slides
   }, [])

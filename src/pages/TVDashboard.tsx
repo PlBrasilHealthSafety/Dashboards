@@ -2,7 +2,7 @@ import { useMemo, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Carousel } from '@/components/custom/Carousel'
 
-import { TVPieChartSlide, TVBarChartSlide, TVGoalsChartSlide } from '@/components/custom/TVChartSlides'
+
 import { 
   PowerPointSlide1, 
   PowerPointSlide2, 
@@ -25,7 +25,7 @@ export function TVDashboard() {
   const [currentContrato, setCurrentContrato] = useState<(Contrato & { id: string }) | null>(null)
 
   const carouselItems = useMemo(() => {
-    // 11 slides: 8 slides de PowerPoint + 3 gráficos limpos
+    // 8 slides de PowerPoint
     const slides = [
       { id: 1, content: <PowerPointSlide1 /> },
       { id: 2, content: <PowerPointSlide2 /> },
@@ -35,9 +35,6 @@ export function TVDashboard() {
       { id: 6, content: <PowerPointSlide6 /> },
       { id: 7, content: <PowerPointSlide7 /> },
       { id: 8, content: <PowerPointSlide8 /> },
-      { id: 9, content: <TVPieChartSlide /> }, // Gráfico 1 - Pizza: Distribuição por Setor
-      { id: 10, content: <TVBarChartSlide /> }, // Gráfico 2 - Barras: Performance Mensal
-      { id: 11, content: <TVGoalsChartSlide /> }, // Gráfico 3 - Barras: Metas vs Realizado
     ]
     return slides
   }, [])
