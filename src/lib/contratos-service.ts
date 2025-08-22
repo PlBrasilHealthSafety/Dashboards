@@ -16,10 +16,11 @@ export class ContratosService extends FirestoreService<Contrato> {
   }
 
   // Create a new contrato
-  async createContrato(titulo: string, descricao: string, userId: string): Promise<string> {
+  async createContrato(razaoSocial: string, nomeFantasia: string, dataInicioContrato: string, userId: string): Promise<string> {
     return this.create({
-      titulo,
-      descricao,
+      razaoSocial,
+      nomeFantasia,
+      dataInicioContrato,
       userId,
       displayedOnTV: false
     });

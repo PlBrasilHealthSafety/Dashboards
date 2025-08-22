@@ -3,8 +3,9 @@ import { FileText, Calendar, User } from 'lucide-react'
 
 interface ContratoNotificationOverlayProps {
   contrato: {
-    titulo: string
-    descricao: string
+    razaoSocial: string
+    nomeFantasia: string
+    dataInicioContrato: string
     userId: string
   }
   onComplete: () => void
@@ -64,7 +65,7 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
                   <FileText className="w-8 h-8 text-white" />
                 </div>
                 <h1 className="text-6xl font-bold bg-gradient-to-r from-[#00A298] via-[#0B5C5B] to-[#1D3C44] bg-clip-text text-transparent">
-                  Novo Contrato Criado
+                  O mais novo cliente da PLBrasil
                 </h1>
               </div>
               <div className="w-32 h-2 bg-gradient-to-r from-[#00A298] to-[#1D3C44] mx-auto rounded-full"></div>
@@ -72,29 +73,46 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
 
             {/* Card principal com as informações */}
             <div className="bg-gradient-to-br from-white via-gray-50 to-gray-100 rounded-3xl shadow-2xl p-12 border border-gray-200 animate-in fade-in slide-in-from-bottom duration-1000 delay-300">
-              {/* Título do contrato */}
+              {/* Razão Social */}
               <div className="mb-10">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-3 h-3 rounded-full bg-[#00A298]"></div>
                   <h2 className="text-2xl font-semibold text-gray-600 uppercase tracking-wider">
-                    Título do Contrato
+                    Razão Social
                   </h2>
                 </div>
                 <h3 className="text-5xl font-bold text-[#1D3C44] leading-tight">
-                  {contrato.titulo}
+                  {contrato.razaoSocial}
                 </h3>
               </div>
 
-              {/* Descrição do contrato */}
+              {/* Nome Fantasia */}
               <div className="mb-10">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-3 h-3 rounded-full bg-[#00A298]"></div>
                   <h2 className="text-2xl font-semibold text-gray-600 uppercase tracking-wider">
-                    Descrição
+                    Nome Fantasia
                   </h2>
                 </div>
-                <p className="text-3xl text-gray-700 leading-relaxed">
-                  {contrato.descricao}
+                <p className="text-4xl font-semibold text-gray-700 leading-relaxed">
+                  {contrato.nomeFantasia}
+                </p>
+              </div>
+
+              {/* Data de Início do Contrato */}
+              <div className="mb-10">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-3 h-3 rounded-full bg-[#00A298]"></div>
+                  <h2 className="text-2xl font-semibold text-gray-600 uppercase tracking-wider">
+                    Data de Início do Contrato
+                  </h2>
+                </div>
+                <p className="text-3xl font-bold text-[#00A298] leading-relaxed">
+                  {new Date(contrato.dataInicioContrato).toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric'
+                  })}
                 </p>
               </div>
 

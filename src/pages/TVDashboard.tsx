@@ -175,8 +175,9 @@ export function TVDashboard() {
       {currentContrato && (
         <ContratoNotificationOverlay
           contrato={{
-            titulo: currentContrato.titulo,
-            descricao: currentContrato.descricao,
+            razaoSocial: currentContrato.razaoSocial,
+            nomeFantasia: currentContrato.nomeFantasia,
+            dataInicioContrato: currentContrato.dataInicioContrato,
             userId: currentContrato.userId
           }}
           onComplete={handleNotificationComplete}

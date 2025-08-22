@@ -10,8 +10,9 @@ interface NovoContratoModalProps {
 
 export function NovoContratoModal({ isOpen, onClose }: NovoContratoModalProps) {
   const { user } = useAuth()
-  const [titulo, setTitulo] = useState('')
-  const [descricao, setDescricao] = useState('')
+  const [razaoSocial, setRazaoSocial] = useState('')
+  const [nomeFantasia, setNomeFantasia] = useState('')
+  const [dataInicioContrato, setDataInicioContrato] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
   if (!isOpen) return null
@@ -21,7 +22,7 @@ export function NovoContratoModal({ isOpen, onClose }: NovoContratoModalProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!user || !titulo.trim() || !descricao.trim()) {
+    if (!user || !razaoSocial.trim() || !nomeFantasia.trim() || !dataInicioContrato.trim()) {
       return
     }
 
@@ -33,8 +34,9 @@ export function NovoContratoModal({ isOpen, onClose }: NovoContratoModalProps) {
       const { db } = await import('@/lib/firebase')
       
       const docData = {
-        titulo: titulo.trim(),
-        descricao: descricao.trim(),
+        razaoSocial: razaoSocial.trim(),
+        nomeFantasia: nomeFantasia.trim(),
+        dataInicioContrato: dataInicioContrato.trim(),
         userId: user.uid,
         displayedOnTV: false, // Novo campo para controlar exibição na TV
         createdAt: serverTimestamp(),
@@ -50,8 +52,9 @@ export function NovoContratoModal({ isOpen, onClose }: NovoContratoModalProps) {
       console.log('NovoContratoModal: Contrato salvo com ID:', docRef.id)
       
       // Limpar campos e fechar modal
-      setTitulo('')
-      setDescricao('')
+      setRazaoSocial('')
+      setNomeFantasia('')
+      setDataInicioContrato('')
       onClose()
       
     } catch (error) {
@@ -62,8 +65,9 @@ export function NovoContratoModal({ isOpen, onClose }: NovoContratoModalProps) {
   }
 
   const handleClose = () => {
-    setTitulo('')
-    setDescricao('')
+    setRazaoSocial('')
+    setNomeFantasia('')
+    setDataInicioContrato('')
     onClose()
   }
 
@@ -99,40 +103,66 @@ export function NovoContratoModal({ isOpen, onClose }: NovoContratoModalProps) {
 
         {/* Content */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Campo Título */}
+          {/* Mensagem de boas-vindas */}
+          <div className="text-center mb-6">
+            <h3 className="text-lg font-semibold text-[#1D3C44] mb-2">
+              O mais novo cliente da PLBrasil
+            </h3>
+            <div className="w-16 h-1 bg-gradient-to-r from-[#00A298] to-[#1D3C44] mx-auto rounded-full"></div>
+          </div>
+
+          {/* Campo Razão Social */}
           <div className="space-y-2">
             <label 
-              htmlFor="titulo" 
+              htmlFor="razaoSocial" 
               className="text-sm font-medium text-slate-700"
             >
-              Título *
+              Razão Social *
             </label>
             <input
-              id="titulo"
+              id="razaoSocial"
               type="text"
-              value={titulo}
-              onChange={(e) => setTitulo(e.target.value)}
-              placeholder="Digite o título do contrato"
+              value={razaoSocial}
+              onChange={(e) => setRazaoSocial(e.target.value)}
+              placeholder="Digite a razão social da empresa"
               className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#00A298] focus:ring-2 focus:ring-[#00A298]/20 outline-none transition-all duration-200 text-slate-700 placeholder-slate-400"
               required
             />
           </div>
 
-          {/* Campo Descrição */}
+          {/* Campo Nome Fantasia */}
           <div className="space-y-2">
             <label 
-              htmlFor="descricao" 
+              htmlFor="nomeFantasia" 
               className="text-sm font-medium text-slate-700"
             >
-              Descrição *
+              Nome Fantasia *
             </label>
-            <textarea
-              id="descricao"
-              value={descricao}
-              onChange={(e) => setDescricao(e.target.value)}
-              placeholder="Digite a descrição do contrato"
-              rows={4}
-              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#00A298] focus:ring-2 focus:ring-[#00A298]/20 outline-none transition-all duration-200 text-slate-700 placeholder-slate-400 resize-none"
+            <input
+              id="nomeFantasia"
+              type="text"
+              value={nomeFantasia}
+              onChange={(e) => setNomeFantasia(e.target.value)}
+              placeholder="Digite o nome fantasia da empresa"
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#00A298] focus:ring-2 focus:ring-[#00A298]/20 outline-none transition-all duration-200 text-slate-700 placeholder-slate-400"
+              required
+            />
+          </div>
+
+          {/* Campo Data de Início do Contrato */}
+          <div className="space-y-2">
+            <label 
+              htmlFor="dataInicioContrato" 
+              className="text-sm font-medium text-slate-700"
+            >
+              Data de Início do Contrato *
+            </label>
+            <input
+              id="dataInicioContrato"
+              type="date"
+              value={dataInicioContrato}
+              onChange={(e) => setDataInicioContrato(e.target.value)}
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#00A298] focus:ring-2 focus:ring-[#00A298]/20 outline-none transition-all duration-200 text-slate-700"
               required
             />
           </div>
@@ -149,7 +179,7 @@ export function NovoContratoModal({ isOpen, onClose }: NovoContratoModalProps) {
             </Button>
             <Button
               type="submit"
-              disabled={isLoading || !titulo.trim() || !descricao.trim()}
+              disabled={isLoading || !razaoSocial.trim() || !nomeFantasia.trim() || !dataInicioContrato.trim()}
               className="flex-1 bg-gradient-to-r from-[#00A298] to-[#1D3C44] hover:from-[#00A298]/90 hover:to-[#1D3C44]/90 text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Criando...' : 'Criar Contrato'}

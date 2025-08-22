@@ -40,8 +40,9 @@ export interface ExampleDocument extends FirestoreDocument {
 
 // Contrato document type
 export interface Contrato extends FirestoreDocument {
-  titulo: string;
-  descricao: string;
+  razaoSocial: string;
+  nomeFantasia: string;
+  dataInicioContrato: string;
   userId: string;
   displayedOnTV: boolean;
 }
