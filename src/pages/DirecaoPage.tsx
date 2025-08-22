@@ -7,7 +7,7 @@ import {
   GoalsVsActualSlide, 
   IndicatorsSlide
 } from '@/components/custom/MedicalDashboard'
-import { BrandHeroSlideOne, BrandHeroSlideTwo, BrandHeroSlideThree } from '@/components/custom/HeroSlides'
+
 import { 
   PowerPointSlide1, 
   PowerPointSlide2, 
