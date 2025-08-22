@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { Carousel } from '@/components/custom/Carousel'
+import { ScrollToTopButton } from '@/components/ui/scroll-to-top-button'
 import { 
   MedicalOverviewSlide, 
   WeeklyTrendSlide, 
@@ -53,10 +54,10 @@ export function ComercialPage() {
       <div className="relative p-6">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-[#00A298] via-[#0B5C5B] to-[#1D3C44] bg-clip-text text-transparent">
             Dashboard Comercial
           </h1>
-          <p className="text-gray-600 mt-2">
+          <p className="text-[#1D3C44]/80 mt-2">
             Métricas específicas do setor comercial
           </p>
         </div>
@@ -92,11 +93,15 @@ export function ComercialPage() {
               </div>
             </div>
 
-            {/* Título abaixo do slide */}
-            <div className="text-center mt-6 mb-10">
-              <h3 className="text-lg font-semibold text-foreground">Análises detalhadas</h3>
-            </div>
           </div>
+        </div>
+
+        {/* Título abaixo do slide */}
+        <div className="text-center mt-10 mb-16">
+          <h3 className="text-xl font-bold tracking-tight text-center bg-gradient-to-r from-[#00A298] via-[#0B5C5B] to-[#1D3C44] bg-clip-text text-transparent">
+            Análises detalhadas
+          </h3>
+          <div className="w-24 h-1 bg-gradient-to-r from-[#00A298] to-[#1D3C44] mx-auto mt-3 rounded-full"></div>
         </div>
 
         {/* Dashboard específico do setor comercial */}
@@ -316,6 +321,8 @@ export function ComercialPage() {
           </div>
         </div>
       </div>
+      
+      <ScrollToTopButton />
     </div>
   )
 }
