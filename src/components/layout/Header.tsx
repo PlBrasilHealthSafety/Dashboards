@@ -2,12 +2,16 @@ import { useAuth } from '@/hooks/useAuth'
 import { useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { User, Monitor } from 'lucide-react'
+import { Monitor } from 'lucide-react'
+import { UserProfileDropdown } from '@/components/custom/UserProfileDropdown'
+import { UserProfileModal } from '@/components/custom/UserProfileModal'
 
 export function Header() {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
   const [logoSrc, setLogoSrc] = useState<string>('/plbrasil-logo.svg')
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
+  
   const handleLogoError = useCallback(() => {
     setLogoSrc(prev => {
       if (prev.endsWith('.svg')) return '/plbrasil-logo.png'
@@ -16,6 +20,18 @@ export function Header() {
       return '/vite.svg' // último fallback
     })
   }, [])
+
+  const handleViewProfile = () => {
+    setIsProfileModalOpen(true)
+  }
+
+  const handleCadastros = () => {
+    console.log('Cadastros - Em desenvolvimento')
+  }
+
+  const handleNovoContrato = () => {
+    console.log('Novo Contrato - Em desenvolvimento')
+  }
 
   return (
     <header className="relative w-full z-10 border-b border-gray-200 shadow-md">
@@ -31,12 +47,11 @@ export function Header() {
         </div>
         {user && (
           <div className="absolute right-6 flex items-center gap-3">
-            <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#00A298]/10 border border-[#00A298]/30">
-                <User className="w-4 h-4 text-[#00A298]" />
-              </div>
-              <span className="text-sm font-medium text-slate-700 hidden sm:block">{user.email}</span>
-            </div>
+            <UserProfileDropdown
+              onViewProfile={handleViewProfile}
+              onCadastros={handleCadastros}
+              onNovoContrato={handleNovoContrato}
+            />
             <Button 
               variant="outline" 
               size="sm" 
@@ -52,6 +67,12 @@ export function Header() {
             </Button>
           </div>
         )}
+        
+        {/* Modal do Perfil */}
+        <UserProfileModal
+          isOpen={isProfileModalOpen}
+          onClose={() => setIsProfileModalOpen(false)}
+        />
       </div>
     </header>
   )

@@ -24,7 +24,10 @@ import {
     type DocumentData,
     type QueryConstraint
 } from 'firebase/firestore';
-import { auth, db } from './firebase';
+import { auth, db, storage } from './firebase';
+
+// Export storage for use in other modules
+export { storage };
 
 // Authentication utilities
 export const createUser = async (email: string, password: string) => {
