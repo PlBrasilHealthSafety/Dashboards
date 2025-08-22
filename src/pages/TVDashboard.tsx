@@ -48,22 +48,40 @@ export function TVDashboard() {
 
     const setupListener = async () => {
       try {
-        const { collection, query, where, orderBy, onSnapshot, limit } = await import('firebase/firestore')
+        console.log('TVDashboard: Configurando listener do Firestore...')
+        const { collection, onSnapshot } = await import('firebase/firestore')
         const { db } = await import('@/lib/firebase')
 
-        // Escutar contratos que ainda não foram exibidos na TV
-        const q = query(
-          collection(db, 'contratos'),
-          where('displayedOnTV', '==', false),
-          orderBy('createdAt', 'desc'),
-          limit(1)
-        )
+        // Escutar todos os contratos (simplificado para debug)
+        const q = collection(db, 'contratos')
+        
+        console.log('TVDashboard: Query configurada, iniciando listener...')
 
         unsubscribe = onSnapshot(q, (snapshot) => {
-          if (!snapshot.empty && !currentContrato) {
-            const doc = snapshot.docs[0]
-            const contrato = { id: doc.id, ...doc.data() } as Contrato & { id: string }
+          console.log('TVDashboard: Listener ativado, total de documentos:', snapshot.size)
+          
+          // Filtrar contratos não exibidos
+          const contratosNaoExibidos = snapshot.docs
+            .map(doc => ({ id: doc.id, ...doc.data() } as Contrato & { id: string }))
+            .filter(contrato => contrato.displayedOnTV === false)
+            .sort((a, b) => {
+              // Ordenar por createdAt se disponível
+              if (a.createdAt && b.createdAt) {
+                return b.createdAt.toMillis() - a.createdAt.toMillis()
+              }
+              return 0
+            })
+          
+          console.log('TVDashboard: Contratos não exibidos encontrados:', contratosNaoExibidos.length)
+          
+          if (contratosNaoExibidos.length > 0 && !currentContrato) {
+            const contrato = contratosNaoExibidos[0]
+            console.log('TVDashboard: Novo contrato detectado:', contrato)
             setCurrentContrato(contrato)
+          } else if (contratosNaoExibidos.length === 0) {
+            console.log('TVDashboard: Nenhum contrato pendente encontrado')
+          } else if (currentContrato) {
+            console.log('TVDashboard: Já existe um contrato sendo exibido')
           }
         })
       } catch (error) {

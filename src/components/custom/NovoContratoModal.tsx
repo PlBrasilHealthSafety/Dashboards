@@ -45,7 +45,9 @@ export function NovoContratoModal({ isOpen, onClose }: NovoContratoModalProps) {
       await user.getIdToken()
       
       // Salvar no Firestore - a TV detectará automaticamente
-      await addDoc(collection(db, 'contratos'), docData)
+      console.log('NovoContratoModal: Salvando contrato no Firestore:', docData)
+      const docRef = await addDoc(collection(db, 'contratos'), docData)
+      console.log('NovoContratoModal: Contrato salvo com ID:', docRef.id)
       
       // Limpar campos e fechar modal
       setTitulo('')
