@@ -5,12 +5,14 @@ import { Button } from '@/components/ui/button'
 import { Monitor } from 'lucide-react'
 import { UserProfileDropdown } from '@/components/custom/UserProfileDropdown'
 import { UserProfileModal } from '@/components/custom/UserProfileModal'
+import { NovoContratoModal } from '@/components/custom/NovoContratoModal'
 
 export function Header() {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
   const [logoSrc, setLogoSrc] = useState<string>('/plbrasil-logo.svg')
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
+  const [isNovoContratoModalOpen, setIsNovoContratoModalOpen] = useState(false)
   
   const handleLogoError = useCallback(() => {
     setLogoSrc(prev => {
@@ -30,7 +32,7 @@ export function Header() {
   }
 
   const handleNovoContrato = () => {
-    console.log('Novo Contrato - Em desenvolvimento')
+    setIsNovoContratoModalOpen(true)
   }
 
   return (
@@ -72,6 +74,12 @@ export function Header() {
         <UserProfileModal
           isOpen={isProfileModalOpen}
           onClose={() => setIsProfileModalOpen(false)}
+        />
+        
+        {/* Modal Novo Contrato */}
+        <NovoContratoModal
+          isOpen={isNovoContratoModalOpen}
+          onClose={() => setIsNovoContratoModalOpen(false)}
         />
       </div>
     </header>
