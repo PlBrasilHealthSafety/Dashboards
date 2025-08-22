@@ -17,12 +17,6 @@ export class ContratosService extends FirestoreService<Contrato> {
 
   // Create a new contrato
   async createContrato(titulo: string, descricao: string, userId: string): Promise<string> {
-    console.log('ContratosService.createContrato chamado com:', {
-      titulo,
-      descricao,
-      userId
-    });
-    
     return this.create({
       titulo,
       descricao,

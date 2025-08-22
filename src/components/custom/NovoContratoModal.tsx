@@ -19,37 +19,18 @@ export function NovoContratoModal({ isOpen, onClose }: NovoContratoModalProps) {
 
   if (!isOpen) return null
 
-  // Debug: log user info when modal opens
-  console.log('Modal aberto - User info:', {
-    user: user ? {
-      uid: user.uid,
-      email: user.email,
-      emailVerified: user.emailVerified
-    } : null
-  })
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!user || !titulo.trim() || !descricao.trim()) {
-      console.log('Validação falhou:', {
-        user: !!user,
-        titulo: titulo.trim(),
-        descricao: descricao.trim()
-      })
       return
     }
 
     setIsLoading(true)
     
     try {
-      console.log('Criando contrato com dados:', {
-        titulo: titulo.trim(),
-        descricao: descricao.trim(),
-        userId: user.uid,
-        userEmail: user.email
-      })
-      
       // Teste direto com Firebase
       const { addDoc, collection, serverTimestamp } = await import('firebase/firestore')
       const { db } = await import('@/lib/firebase')
@@ -62,14 +43,10 @@ export function NovoContratoModal({ isOpen, onClose }: NovoContratoModalProps) {
         updatedAt: serverTimestamp()
       }
       
-      console.log('Dados que serão enviados:', docData)
-      
       // Verificar se o usuário tem um token válido
-      const token = await user.getIdToken()
-      console.log('Token do usuário obtido:', !!token)
+      await user.getIdToken()
       
-      const docRef = await addDoc(collection(db, 'contratos'), docData)
-      console.log('Documento criado com ID:', docRef.id)
+      await addDoc(collection(db, 'contratos'), docData)
       
       // Enviar notificação para o modo TV
       addNotification({
@@ -83,12 +60,8 @@ export function NovoContratoModal({ isOpen, onClose }: NovoContratoModalProps) {
       setDescricao('')
       onClose()
       
-      // Opcional: mostrar notificação de sucesso
-      console.log('Contrato criado com sucesso!')
-      
     } catch (error) {
       console.error('Erro ao criar contrato:', error)
-      // Opcional: mostrar notificação de erro
     } finally {
       setIsLoading(false)
     }

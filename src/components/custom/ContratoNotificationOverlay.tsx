@@ -40,7 +40,7 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
           <iframe
             width="100%"
             height="100%"
-            src="https://www.youtube.com/embed/aLY51m8HAPY?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&loop=0&start=0&end=7"
+            src="https://www.youtube.com/embed/aLY51m8HAPY?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&loop=0"
             title="Novo Contrato Criado"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

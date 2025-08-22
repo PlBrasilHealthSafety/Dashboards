@@ -1,20 +1,20 @@
 import { useMemo } from 'react'
 import { Carousel } from '@/components/custom/Carousel'
 import { ScrollToTopButton } from '@/components/ui/scroll-to-top-button'
-import { 
-  WeeklyTrendSlide, 
-  GoalsVsActualSlide, 
+import {
+  WeeklyTrendSlide,
+  GoalsVsActualSlide,
   IndicatorsSlide
 } from '@/components/custom/MedicalDashboard'
-import { 
-  PowerPointSlide1, 
-  PowerPointSlide2, 
-  PowerPointSlide3, 
-  PowerPointSlide4, 
-  PowerPointSlide5, 
-  PowerPointSlide6, 
-  PowerPointSlide7, 
-  PowerPointSlide8 
+import {
+  PowerPointSlide1,
+  PowerPointSlide2,
+  PowerPointSlide3,
+  PowerPointSlide4,
+  PowerPointSlide5,
+  PowerPointSlide6,
+  PowerPointSlide7,
+  PowerPointSlide8
 } from '@/components/custom/PowerPointSlides'
 
 import {
@@ -57,7 +57,7 @@ export function ComercialPage() {
     <div className="relative min-h-screen bg-transparent">
       {/* Padrão de fundo sutil PLBrasil para tela toda */}
       <div className="fixed inset-0 -z-10 pointer-events-none bg-[radial-gradient(circle_at_30%_20%,rgba(0,162,152,0.08)_0%,transparent_50%),radial-gradient(circle_at_80%_80%,rgba(29,60,68,0.06)_0%,transparent_50%),radial-gradient(circle_at_40%_60%,rgba(174,206,203,0.04)_0%,transparent_30%)]"></div>
-      
+
       <div className="relative p-6">
         {/* Header */}
         <div className="text-center mb-8">
@@ -87,7 +87,7 @@ export function ComercialPage() {
                     centeredSlides
                     showNavigation
                     showPagination
-                    autoplay={{ 
+                    autoplay={{
                       delay: 30000, // 30 segundos por slide
                       disableOnInteraction: false,
                       pauseOnMouseEnter: true
@@ -116,7 +116,7 @@ export function ComercialPage() {
               <h2 className="text-2xl font-bold text-slate-800">Dashboard Comercial</h2>
             </div>
             <p className="text-slate-600 mb-8 text-lg">Métricas e indicadores do setor comercial</p>
-            
+
             {/* KPIs comerciais - grid 4 colunas */}
             <div className="grid grid-cols-4 gap-6 mb-8">
               <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border border-blue-200">
@@ -291,7 +291,7 @@ export function ComercialPage() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                     <XAxis dataKey="mes" stroke="#64748b" fontSize={12} />
                     <YAxis stroke="#64748b" fontSize={12} />
-                    <Tooltip 
+                    <Tooltip
                       contentStyle={{
                         backgroundColor: 'white',
                         border: '1px solid #e2e8f0',
@@ -301,18 +301,18 @@ export function ComercialPage() {
                       formatter={(value) => [`R$ ${value}`, '']}
                     />
                     <Legend />
-                    <Line 
-                      type="monotone" 
-                      dataKey="vendas" 
-                      stroke="#00A298" 
+                    <Line
+                      type="monotone"
+                      dataKey="vendas"
+                      stroke="#00A298"
                       strokeWidth={3}
                       dot={{ fill: '#00A298', strokeWidth: 2, r: 4 }}
                       name="Vendas Realizadas"
                     />
-                    <Line 
-                      type="monotone" 
-                      dataKey="meta" 
-                      stroke="#1D3C44" 
+                    <Line
+                      type="monotone"
+                      dataKey="meta"
+                      stroke="#1D3C44"
                       strokeWidth={2}
                       strokeDasharray="5 5"
                       dot={{ fill: '#1D3C44', strokeWidth: 1, r: 3 }}
@@ -325,7 +325,7 @@ export function ComercialPage() {
           </div>
         </div>
       </div>
-      
+
       <ScrollToTopButton />
     </div>
   )
