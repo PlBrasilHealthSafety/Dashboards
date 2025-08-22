@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { X, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useAuth } from '@/hooks/useAuth'
+import { contratosService } from '@/lib/contratos-service'
 
 interface NovoContratoModalProps {
   isOpen: boolean
@@ -8,16 +10,79 @@ interface NovoContratoModalProps {
 }
 
 export function NovoContratoModal({ isOpen, onClose }: NovoContratoModalProps) {
+  const { user } = useAuth()
   const [titulo, setTitulo] = useState('')
   const [descricao, setDescricao] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   if (!isOpen) return null
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Debug: log user info when modal opens
+  console.log('Modal aberto - User info:', {
+    user: user ? {
+      uid: user.uid,
+      email: user.email,
+      emailVerified: user.emailVerified
+    } : null
+  })
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Lógica será implementada posteriormente
-    console.log('Novo contrato:', { titulo, descricao })
-    onClose()
+    
+    if (!user || !titulo.trim() || !descricao.trim()) {
+      console.log('Validação falhou:', {
+        user: !!user,
+        titulo: titulo.trim(),
+        descricao: descricao.trim()
+      })
+      return
+    }
+
+    setIsLoading(true)
+    
+    try {
+      console.log('Criando contrato com dados:', {
+        titulo: titulo.trim(),
+        descricao: descricao.trim(),
+        userId: user.uid,
+        userEmail: user.email
+      })
+      
+      // Teste direto com Firebase
+      const { addDoc, collection, serverTimestamp } = await import('firebase/firestore')
+      const { db } = await import('@/lib/firebase')
+      
+      const docData = {
+        titulo: titulo.trim(),
+        descricao: descricao.trim(),
+        userId: user.uid,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      }
+      
+      console.log('Dados que serão enviados:', docData)
+      
+      // Verificar se o usuário tem um token válido
+      const token = await user.getIdToken()
+      console.log('Token do usuário obtido:', !!token)
+      
+      const docRef = await addDoc(collection(db, 'contratos'), docData)
+      console.log('Documento criado com ID:', docRef.id)
+      
+      // Limpar campos e fechar modal
+      setTitulo('')
+      setDescricao('')
+      onClose()
+      
+      // Opcional: mostrar notificação de sucesso
+      console.log('Contrato criado com sucesso!')
+      
+    } catch (error) {
+      console.error('Erro ao criar contrato:', error)
+      // Opcional: mostrar notificação de erro
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleClose = () => {
@@ -108,9 +173,10 @@ export function NovoContratoModal({ isOpen, onClose }: NovoContratoModalProps) {
             </Button>
             <Button
               type="submit"
-              className="flex-1 bg-gradient-to-r from-[#00A298] to-[#1D3C44] hover:from-[#00A298]/90 hover:to-[#1D3C44]/90 text-white shadow-lg"
+              disabled={isLoading || !titulo.trim() || !descricao.trim()}
+              className="flex-1 bg-gradient-to-r from-[#00A298] to-[#1D3C44] hover:from-[#00A298]/90 hover:to-[#1D3C44]/90 text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Criar Contrato
+              {isLoading ? 'Criando...' : 'Criar Contrato'}
             </Button>
           </div>
         </form>

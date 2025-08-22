@@ -38,6 +38,13 @@ export interface ExampleDocument extends FirestoreDocument {
   status: 'active' | 'inactive';
 }
 
+// Contrato document type
+export interface Contrato extends FirestoreDocument {
+  titulo: string;
+  descricao: string;
+  userId: string;
+}
+
 // Firebase configuration type
 export interface FirebaseConfig {
   apiKey: string;
