@@ -1,4 +1,4 @@
-import { useMemo, useEffect } from 'react'
+import { useMemo, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Carousel } from '@/components/custom/Carousel'
 
@@ -13,6 +13,8 @@ import {
   PowerPointSlide7, 
   PowerPointSlide8 
 } from '@/components/custom/PowerPointSlides'
+import { ContratoNotificationOverlay } from '@/components/custom/ContratoNotificationOverlay'
+import { useContratoNotifications } from '@/contexts/ContratoNotificationContext'
 import { X } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { getUserRoute } from '@/lib/utils'
@@ -20,6 +22,8 @@ import { getUserRoute } from '@/lib/utils'
 export function TVDashboard() {
   const navigate = useNavigate()
   const { user } = useAuth()
+  const { notifications, removeNotification } = useContratoNotifications()
+  const [currentNotification, setCurrentNotification] = useState<typeof notifications[0] | null>(null)
 
   const carouselItems = useMemo(() => {
     // 11 slides: 8 slides de PowerPoint + 3 gráficos limpos
@@ -39,6 +43,15 @@ export function TVDashboard() {
     return slides
   }, [])
 
+  // Gerenciar notificações de contratos
+  useEffect(() => {
+    if (notifications.length > 0 && !currentNotification) {
+      // Pegar a notificação mais recente
+      const latestNotification = notifications[notifications.length - 1]
+      setCurrentNotification(latestNotification)
+    }
+  }, [notifications, currentNotification])
+
   // Listener para tecla ESC
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -53,6 +66,13 @@ export function TVDashboard() {
       document.removeEventListener('keydown', handleKeyDown)
     }
   }, [navigate])
+
+  const handleNotificationComplete = () => {
+    if (currentNotification) {
+      removeNotification(currentNotification.id)
+      setCurrentNotification(null)
+    }
+  }
 
   return (
     <div className="fixed inset-0 bg-black overflow-hidden">
@@ -89,6 +109,14 @@ export function TVDashboard() {
           }}
         />
       </div>
+
+      {/* Overlay de notificação de contrato */}
+      {currentNotification && (
+        <ContratoNotificationOverlay
+          contrato={currentNotification.contrato}
+          onComplete={handleNotificationComplete}
+        />
+      )}
     </div>
   )
 }
