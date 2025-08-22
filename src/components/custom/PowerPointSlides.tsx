@@ -1,4 +1,4 @@
-import React from 'react'
+
 
 // Componente base para slides de imagem
 interface ImageSlideProps {

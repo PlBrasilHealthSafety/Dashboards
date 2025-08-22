@@ -2,14 +2,11 @@ import { useMemo } from 'react'
 import { Carousel } from '@/components/custom/Carousel'
 import { ExecutiveLayoutDashboard } from '@/components/custom/ExecutiveLayoutDashboard'
 import {
-  MedicalOverviewSlide,
   WeeklyTrendSlide,
   GoalsVsActualSlide,
-  IndicatorsSlide,
-  AnnualAnalysisSlide
+  IndicatorsSlide
 } from '@/components/custom/MedicalDashboard'
 
-import { BrandHeroSlideOne, BrandHeroSlideTwo, BrandHeroSlideThree } from '@/components/custom/HeroSlides'
 import { 
   PowerPointSlide1, 
   PowerPointSlide2, 

@@ -3,11 +3,9 @@ import { Carousel } from '@/components/custom/Carousel'
 import { ScrollToTopButton } from '@/components/ui/scroll-to-top-button'
 import { ExecutiveLayoutDashboard } from '@/components/custom/ExecutiveLayoutDashboard'
 import { 
-  MedicalOverviewSlide, 
   WeeklyTrendSlide, 
   GoalsVsActualSlide, 
-  IndicatorsSlide,
-  AnnualAnalysisSlide
+  IndicatorsSlide
 } from '@/components/custom/MedicalDashboard'
 import { BrandHeroSlideOne, BrandHeroSlideTwo, BrandHeroSlideThree } from '@/components/custom/HeroSlides'
 import { 

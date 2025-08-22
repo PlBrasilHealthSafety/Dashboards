@@ -1,4 +1,3 @@
-import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   BarChart,
@@ -6,8 +5,6 @@ import {
   PieChart,
   Pie,
   Cell,
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -48,11 +45,7 @@ const tendenciaSemanalData = [
   { dia: 'Dom', valor: 0 }
 ];
 
-const metasRealizadoData = [
-  { setor: 'Medicina', meta: 75, realizado: 94 },
-  { setor: 'Comercial', meta: 80, realizado: 87 },
-  { setor: 'Operações', meta: 85, realizado: 91 }
-];
+
 
 const anualData = [
   { mes: 'Jan', valor: 115 },
@@ -125,7 +118,7 @@ export const MedicalOverviewSlide = () => {
                   cy="50%"
                   outerRadius={80}
                   dataKey="value"
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
                 >
                   {consultasData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
@@ -276,7 +269,7 @@ export const GoalsVsActualSlide = () => {
             cy="50%"
             outerRadius={100}
             dataKey="value"
-            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+            label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
           >
             <Cell fill={COLORS.primary} />
             <Cell fill={COLORS.secondary} />

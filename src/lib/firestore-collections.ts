@@ -36,7 +36,7 @@ export const firestoreHelpers = {
       displayName,
       bio: '',
       photoURL: '',
-      role: 'user' as const
+      role: 'diretoria' as const
     };
     
     return await userProfileService.create(userData);

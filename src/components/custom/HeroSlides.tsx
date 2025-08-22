@@ -1,4 +1,4 @@
-import React from 'react'
+
 
 // Brand colors (PLBrasil)
 const BRAND_PRIMARY = '#00A298'

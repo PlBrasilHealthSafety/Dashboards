@@ -1,6 +1,6 @@
 import { useState, useEffect, createContext, useContext } from 'react';
 import type { User } from 'firebase/auth';
-import { onAuthStateChange, signInUser, signInUserWithPersistence, createUser, signOutUser } from '../lib/firebase-utils';
+import { onAuthStateChange, signInUserWithPersistence, createUser, signOutUser } from '../lib/firebase-utils';
 import { userProfileService } from '../lib/firestore-collections';
 import { Timestamp } from 'firebase/firestore';
 

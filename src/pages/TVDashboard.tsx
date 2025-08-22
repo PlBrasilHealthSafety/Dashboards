@@ -1,14 +1,7 @@
 import { useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Carousel } from '@/components/custom/Carousel'
-import { 
-  MedicalOverviewSlide, 
-  WeeklyTrendSlide, 
-  GoalsVsActualSlide, 
-  IndicatorsSlide,
-  AnnualAnalysisSlide
-} from '@/components/custom/MedicalDashboard'
-import { BrandHeroSlideOne, BrandHeroSlideTwo, BrandHeroSlideThree } from '@/components/custom/HeroSlides'
+
 import { TVPieChartSlide, TVBarChartSlide, TVGoalsChartSlide } from '@/components/custom/TVChartSlides'
 import { 
   PowerPointSlide1, 
