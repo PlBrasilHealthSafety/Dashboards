@@ -66,23 +66,23 @@ export function DirecaoPage() {
       {/* Padrão de fundo sutil PLBrasil para tela toda */}
       <div className="fixed inset-0 -z-10 pointer-events-none bg-[radial-gradient(circle_at_30%_20%,rgba(0,162,152,0.08)_0%,transparent_50%),radial-gradient(circle_at_80%_80%,rgba(29,60,68,0.06)_0%,transparent_50%),radial-gradient(circle_at_40%_60%,rgba(174,206,203,0.04)_0%,transparent_30%)]"></div>
       
-      {/* Seção do slide (carousel) com títulos e espaçamentos */}
-      <div className="relative py-12">
-        <div className="max-w-7xl mx-auto px-4">
-          {/* Título acima do slide - aprimorado e profissional */}
-          <div className="text-center mb-8">
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-              <span className="bg-gradient-to-r from-[#00A298] via-[#0B5C5B] to-[#1D3C44] bg-clip-text text-transparent">
-                Dashboard Interativo de Sistema
-              </span>
-            </h2>
-            <p className="text-sm text-slate-600 mt-2 font-medium">
-              Painel integrado de indicadores estratégicos • PLBrasil Health & Safety
-            </p>
-          </div>
+      <div className="relative p-6">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-[#00A298] via-[#0B5C5B] to-[#1D3C44] bg-clip-text text-transparent">
+            Dashboard Diretoria
+          </h1>
+          <p className="text-[#1D3C44]/80 mt-2">
+            Visão estratégica e indicadores executivos
+          </p>
+        </div>
 
-          {/* Carousel centralizado em formato wide */}
-          <div className="flex justify-center mt-12">
+        {/* Seção do slide (carousel) com títulos e espaçamentos */}
+        <div className="py-6">
+          <div className="max-w-7xl mx-auto px-4">
+
+            {/* Carousel centralizado */}
+            <div className="flex justify-center">
             <div className="w-full">
               <div className="w-full rounded-2xl shadow-2xl overflow-hidden bg-white aspect-[20/9]">
                 <Carousel
@@ -104,23 +104,25 @@ export function DirecaoPage() {
             </div>
           </div>
 
-          {/* Título abaixo do slide */}
-          <div className="text-center mt-6 mb-10">
-            <h3 className="text-lg font-semibold text-foreground">
-              
-            </h3>
           </div>
         </div>
-      </div>
 
-      {/* Dashboard executivo completo */}
-      <ExecutiveLayoutDashboard />
+        {/* Título abaixo do slide */}
+        <div className="text-center mt-10 mb-16">
+          <h3 className="text-xl font-bold tracking-tight text-center bg-gradient-to-r from-[#00A298] via-[#0B5C5B] to-[#1D3C44] bg-clip-text text-transparent">
+            Análises detalhadas
+          </h3>
+          <div className="w-24 h-1 bg-gradient-to-r from-[#00A298] to-[#1D3C44] mx-auto mt-3 rounded-full"></div>
+        </div>
 
-      {/* Seção de análises estilizada */}
-      <DetailedSectorAnalysis />
+        {/* Dashboard executivo completo */}
+        <ExecutiveLayoutDashboard />
 
-      {/* Gráfico grande de evolução trimestral */}
-      <div className="mx-8 mb-12">
+        {/* Seção de análises estilizada */}
+        <DetailedSectorAnalysis />
+
+        {/* Gráfico grande de evolução trimestral */}
+        <div className="mx-8 mb-12">
         <div className="bg-white rounded-xl p-8 shadow-lg border">
           <div className="flex items-center gap-2 mb-6">
             <div className="w-4 h-4 rounded-full bg-blue-500"></div>
@@ -186,6 +188,7 @@ export function DirecaoPage() {
               </LineChart>
             </ResponsiveContainer>
           </div>
+        </div>
         </div>
       </div>
       

@@ -39,44 +39,6 @@ const evolucaoTrimestralData = [
 export const ExecutiveLayoutDashboard = () => {
   return (
     <div className="w-full bg-gradient-to-b from-transparent via-slate-50/80 to-slate-100/60">
-      {/* Header compactado com filtros e branding PLBrasil */}
-      <div className="mx-8 mb-8">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-white rounded-xl p-4 shadow border">
-          <div>
-            <h2 className="text-xl font-extrabold tracking-tight">
-              <span
-                className="text-transparent bg-clip-text"
-                style={{ backgroundImage: 'linear-gradient(90deg, #00A298, #1D3C44)' }}
-              >
-                PLBrasil Health & Safety
-              </span>
-              {' '}• Visão da Direção
-            </h2>
-            <p className="text-xs text-muted-foreground">Consolidado de metas e indicadores por setor</p>
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            {[2021, 2022, 2023, 2024, 2025].map((year) => (
-              <button
-                key={year}
-                className={`px-3 py-1 rounded border text-sm transition-colors ${
-                  year === 2025
-                    ? 'bg-[hsl(174,100%,32%)] text-white border-transparent'
-                    : 'bg-white text-foreground border-border hover:bg-muted'
-                }`}
-              >
-                {year}
-              </button>
-            ))}
-            <select className="px-2 py-1 rounded border text-sm">
-              <option>Todos os Meses</option>
-              <option>1º Trimestre</option>
-              <option>2º Trimestre</option>
-              <option>3º Trimestre</option>
-              <option>4º Trimestre</option>
-            </select>
-          </div>
-        </div>
-      </div>
 
       {/* Gráfico Principal - Metas vs Realizado */}
       <Card className="mb-8 shadow-lg">
