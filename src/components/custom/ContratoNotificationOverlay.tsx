@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { FileText, Calendar, User } from 'lucide-react'
+import { FileText } from 'lucide-react'
 
 interface ContratoNotificationOverlayProps {
   contrato: {
