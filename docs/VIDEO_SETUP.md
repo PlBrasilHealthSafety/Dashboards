@@ -20,7 +20,7 @@ O componente suporta dois formatos para máxima compatibilidade:
 - **Resolução**: 1920x1080 (Full HD) para TVs
 - **Codec**: H.264 para MP4
 - **Taxa de bits**: 5-10 Mbps para qualidade TV
-- **Áudio**: Opcional (o vídeo será reproduzido mudo)
+- **Áudio**: OBRIGATÓRIO - O vídeo deve ter trilha sonora
 
 ### 4. **Vantagens do Vídeo Local:**
 - ✅ **Som habilitado** com fallback inteligente
@@ -39,11 +39,13 @@ O componente suporta dois formatos para máxima compatibilidade:
 Se o vídeo não carregar, será exibida a mensagem: "Seu navegador não suporta o elemento de vídeo."
 
 ## 🔧 Configurações Aplicadas:
-- **Som Inteligente**: Tenta reproduzir com som primeiro, fallback para mudo se bloqueado
+- **autoPlay**: Reprodução automática habilitada
+- **Som Forçado**: Volume máximo (1.0) e muted=false por padrão
+- **preload="auto"**: Carrega o vídeo completamente antes de reproduzir
 - **playsInline**: Reprodução inline em dispositivos móveis
 - **object-cover**: Vídeo preenche toda a tela
+- **Event Listeners**: Monitora carregamento para garantir som
 - **Controle Manual**: Clique/toque para ativar som se necessário
-- **Indicador Visual**: Mostra quando o som está desabilitado
 
 ## 🔊 Como Funciona o Som:
 1. **Primeira tentativa**: Reproduz com som automaticamente
