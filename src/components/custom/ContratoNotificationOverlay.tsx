@@ -69,53 +69,53 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
             </div>
           </div>
 
-          {/* Conteúdo principal */}
-          <div className="relative z-10 w-full h-full flex flex-col items-center justify-center p-16">
+          {/* Conteúdo principal - Otimizado para TV 55" */}
+          <div className="relative z-10 w-full h-full flex flex-col items-center justify-center p-8">
             
-            {/* Header principal */}
-            <div className="text-center mb-16 animate-in fade-in slide-in-from-top duration-1000">
-              <div className="mb-8">
-                <h1 className="text-8xl font-black text-white mb-4 tracking-tight">
+            {/* Header principal - Compacto */}
+            <div className="text-center mb-8 animate-in fade-in slide-in-from-top duration-1000">
+              <div className="mb-4">
+                <h1 className="text-5xl font-black text-white mb-2 tracking-tight">
                   BEM-VINDO
                 </h1>
-                <p className="text-3xl text-white/90 font-light tracking-wide">
+                <p className="text-xl text-white/90 font-light tracking-wide">
                   O mais novo cliente da PLBrasil
                 </p>
               </div>
-              <div className="w-48 h-1 bg-white/60 mx-auto rounded-full"></div>
+              <div className="w-32 h-0.5 bg-white/60 mx-auto rounded-full"></div>
             </div>
 
-            {/* Card único centralizado com informações empilhadas */}
-            <div className="w-full max-w-4xl mb-16">
-              <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-12 shadow-2xl border border-white/20 animate-in fade-in slide-in-from-bottom duration-1000 delay-300">
-                <div className="text-center space-y-12">
+            {/* Card único centralizado - Compacto para TV */}
+            <div className="w-full max-w-3xl mb-6">
+              <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-white/20 animate-in fade-in slide-in-from-bottom duration-1000 delay-300">
+                <div className="text-center space-y-6">
                   
                   {/* Razão Social */}
-                  <div className="border-b border-gray-200 pb-8">
-                    <h3 className="text-2xl font-bold text-[#00A298] uppercase tracking-wider mb-4">
+                  <div className="border-b border-gray-200 pb-4">
+                    <h3 className="text-lg font-bold text-[#00A298] uppercase tracking-wider mb-2">
                       Razão Social
                     </h3>
-                    <p className="text-5xl font-black text-[#1D3C44] leading-tight">
+                    <p className="text-3xl font-black text-[#1D3C44] leading-tight">
                       {contrato.razaoSocial}
                     </p>
                   </div>
 
                   {/* Nome Fantasia */}
-                  <div className="border-b border-gray-200 pb-8">
-                    <h3 className="text-2xl font-bold text-[#00A298] uppercase tracking-wider mb-4">
+                  <div className="border-b border-gray-200 pb-4">
+                    <h3 className="text-lg font-bold text-[#00A298] uppercase tracking-wider mb-2">
                       Nome Fantasia
                     </h3>
-                    <p className="text-4xl font-bold text-[#1D3C44] leading-tight">
+                    <p className="text-2xl font-bold text-[#1D3C44] leading-tight">
                       {contrato.nomeFantasia}
                     </p>
                   </div>
 
                   {/* Data de Início do Contrato */}
                   <div>
-                    <h3 className="text-2xl font-bold text-[#00A298] uppercase tracking-wider mb-4">
+                    <h3 className="text-lg font-bold text-[#00A298] uppercase tracking-wider mb-2">
                       Data de Início do Contrato
                     </h3>
-                    <p className="text-3xl font-bold text-black leading-tight">
+                    <p className="text-xl font-bold text-black leading-tight">
                       {new Date(contrato.dataInicioContrato).toLocaleDateString('pt-BR', {
                         day: '2-digit',
                         month: 'long',
@@ -127,15 +127,15 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
               </div>
             </div>
 
-            {/* Footer com indicador de progresso */}
+            {/* Footer com indicador de progresso - Compacto */}
             <div className="text-center animate-in fade-in duration-1000 delay-1000">
-              <div className="inline-flex items-center gap-4 px-8 py-4 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 shadow-lg">
+              <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 shadow-lg">
                 <div className="flex space-x-1">
-                  <div className="w-3 h-3 rounded-full bg-white animate-pulse"></div>
-                  <div className="w-3 h-3 rounded-full bg-white/70 animate-pulse delay-200"></div>
-                  <div className="w-3 h-3 rounded-full bg-white/50 animate-pulse delay-400"></div>
+                  <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+                  <div className="w-2 h-2 rounded-full bg-white/70 animate-pulse delay-200"></div>
+                  <div className="w-2 h-2 rounded-full bg-white/50 animate-pulse delay-400"></div>
                 </div>
-                <span className="text-white text-xl font-medium tracking-wide">
+                <span className="text-white text-lg font-medium tracking-wide">
                   Retornando aos slides em breve...
                 </span>
               </div>
