@@ -12,6 +12,8 @@ interface ContratoNotificationOverlayProps {
 
 export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNotificationOverlayProps) {
   const [phase, setPhase] = useState<'video' | 'info'>('video')
+  const [videoMuted, setVideoMuted] = useState(false) // Começar sem mute
+  const [videoRef, setVideoRef] = useState<HTMLVideoElement | null>(null)
 
   useEffect(() => {
     // Após 7 segundos (duração do vídeo), mudar para a fase de informações
@@ -21,6 +23,37 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
 
     return () => clearTimeout(videoTimer)
   }, [])
+
+  // Função para tentar reproduzir com som
+  const handleVideoLoad = async (video: HTMLVideoElement) => {
+    setVideoRef(video)
+    try {
+      // Tentar reproduzir com som primeiro
+      video.muted = false
+      await video.play()
+      console.log('Vídeo reproduzindo com som')
+    } catch (error) {
+      console.log('Autoplay com som bloqueado, tentando sem som:', error)
+      // Se falhar, reproduzir sem som
+      video.muted = true
+      setVideoMuted(true)
+      try {
+        await video.play()
+        console.log('Vídeo reproduzindo sem som')
+      } catch (mutedError) {
+        console.error('Erro ao reproduzir vídeo:', mutedError)
+      }
+    }
+  }
+
+  // Função para ativar som com clique/toque
+  const handleVideoClick = () => {
+    if (videoRef && videoMuted) {
+      videoRef.muted = false
+      setVideoMuted(false)
+      console.log('Som ativado pelo usuário')
+    }
+  }
 
 
 
@@ -38,14 +71,14 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
   return (
     <div className="fixed inset-0 z-[9999] bg-black flex items-center justify-center">
       {phase === 'video' && (
-        <div className="w-full h-full flex items-center justify-center">
+        <div className="w-full h-full flex items-center justify-center relative">
           <video
+            ref={handleVideoLoad}
             width="100%"
             height="100%"
-            autoPlay
-            muted
             playsInline
-            className="w-full h-full object-cover"
+            onClick={handleVideoClick}
+            className="w-full h-full object-cover cursor-pointer"
             style={{
               minHeight: '100vh',
               minWidth: '100vw'
@@ -55,6 +88,19 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
             <source src="/novo-contrato-video.webm" type="video/webm" />
             Seu navegador não suporta o elemento de vídeo.
           </video>
+          
+          {/* Indicador de som quando mutado */}
+          {videoMuted && (
+            <div className="absolute bottom-8 right-8 bg-black/70 backdrop-blur-sm rounded-full p-4 animate-pulse">
+              <div className="flex items-center gap-2 text-white">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                </svg>
+                <span className="text-sm font-medium">Toque para ativar som</span>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
