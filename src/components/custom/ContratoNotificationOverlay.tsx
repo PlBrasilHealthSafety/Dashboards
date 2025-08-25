@@ -39,20 +39,22 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
     <div className="fixed inset-0 z-[9999] bg-black flex items-center justify-center">
       {phase === 'video' && (
         <div className="w-full h-full flex items-center justify-center">
-          <iframe
+          <video
             width="100%"
             height="100%"
-            src="https://www.youtube.com/embed/aLY51m8HAPY?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&loop=0"
-            title="Novo Contrato Criado"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
+            autoPlay
+            muted
+            playsInline
             className="w-full h-full object-cover"
             style={{
               minHeight: '100vh',
               minWidth: '100vw'
             }}
-          />
+          >
+            <source src="/novo-contrato-video.mp4" type="video/mp4" />
+            <source src="/novo-contrato-video.webm" type="video/webm" />
+            Seu navegador não suporta o elemento de vídeo.
+          </video>
         </div>
       )}
 
@@ -113,7 +115,7 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
                     <h3 className="text-2xl font-bold text-[#00A298] uppercase tracking-wider mb-4">
                       Data de Início do Contrato
                     </h3>
-                    <p className="text-3xl font-bold text-[#00A298] leading-tight">
+                    <p className="text-3xl font-bold text-black leading-tight">
                       {new Date(contrato.dataInicioContrato).toLocaleDateString('pt-BR', {
                         day: '2-digit',
                         month: 'long',
