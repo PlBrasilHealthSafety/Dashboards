@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 interface ContratoNotificationOverlayProps {
   contrato: {
@@ -13,7 +13,7 @@ interface ContratoNotificationOverlayProps {
 export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNotificationOverlayProps) {
   const [phase, setPhase] = useState<'video' | 'info'>('video')
   const [videoMuted, setVideoMuted] = useState(false) // Começar sem mute
-  const [videoRef, setVideoRef] = useState<HTMLVideoElement | null>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
     // Após 7 segundos (duração do vídeo), mudar para a fase de informações
@@ -24,32 +24,40 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
     return () => clearTimeout(videoTimer)
   }, [])
 
-  // Função para tentar reproduzir com som
-  const handleVideoLoad = async (video: HTMLVideoElement) => {
-    setVideoRef(video)
-    try {
-      // Tentar reproduzir com som primeiro
-      video.muted = false
-      await video.play()
-      console.log('Vídeo reproduzindo com som')
-    } catch (error) {
-      console.log('Autoplay com som bloqueado, tentando sem som:', error)
-      // Se falhar, reproduzir sem som
-      video.muted = true
-      setVideoMuted(true)
+  // Função para tentar reproduzir com som quando o vídeo carrega
+  useEffect(() => {
+    const handleVideoLoad = async () => {
+      const video = videoRef.current
+      if (!video) return
+
       try {
+        // Tentar reproduzir com som primeiro
+        video.muted = false
         await video.play()
-        console.log('Vídeo reproduzindo sem som')
-      } catch (mutedError) {
-        console.error('Erro ao reproduzir vídeo:', mutedError)
+        console.log('Vídeo reproduzindo com som')
+      } catch (error) {
+        console.log('Autoplay com som bloqueado, tentando sem som:', error)
+        // Se falhar, reproduzir sem som
+        video.muted = true
+        setVideoMuted(true)
+        try {
+          await video.play()
+          console.log('Vídeo reproduzindo sem som')
+        } catch (mutedError) {
+          console.error('Erro ao reproduzir vídeo:', mutedError)
+        }
       }
     }
-  }
+
+    if (phase === 'video' && videoRef.current) {
+      handleVideoLoad()
+    }
+  }, [phase])
 
   // Função para ativar som com clique/toque
   const handleVideoClick = () => {
-    if (videoRef && videoMuted) {
-      videoRef.muted = false
+    if (videoRef.current && videoMuted) {
+      videoRef.current.muted = false
       setVideoMuted(false)
       console.log('Som ativado pelo usuário')
     }
@@ -73,7 +81,7 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
       {phase === 'video' && (
         <div className="w-full h-full flex items-center justify-center relative">
           <video
-            ref={handleVideoLoad}
+            ref={videoRef}
             width="100%"
             height="100%"
             playsInline
