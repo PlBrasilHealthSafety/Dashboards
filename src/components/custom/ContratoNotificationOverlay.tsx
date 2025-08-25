@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { FileText } from 'lucide-react'
 
 interface ContratoNotificationOverlayProps {
   contrato: {
@@ -64,6 +63,9 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
             <div className="text-center mb-12 animate-in fade-in slide-in-from-top duration-1000">
               <div className="inline-flex items-center gap-4 mb-6">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#00A298] to-[#1D3C44] flex items-center justify-center shadow-2xl">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
                 </div>
                 <h1 className="text-6xl font-bold bg-gradient-to-r from-[#00A298] via-[#0B5C5B] to-[#1D3C44] bg-clip-text text-transparent">
                   O mais novo cliente da PLBrasil
