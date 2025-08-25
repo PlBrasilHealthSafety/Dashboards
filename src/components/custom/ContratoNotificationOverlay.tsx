@@ -73,11 +73,6 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
             {/* Header principal */}
             <div className="text-center mb-16 animate-in fade-in slide-in-from-top duration-1000">
               <div className="mb-8">
-                <div className="inline-flex items-center justify-center w-32 h-32 rounded-full bg-white/20 backdrop-blur-sm border-4 border-white/30 shadow-2xl mb-8">
-                  <svg className="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
                 <h1 className="text-8xl font-black text-white mb-4 tracking-tight">
                   BEM-VINDO
                 </h1>
@@ -88,61 +83,44 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
               <div className="w-48 h-1 bg-white/60 mx-auto rounded-full"></div>
             </div>
 
-            {/* Cards de informação em layout moderno */}
-            <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
-              
-              {/* Card Razão Social */}
-              <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-white/20 animate-in fade-in slide-in-from-left duration-1000 delay-300 hover:scale-105 transition-transform">
-                <div className="text-center">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#00A298] to-[#1D3C44] flex items-center justify-center mx-auto mb-6 shadow-lg">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
+            {/* Card único centralizado com informações empilhadas */}
+            <div className="w-full max-w-4xl mb-16">
+              <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-12 shadow-2xl border border-white/20 animate-in fade-in slide-in-from-bottom duration-1000 delay-300">
+                <div className="text-center space-y-12">
+                  
+                  {/* Razão Social */}
+                  <div className="border-b border-gray-200 pb-8">
+                    <h3 className="text-2xl font-bold text-[#00A298] uppercase tracking-wider mb-4">
+                      Razão Social
+                    </h3>
+                    <p className="text-5xl font-black text-[#1D3C44] leading-tight">
+                      {contrato.razaoSocial}
+                    </p>
                   </div>
-                  <h3 className="text-lg font-bold text-[#00A298] uppercase tracking-wider mb-4">
-                    Razão Social
-                  </h3>
-                  <p className="text-2xl font-bold text-[#1D3C44] leading-tight">
-                    {contrato.razaoSocial}
-                  </p>
-                </div>
-              </div>
 
-              {/* Card Nome Fantasia */}
-              <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-white/20 animate-in fade-in slide-in-from-bottom duration-1000 delay-500 hover:scale-105 transition-transform">
-                <div className="text-center">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#00A298] to-[#1D3C44] flex items-center justify-center mx-auto mb-6 shadow-lg">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                    </svg>
+                  {/* Nome Fantasia */}
+                  <div className="border-b border-gray-200 pb-8">
+                    <h3 className="text-2xl font-bold text-[#00A298] uppercase tracking-wider mb-4">
+                      Nome Fantasia
+                    </h3>
+                    <p className="text-4xl font-bold text-[#1D3C44] leading-tight">
+                      {contrato.nomeFantasia}
+                    </p>
                   </div>
-                  <h3 className="text-lg font-bold text-[#00A298] uppercase tracking-wider mb-4">
-                    Nome Fantasia
-                  </h3>
-                  <p className="text-2xl font-bold text-[#1D3C44] leading-tight">
-                    {contrato.nomeFantasia}
-                  </p>
-                </div>
-              </div>
 
-              {/* Card Data de Início */}
-              <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-white/20 animate-in fade-in slide-in-from-right duration-1000 delay-700 hover:scale-105 transition-transform">
-                <div className="text-center">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#00A298] to-[#1D3C44] flex items-center justify-center mx-auto mb-6 shadow-lg">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
+                  {/* Data de Início do Contrato */}
+                  <div>
+                    <h3 className="text-2xl font-bold text-[#00A298] uppercase tracking-wider mb-4">
+                      Data de Início do Contrato
+                    </h3>
+                    <p className="text-3xl font-bold text-[#00A298] leading-tight">
+                      {new Date(contrato.dataInicioContrato).toLocaleDateString('pt-BR', {
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric'
+                      })}
+                    </p>
                   </div>
-                  <h3 className="text-lg font-bold text-[#00A298] uppercase tracking-wider mb-4">
-                    Data de Início
-                  </h3>
-                  <p className="text-2xl font-bold text-[#1D3C44] leading-tight">
-                    {new Date(contrato.dataInicioContrato).toLocaleDateString('pt-BR', {
-                      day: '2-digit',
-                      month: 'long',
-                      year: 'numeric'
-                    })}
-                  </p>
                 </div>
               </div>
             </div>
