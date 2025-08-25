@@ -12,42 +12,18 @@ interface ContratoNotificationOverlayProps {
 }
 
 export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNotificationOverlayProps) {
-  const [phase, setPhase] = useState<'waiting' | 'video' | 'info'>('waiting')
-  const [countdown, setCountdown] = useState(60) // 60 segundos = 1 minuto
+  const [phase, setPhase] = useState<'video' | 'info'>('video')
 
   useEffect(() => {
-    // Delay de 1 minuto antes do vídeo
-    const waitingTimer = setTimeout(() => {
-      setPhase('video')
-    }, 60000) // 1 minuto
+    // Após 7 segundos (duração do vídeo), mudar para a fase de informações
+    const videoTimer = setTimeout(() => {
+      setPhase('info')
+    }, 7000)
 
-    // Countdown para mostrar o tempo restante
-    const countdownInterval = setInterval(() => {
-      setCountdown(prev => {
-        if (prev <= 1) {
-          clearInterval(countdownInterval)
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-
-    return () => {
-      clearTimeout(waitingTimer)
-      clearInterval(countdownInterval)
-    }
+    return () => clearTimeout(videoTimer)
   }, [])
 
-  useEffect(() => {
-    if (phase === 'video') {
-      // Após 7 segundos (duração do vídeo), mudar para a fase de informações
-      const videoTimer = setTimeout(() => {
-        setPhase('info')
-      }, 7000)
 
-      return () => clearTimeout(videoTimer)
-    }
-  }, [phase])
 
   useEffect(() => {
     if (phase === 'info') {
@@ -62,42 +38,6 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
 
   return (
     <div className="fixed inset-0 z-[9999] bg-black flex items-center justify-center">
-      {phase === 'waiting' && (
-        <div className="w-full h-full flex items-center justify-center">
-          <div className="text-center">
-            <div className="mb-8">
-              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#00A298] to-[#1D3C44] flex items-center justify-center shadow-2xl mx-auto mb-6">
-                <FileText className="w-12 h-12 text-white" />
-              </div>
-              <h1 className="text-4xl font-bold text-white mb-4">
-                Novo Contrato Detectado!
-              </h1>
-              <p className="text-xl text-gray-300">
-                Preparando apresentação...
-              </p>
-            </div>
-            
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-              <div className="text-6xl font-bold text-[#00A298] mb-2">
-                {countdown}
-              </div>
-              <p className="text-white text-lg">
-                segundos restantes
-              </p>
-            </div>
-            
-            <div className="mt-8">
-              <div className="w-32 h-2 bg-white/20 rounded-full mx-auto overflow-hidden">
-                <div 
-                  className="h-full bg-gradient-to-r from-[#00A298] to-[#1D3C44] rounded-full transition-all duration-1000"
-                  style={{ width: `${((60 - countdown) / 60) * 100}%` }}
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {phase === 'video' && (
         <div className="w-full h-full flex items-center justify-center">
           <iframe
@@ -124,7 +64,6 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
             <div className="text-center mb-12 animate-in fade-in slide-in-from-top duration-1000">
               <div className="inline-flex items-center gap-4 mb-6">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#00A298] to-[#1D3C44] flex items-center justify-center shadow-2xl">
-                  <FileText className="w-8 h-8 text-white" />
                 </div>
                 <h1 className="text-6xl font-bold bg-gradient-to-r from-[#00A298] via-[#0B5C5B] to-[#1D3C44] bg-clip-text text-transparent">
                   O mais novo cliente da PLBrasil

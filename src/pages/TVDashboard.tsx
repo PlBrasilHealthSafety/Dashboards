@@ -23,6 +23,7 @@ export function TVDashboard() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const [currentContrato, setCurrentContrato] = useState<(Contrato & { id: string }) | null>(null)
+  const [showOverlay, setShowOverlay] = useState(false)
 
   const carouselItems = useMemo(() => {
     // 8 slides de PowerPoint
@@ -75,6 +76,11 @@ export function TVDashboard() {
             const contrato = contratosNaoExibidos[0]
             console.log('TVDashboard: Novo contrato detectado:', contrato)
             setCurrentContrato(contrato)
+            
+            // Delay de 1 minuto antes de mostrar o overlay
+            setTimeout(() => {
+              setShowOverlay(true)
+            }, 60000) // 1 minuto
           } else if (contratosNaoExibidos.length === 0) {
             console.log('TVDashboard: Nenhum contrato pendente encontrado')
           } else if (currentContrato) {
@@ -123,9 +129,11 @@ export function TVDashboard() {
         })
         
         setCurrentContrato(null)
+        setShowOverlay(false)
       } catch (error) {
         console.error('Erro ao marcar contrato como exibido:', error)
         setCurrentContrato(null)
+        setShowOverlay(false)
       }
     }
   }
@@ -169,7 +177,7 @@ export function TVDashboard() {
       </div>
 
       {/* Overlay de notificação de contrato */}
-      {currentContrato && (
+      {currentContrato && showOverlay && (
         <ContratoNotificationOverlay
           contrato={{
             razaoSocial: currentContrato.razaoSocial,
