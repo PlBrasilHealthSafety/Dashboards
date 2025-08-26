@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { UserCircle, FileText, Plus, ChevronDown } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useLocation } from 'react-router-dom'
@@ -18,22 +19,75 @@ export function UserProfileDropdown({
   const { user } = useAuth()
   const location = useLocation()
   const [isOpen, setIsOpen] = useState(false)
+  const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; minWidth?: number }>({ top: 0, left: 0 })
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
 
   // Verificar se está na página de diretoria
   const isDirectorPage = location.pathname === '/direcao'
 
+  // Calcular posição do dropdown baseada no espaço disponível
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const buttonRect = buttonRef.current.getBoundingClientRect()
+      const viewportWidth = window.innerWidth
+      const viewportHeight = window.innerHeight
+      const dropdownWidth = 224 // Largura mínima do dropdown
+      const dropdownHeight = 300 // Altura estimada do dropdown
+      const buffer = 16 // Margem de segurança
+      
+      // Posição vertical: abaixo do botão
+      let top = buttonRect.bottom + 8
+      
+      // Posição horizontal: alinhar a borda esquerda do dropdown com a borda esquerda do botão
+      let left = buttonRect.left
+      
+      // Se o dropdown for maior que o botão e sair da tela à direita, ajustar
+      if (left + dropdownWidth > viewportWidth - buffer) {
+        // Tentar alinhar à direita (borda direita do dropdown = borda direita do botão)
+        left = buttonRect.right - dropdownWidth
+      }
+      
+      // Se ainda não couber, usar margem mínima
+      if (left < buffer) {
+        left = buffer
+      }
+      
+      // Se sair da tela à direita, ajustar
+      if (left + dropdownWidth > viewportWidth - buffer) {
+        left = viewportWidth - dropdownWidth - buffer
+      }
+      
+      // Se não couber abaixo, posicionar acima
+      if (top + dropdownHeight > viewportHeight - buffer) {
+        top = buttonRect.top - dropdownHeight - 8
+      }
+      
+      // Garantir limites da tela
+      top = Math.max(buffer, Math.min(top, viewportHeight - dropdownHeight - buffer))
+      left = Math.max(buffer, left)
+      
+      // Usar a largura do botão como largura mínima
+      const finalWidth = Math.max(buttonRect.width, dropdownWidth)
+      
+      setDropdownPosition({ top, left, minWidth: finalWidth })
+    }
+  }, [isOpen])
+
   // Fechar dropdown ao clicar fora
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node) &&
+          buttonRef.current && !buttonRef.current.contains(event.target as Node)) {
         setIsOpen(false)
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isOpen])
 
   const handleViewProfile = () => {
     setIsOpen(false)
@@ -51,9 +105,10 @@ export function UserProfileDropdown({
   }
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <>
       {/* Botão do perfil */}
       <button
+        ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors duration-200 group"
       >
@@ -64,9 +119,19 @@ export function UserProfileDropdown({
         <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
-      {/* Dropdown */}
-      {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden z-50 animate-in slide-in-from-top-2 duration-200">
+      {/* Dropdown usando Portal */}
+      {isOpen && createPortal(
+        <div 
+          ref={dropdownRef}
+          className="fixed bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden animate-in slide-in-from-top-2 duration-200"
+          style={{
+            top: dropdownPosition.top,
+            left: dropdownPosition.left,
+            minWidth: dropdownPosition.minWidth || 224,
+            width: Math.max(dropdownPosition.minWidth || 224, 224),
+            zIndex: 99999
+          }}
+        >
           {/* Header do dropdown */}
           <div className="px-4 py-3 bg-gradient-to-r from-[#00A298]/10 via-[#0B5C5B]/10 to-[#1D3C44]/10 border-b border-gray-100">
             <div className="flex items-center gap-3">
@@ -127,8 +192,9 @@ export function UserProfileDropdown({
               </button>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
-    </div>
+    </>
   )
 }

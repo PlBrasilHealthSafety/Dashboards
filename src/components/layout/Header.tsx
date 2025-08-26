@@ -36,7 +36,7 @@ export function Header() {
   }
 
   return (
-    <header className="relative w-full z-10 border-b border-gray-200 shadow-md">
+    <header className="relative w-full z-50 border-b border-gray-200 shadow-md">
       <div className="absolute inset-0 bg-gradient-to-r from-[#00A298]/10 via-white to-[#1D3C44]/10" />
       <div className="relative z-10 w-full px-6 py-4 flex items-center">
         <div className="flex items-center gap-4">
