@@ -14,14 +14,34 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
   const [phase, setPhase] = useState<'video' | 'info'>('video')
   const [videoMuted, setVideoMuted] = useState(false) // Começar sem mute
   const videoRef = useRef<HTMLVideoElement>(null)
+  const safetyTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Timer de segurança dinâmico baseado na duração do vídeo
+  const setupSafetyTimer = (videoDuration?: number) => {
+    // Limpar timer anterior se existir
+    if (safetyTimerRef.current) {
+      clearTimeout(safetyTimerRef.current)
+    }
+
+    // Calcular tempo de segurança: duração do vídeo + 5 segundos de margem
+    // Mínimo de 30 segundos para casos onde a duração não é detectada
+    const safetyTime = videoDuration ? (videoDuration + 5) * 1000 : 30000
+    
+    safetyTimerRef.current = setTimeout(() => {
+      console.log(`Timer de segurança ativado após ${safetyTime/1000}s - mudando para info`)
+      setPhase('info')
+    }, safetyTime)
+  }
 
   useEffect(() => {
-    // Após 7 segundos (duração do vídeo), mudar para a fase de informações
-    const videoTimer = setTimeout(() => {
-      setPhase('info')
-    }, 7000)
+    // Timer inicial de segurança
+    setupSafetyTimer()
 
-    return () => clearTimeout(videoTimer)
+    return () => {
+      if (safetyTimerRef.current) {
+        clearTimeout(safetyTimerRef.current)
+      }
+    }
   }, [])
 
   // Função para tentar reproduzir com som quando o vídeo carrega
@@ -36,7 +56,7 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
       
       // Adicionar event listeners
       video.addEventListener('loadeddata', () => {
-        console.log('Vídeo carregado, tentando reproduzir com som')
+        console.log('Vídeo carregado, duração:', video.duration, 'segundos')
       })
 
       video.addEventListener('canplay', async () => {
@@ -45,7 +65,7 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
           video.muted = false
           video.volume = 1.0
           await video.play()
-          console.log('Vídeo reproduzindo com som - volume:', video.volume, 'muted:', video.muted)
+          console.log('Vídeo reproduzindo com som - volume:', video.volume, 'muted:', video.muted, 'duração:', video.duration)
         } catch (error) {
           console.log('Autoplay com som bloqueado, tentando sem som:', error)
           // Se falhar, reproduzir sem som
@@ -58,6 +78,28 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
             console.error('Erro ao reproduzir vídeo:', mutedError)
           }
         }
+      })
+
+      // Event listener para detectar fim do vídeo
+      video.addEventListener('ended', () => {
+        console.log('Vídeo terminou naturalmente, mudando para informações')
+        setPhase('info')
+      })
+
+      // Event listener para detectar quando está próximo do fim (últimos 0.2s)
+      // Reduzido para dar mais tempo ao vídeo antes da transição
+      video.addEventListener('timeupdate', () => {
+        if (video.duration && video.currentTime >= video.duration - 0.2) {
+          console.log('Vídeo próximo do fim (últimos 0.2s), preparando transição')
+        }
+      })
+
+      // Event listener adicional para garantir que o vídeo não seja cortado
+      video.addEventListener('loadedmetadata', () => {
+        console.log(`Metadados carregados - Duração do vídeo: ${video.duration} segundos`)
+        // Reconfigurar timer de segurança com base na duração real do vídeo
+        setupSafetyTimer(video.duration)
+        console.log(`Timer de segurança ajustado para ${video.duration + 5} segundos`)
       })
 
       // Tentar reproduzir imediatamente se já carregado
