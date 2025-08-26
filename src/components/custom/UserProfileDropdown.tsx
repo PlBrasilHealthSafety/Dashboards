@@ -1,20 +1,18 @@
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { UserCircle, FileText, Plus, ChevronDown, UserPlus } from 'lucide-react'
+import { UserCircle, Plus, ChevronDown, UserPlus } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useLocation } from 'react-router-dom'
 import { ProfilePhotoUpload } from './ProfilePhotoUpload'
 
 interface UserProfileDropdownProps {
   onViewProfile?: () => void
-  onCadastros?: () => void
   onNovoContrato?: () => void
   onNovoCadastro?: () => void
 }
 
 export function UserProfileDropdown({ 
   onViewProfile, 
-  onCadastros, 
   onNovoContrato,
   onNovoCadastro 
 }: UserProfileDropdownProps) {
@@ -109,10 +107,6 @@ export function UserProfileDropdown({
     onViewProfile?.()
   }
 
-  const handleCadastros = () => {
-    setIsOpen(false)
-    onCadastros?.()
-  }
 
   const handleNovoContrato = () => {
     setIsOpen(false)
