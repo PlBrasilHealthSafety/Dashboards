@@ -19,7 +19,7 @@ export function UserProfileDropdown({
   const { user } = useAuth()
   const location = useLocation()
   const [isOpen, setIsOpen] = useState(false)
-  const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; minWidth?: number }>({ top: 0, left: 0 })
+  const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; minWidth?: number }>({ top: -9999, left: -9999 })
   const dropdownRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
 
@@ -29,48 +29,53 @@ export function UserProfileDropdown({
   // Calcular posição do dropdown baseada no espaço disponível
   useEffect(() => {
     if (isOpen && buttonRef.current) {
-      const buttonRect = buttonRef.current.getBoundingClientRect()
-      const viewportWidth = window.innerWidth
-      const viewportHeight = window.innerHeight
-      const dropdownWidth = 224 // Largura mínima do dropdown
-      const dropdownHeight = 300 // Altura estimada do dropdown
-      const buffer = 16 // Margem de segurança
-      
-      // Posição vertical: abaixo do botão
-      let top = buttonRect.bottom + 8
-      
-      // Posição horizontal: alinhar a borda esquerda do dropdown com a borda esquerda do botão
-      let left = buttonRect.left
-      
-      // Se o dropdown for maior que o botão e sair da tela à direita, ajustar
-      if (left + dropdownWidth > viewportWidth - buffer) {
-        // Tentar alinhar à direita (borda direita do dropdown = borda direita do botão)
-        left = buttonRect.right - dropdownWidth
-      }
-      
-      // Se ainda não couber, usar margem mínima
-      if (left < buffer) {
-        left = buffer
-      }
-      
-      // Se sair da tela à direita, ajustar
-      if (left + dropdownWidth > viewportWidth - buffer) {
-        left = viewportWidth - dropdownWidth - buffer
-      }
-      
-      // Se não couber abaixo, posicionar acima
-      if (top + dropdownHeight > viewportHeight - buffer) {
-        top = buttonRect.top - dropdownHeight - 8
-      }
-      
-      // Garantir limites da tela
-      top = Math.max(buffer, Math.min(top, viewportHeight - dropdownHeight - buffer))
-      left = Math.max(buffer, left)
-      
-      // Usar a largura do botão como largura mínima
-      const finalWidth = Math.max(buttonRect.width, dropdownWidth)
-      
-      setDropdownPosition({ top, left, minWidth: finalWidth })
+      // Usar requestAnimationFrame para garantir que o DOM esteja completamente renderizado
+      requestAnimationFrame(() => {
+        if (!buttonRef.current) return
+        
+        const buttonRect = buttonRef.current.getBoundingClientRect()
+        const viewportWidth = window.innerWidth
+        const viewportHeight = window.innerHeight
+        const dropdownWidth = 224 // Largura mínima do dropdown
+        const dropdownHeight = 300 // Altura estimada do dropdown
+        const buffer = 16 // Margem de segurança
+        
+        // Posição vertical: abaixo do botão
+        let top = buttonRect.bottom + 8
+        
+        // Posição horizontal: alinhar a borda esquerda do dropdown com a borda esquerda do botão
+        let left = buttonRect.left
+        
+        // Se o dropdown for maior que o botão e sair da tela à direita, ajustar
+        if (left + dropdownWidth > viewportWidth - buffer) {
+          // Tentar alinhar à direita (borda direita do dropdown = borda direita do botão)
+          left = buttonRect.right - dropdownWidth
+        }
+        
+        // Se ainda não couber, usar margem mínima
+        if (left < buffer) {
+          left = buffer
+        }
+        
+        // Se sair da tela à direita, ajustar
+        if (left + dropdownWidth > viewportWidth - buffer) {
+          left = viewportWidth - dropdownWidth - buffer
+        }
+        
+        // Se não couber abaixo, posicionar acima
+        if (top + dropdownHeight > viewportHeight - buffer) {
+          top = buttonRect.top - dropdownHeight - 8
+        }
+        
+        // Garantir limites da tela
+        top = Math.max(buffer, Math.min(top, viewportHeight - dropdownHeight - buffer))
+        left = Math.max(buffer, left)
+        
+        // Usar a largura do botão como largura mínima
+        const finalWidth = Math.max(buttonRect.width, dropdownWidth)
+        
+        setDropdownPosition({ top, left, minWidth: finalWidth })
+      })
     }
   }, [isOpen])
 
@@ -123,13 +128,14 @@ export function UserProfileDropdown({
       {isOpen && createPortal(
         <div 
           ref={dropdownRef}
-          className="fixed bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden animate-in slide-in-from-top-2 duration-200"
+          className={`fixed bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden animate-in slide-in-from-top-2 duration-200 ${dropdownPosition.top === -9999 ? 'opacity-0' : 'opacity-100'}`}
           style={{
             top: dropdownPosition.top,
             left: dropdownPosition.left,
             minWidth: dropdownPosition.minWidth || 224,
             width: Math.max(dropdownPosition.minWidth || 224, 224),
-            zIndex: 99999
+            zIndex: 99999,
+            transition: 'opacity 0.1s ease-in-out'
           }}
         >
           {/* Header do dropdown */}
