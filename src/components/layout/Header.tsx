@@ -29,9 +29,6 @@ export function Header() {
     setIsProfileModalOpen(true)
   }
 
-  const handleCadastros = () => {
-    console.log('Cadastros - Em desenvolvimento')
-  }
 
   const handleNovoContrato = () => {
     setIsNovoContratoModalOpen(true)
@@ -57,7 +54,6 @@ export function Header() {
           <div className="absolute right-6 flex items-center gap-3">
             <UserProfileDropdown
               onViewProfile={handleViewProfile}
-              onCadastros={handleCadastros}
               onNovoContrato={handleNovoContrato}
               onNovoCadastro={handleNovoCadastro}
             />
