@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { UserCircle, FileText, Plus, ChevronDown } from 'lucide-react'
+import { UserCircle, FileText, Plus, ChevronDown, UserPlus } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useLocation } from 'react-router-dom'
 import { ProfilePhotoUpload } from './ProfilePhotoUpload'
@@ -9,12 +9,14 @@ interface UserProfileDropdownProps {
   onViewProfile?: () => void
   onCadastros?: () => void
   onNovoContrato?: () => void
+  onNovoCadastro?: () => void
 }
 
 export function UserProfileDropdown({ 
   onViewProfile, 
   onCadastros, 
-  onNovoContrato 
+  onNovoContrato,
+  onNovoCadastro 
 }: UserProfileDropdownProps) {
   const { user } = useAuth()
   const location = useLocation()
@@ -117,6 +119,11 @@ export function UserProfileDropdown({
     onNovoContrato?.()
   }
 
+  const handleNovoCadastro = () => {
+    setIsOpen(false)
+    onNovoCadastro?.()
+  }
+
   return (
     <>
       {/* Botão do perfil */}
@@ -174,21 +181,17 @@ export function UserProfileDropdown({
               </span>
             </button>
 
-            {/* Cadastros - Apenas visual */}
+            {/* Novo Cadastro - Funcional */}
             <button
-              onClick={handleCadastros}
-              className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gradient-to-r hover:from-[#00A298]/5 hover:to-[#1D3C44]/5 transition-all duration-200 group opacity-75 cursor-not-allowed"
-              disabled
+              onClick={handleNovoCadastro}
+              className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gradient-to-r hover:from-[#00A298]/5 hover:to-[#1D3C44]/5 transition-all duration-200 group"
             >
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#00A298]/10 to-[#1D3C44]/10 flex items-center justify-center group-hover:from-[#00A298]/20 group-hover:to-[#1D3C44]/20 transition-all duration-200">
-                <FileText className="w-4 h-4 text-[#00A298]" />
+                <UserPlus className="w-4 h-4 text-[#00A298]" />
               </div>
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">
-                  Cadastros
-                </span>
-                <span className="text-xs text-slate-500">Em breve</span>
-              </div>
+              <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">
+                Novo Cadastro
+              </span>
             </button>
 
             {/* Novo Contrato - Apenas na página de diretoria */}

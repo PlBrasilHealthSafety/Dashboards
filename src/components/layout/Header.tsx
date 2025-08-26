@@ -6,6 +6,7 @@ import { Monitor } from 'lucide-react'
 import { UserProfileDropdown } from '@/components/custom/UserProfileDropdown'
 import { UserProfileModal } from '@/components/custom/UserProfileModal'
 import { NovoContratoModal } from '@/components/custom/NovoContratoModal'
+import { NovoCadastroModal } from '@/components/custom/NovoCadastroModal'
 
 export function Header() {
   const { user, signOut } = useAuth()
@@ -13,6 +14,7 @@ export function Header() {
   const [logoSrc, setLogoSrc] = useState<string>('/plbrasil-logo.svg')
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
   const [isNovoContratoModalOpen, setIsNovoContratoModalOpen] = useState(false)
+  const [isNovoCadastroModalOpen, setIsNovoCadastroModalOpen] = useState(false)
   
   const handleLogoError = useCallback(() => {
     setLogoSrc(prev => {
@@ -35,6 +37,10 @@ export function Header() {
     setIsNovoContratoModalOpen(true)
   }
 
+  const handleNovoCadastro = () => {
+    setIsNovoCadastroModalOpen(true)
+  }
+
   return (
     <header className="relative w-full z-50 border-b border-gray-200 shadow-md">
       <div className="absolute inset-0 bg-gradient-to-r from-[#00A298]/10 via-white to-[#1D3C44]/10" />
@@ -53,6 +59,7 @@ export function Header() {
               onViewProfile={handleViewProfile}
               onCadastros={handleCadastros}
               onNovoContrato={handleNovoContrato}
+              onNovoCadastro={handleNovoCadastro}
             />
             <Button 
               variant="outline" 
@@ -80,6 +87,12 @@ export function Header() {
         <NovoContratoModal
           isOpen={isNovoContratoModalOpen}
           onClose={() => setIsNovoContratoModalOpen(false)}
+        />
+        
+        {/* Modal Novo Cadastro */}
+        <NovoCadastroModal
+          isOpen={isNovoCadastroModalOpen}
+          onClose={() => setIsNovoCadastroModalOpen(false)}
         />
       </div>
     </header>
