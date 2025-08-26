@@ -79,7 +79,7 @@ export function UserProfileDropdown({
     }
   }, [isOpen])
 
-  // Fechar dropdown ao clicar fora
+  // Fechar dropdown ao clicar fora ou ao rolar a tela
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node) &&
@@ -88,9 +88,17 @@ export function UserProfileDropdown({
       }
     }
 
+    function handleScroll() {
+      setIsOpen(false)
+    }
+
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside)
-      return () => document.removeEventListener('mousedown', handleClickOutside)
+      window.addEventListener('scroll', handleScroll, true)
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside)
+        window.removeEventListener('scroll', handleScroll, true)
+      }
     }
   }, [isOpen])
 
