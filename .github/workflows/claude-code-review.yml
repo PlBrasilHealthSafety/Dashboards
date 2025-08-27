@@ -43,6 +43,7 @@ jobs:
             - Performance considerations
             - Security concerns
             - Test coverage
+            - And finally, if the merge is safely approved
             
             Use the repository's CLAUDE.md for guidance on style and conventions. Be constructive and helpful in your feedback.
 
