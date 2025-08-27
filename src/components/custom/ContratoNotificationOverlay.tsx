@@ -192,7 +192,7 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
             </div>
           </div>
 
-          {/* Conteúdo principal - Otimizado para TV 55" com zoom 125% */}
+          {/* Conteúdo principal */}
           <div className="relative z-10 w-full h-full flex flex-col items-center justify-center p-12">
             
             {/* Header principal - Com espaçamento aumentado */}
