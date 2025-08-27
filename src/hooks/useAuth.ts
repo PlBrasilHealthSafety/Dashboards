@@ -60,7 +60,7 @@ export const useAuthState = () => {
           updatedAt: Timestamp.now()
         };
         
-        await userProfileService.create(userProfile);
+        await userProfileService.createWithId(user.uid, userProfile);
         console.log(`✅ Perfil criado para ${user.email} com role ${role}`);
       }
     } catch (error) {

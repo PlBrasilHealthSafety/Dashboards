@@ -6,8 +6,10 @@ import { testFirebaseConnection } from '@/lib/firebase-test'
 
 function App() {
   useEffect(() => {
-    // Test Firebase connection on app load
-    testFirebaseConnection()
+    // Test Firebase connection on app load (only in development)
+    if (import.meta.env.DEV) {
+      testFirebaseConnection()
+    }
   }, [])
 
   return (

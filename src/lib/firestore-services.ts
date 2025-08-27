@@ -4,6 +4,7 @@ import {
   getDoc,
   getDocs,
   addDoc,
+  setDoc,
   updateDoc,
   deleteDoc,
   query,
@@ -42,6 +43,23 @@ export class FirestoreService<T extends DocumentData> {
       return docRef.id;
     } catch (error) {
       console.error(`Error creating document in ${this.collectionName}:`, error);
+      throw error;
+    }
+  }
+
+  // Create a new document with specific ID
+  async createWithId(id: string, data: Omit<T, 'id' | 'createdAt' | 'updatedAt'>): Promise<void> {
+    try {
+      const docData = {
+        ...data,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      };
+      
+      const docRef = doc(db, this.collectionName, id);
+      await setDoc(docRef, docData);
+    } catch (error) {
+      console.error(`Error creating document with ID ${id} in ${this.collectionName}:`, error);
       throw error;
     }
   }
