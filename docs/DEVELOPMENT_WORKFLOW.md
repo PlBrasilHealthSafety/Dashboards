@@ -134,6 +134,12 @@ import type { User } from '@/lib/types'
 - Verify protected routes functionality
 - Test user profile management
 
+### Video Notification Testing
+- Ensure `novo-contrato-video.mp4` is in `public/` directory
+- Test video playback in different browsers
+- Verify overlay functionality in TV Dashboard
+- Test video controls and accessibility features
+
 ## Build and Deployment
 
 ### Build Process
@@ -170,6 +176,8 @@ import type { User } from '@/lib/types'
 2. **Build Errors**: Verify TypeScript types and imports
 3. **Styling Issues**: Check Tailwind configuration and CSS variables
 4. **Performance**: Use React DevTools and browser profiling
+5. **Video Playback**: Check video file format, codec compatibility, and browser support
+6. **Asset Loading**: Verify files exist in `public/` directory and are accessible
 
 ### Debug Tools
 - React Developer Tools

@@ -66,6 +66,22 @@
 - `VITE_FIREBASE_MESSAGING_SENDER_ID`
 - `VITE_FIREBASE_APP_ID`
 
+## 📁 Arquivos Necessários para Deploy
+
+### Assets de Mídia
+- [x] `public/novo-contrato-video.mp4` - Vídeo de notificação de contratos
+- [x] `public/Logo-PlBrasilHealth.png` - Logo principal
+- [x] `public/plbrasil-logo.png` - Logo alternativo
+
+### Verificação de Assets
+```bash
+# Verificar se os arquivos de mídia existem
+ls -la public/novo-contrato-video.mp4
+ls -la public/*.png
+```
+
+**Importante**: Certifique-se de que o arquivo de vídeo `novo-contrato-video.mp4` está presente na pasta `public/` antes do deploy, pois é necessário para o sistema de notificação de contratos no TV Dashboard.
+
 ## 🔧 Comandos Úteis
 
 ```bash

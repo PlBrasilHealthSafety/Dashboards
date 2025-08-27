@@ -8,6 +8,7 @@ This directory contains comprehensive documentation for the React + Firebase app
 - **[FIREBASE_SETUP.md](./FIREBASE_SETUP.md)** - Complete Firebase project setup guide
 - **[FIRESTORE_SETUP.md](./FIRESTORE_SETUP.md)** - Firestore database configuration and usage
 - **[GOOGLE_AUTH_SETUP.md](./GOOGLE_AUTH_SETUP.md)** - Google Authentication configuration
+- **[VIDEO_SETUP.md](./VIDEO_SETUP.md)** - Video notification system setup and configuration
 - **[VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md)** - Vercel deployment guide
 - **[DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md)** - Pre-deployment checklist
 
@@ -30,6 +31,7 @@ docs/
 ├── FIREBASE_SETUP.md            # Firebase project setup and configuration
 ├── FIRESTORE_SETUP.md           # Firestore database setup and usage
 ├── GOOGLE_AUTH_SETUP.md         # Google Authentication setup
+├── VIDEO_SETUP.md               # Video notification system setup
 ├── VERCEL_DEPLOYMENT.md         # Vercel deployment guide
 ├── DEPLOYMENT_CHECKLIST.md      # Pre-deployment checklist
 ├── DEVELOPMENT_WORKFLOW.md      # Complete development workflow
@@ -52,6 +54,13 @@ docs/
 - Real-time hooks and operations
 - Testing and development workflow
 - Performance optimization
+
+### Video Notification System
+- Video file setup and configuration
+- ContratoNotificationOverlay component usage
+- Video format requirements and optimization
+- Integration with TV Dashboard
+- Troubleshooting video playback issues
 
 ## Contributing to Documentation
 

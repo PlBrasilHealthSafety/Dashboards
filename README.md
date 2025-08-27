@@ -138,7 +138,9 @@ dashboards/
 │   ├── styles/           # Estilos adicionais
 │   │   └── carousel.css  # Estilos do carrossel
 │   └── main.tsx          # Entry point
-├── public/               # Assets públicos e logos
+├── public/               # Assets públicos, logos e vídeos
+│   ├── novo-contrato-video.mp4 # Vídeo para notificação de contratos
+│   └── *.png             # Logos e imagens
 ├── docs/                 # Documentação detalhada
 ├── scripts/              # Scripts de automação
 │   ├── setup-vercel-env.js # Setup Vercel
@@ -150,6 +152,14 @@ dashboards/
 ```
 
 ## 🎯 Features Implementadas
+
+### 📹 Sistema de Notificação com Vídeo
+- Overlay de notificação para novos contratos
+- Reprodução automática de vídeo personalizado
+- Transição suave entre fases (vídeo → informações)
+- Integração com TV Dashboard
+- Suporte a múltiplos formatos de vídeo (MP4, WebM)
+- Controles de acessibilidade e fallback
 
 ### 🔐 Autenticação
 - Login/Registro com Firebase Auth
@@ -164,6 +174,7 @@ dashboards/
 - Dark/Light mode ready com CSS variables
 - Layout responsivo com AppLayout
 - Header, Footer e Sidebar modulares
+- Overlay de notificação com vídeo integrado (ContratoNotificationOverlay)
 
 ### 📊 Visualizações e Dashboards
 - Gráficos interativos com Recharts (linha, barra, pizza)
@@ -172,6 +183,7 @@ dashboards/
 - Dashboard executivo com análise setorial
 - Carrosséis customizáveis com Swiper.js
 - Slides para TV Dashboard
+- Sistema de notificação com vídeo para novos contratos
 
 ### 🎬 Animações
 - Framer Motion para animações declarativas
@@ -238,6 +250,7 @@ npm run build
 - [Configuração do Firebase](./docs/FIREBASE_SETUP.md)
 - [Setup do Firestore](./docs/FIRESTORE_SETUP.md)
 - [Configuração Google Auth](./docs/GOOGLE_AUTH_SETUP.md)
+- [Configuração de Vídeo](./docs/VIDEO_SETUP.md)
 - [Guia de Início Rápido](./docs/QUICK_START.md)
 
 ### Desenvolvimento
@@ -376,6 +389,39 @@ function AnimatedPage() {
         <h1>Página Animada</h1>
       </motion.div>
     </PageTransition>
+  )
+}
+```
+
+### Sistema de Notificação com Vídeo
+```typescript
+import { ContratoNotificationOverlay } from '@/components/custom/ContratoNotificationOverlay'
+
+function TVDashboard() {
+  const [showOverlay, setShowOverlay] = useState(false)
+  const [currentContrato, setCurrentContrato] = useState(null)
+
+  const handleNotificationComplete = () => {
+    setShowOverlay(false)
+    setCurrentContrato(null)
+  }
+
+  return (
+    <div>
+      {/* Dashboard content */}
+      
+      {currentContrato && showOverlay && (
+        <ContratoNotificationOverlay
+          contrato={{
+            razaoSocial: currentContrato.razaoSocial,
+            nomeFantasia: currentContrato.nomeFantasia,
+            dataInicioContrato: currentContrato.dataInicioContrato,
+            userId: currentContrato.userId
+          }}
+          onComplete={handleNotificationComplete}
+        />
+      )}
+    </div>
   )
 }
 

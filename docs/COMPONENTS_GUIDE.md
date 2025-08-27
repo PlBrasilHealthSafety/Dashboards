@@ -48,6 +48,9 @@ Base Shadcn/ui components that provide the foundation for the design system:
 - **HeroSlides** - Hero section slideshow
 - **TVChartSlides** - TV-optimized chart slides
 
+#### Notification Components
+- **ContratoNotificationOverlay** - Video notification overlay for new contracts
+
 #### 3D Components
 - **SimpleThreeJS** - Basic Three.js integration example
 
@@ -103,6 +106,66 @@ All components use:
 - **Shadcn/ui** design tokens
 - **Responsive design** principles
 
+## Component Details
+
+### ContratoNotificationOverlay
+
+A specialized overlay component that displays a video notification when new contracts are created. Used primarily in the TV Dashboard for visual notifications.
+
+#### Props
+```typescript
+interface ContratoNotificationOverlayProps {
+  contrato: {
+    razaoSocial: string
+    nomeFantasia: string
+    dataInicioContrato: string
+    userId: string
+  }
+  onComplete: () => void
+}
+```
+
+#### Features
+- **Video Playback**: Plays a notification video (`novo-contrato-video.mp4`)
+- **Two-Phase Display**: Video phase followed by contract information phase
+- **Auto-progression**: Automatically transitions between phases
+- **Responsive Design**: Optimized for TV dashboard display
+- **Accessibility**: Includes video controls and fallback content
+
+#### Usage Example
+```typescript
+import { ContratoNotificationOverlay } from '@/components/custom/ContratoNotificationOverlay'
+
+function Dashboard() {
+  const [showNotification, setShowNotification] = useState(false)
+  const [contractData, setContractData] = useState(null)
+
+  const handleComplete = () => {
+    setShowNotification(false)
+    setContractData(null)
+  }
+
+  return (
+    <div>
+      {/* Dashboard content */}
+      
+      {contractData && showNotification && (
+        <ContratoNotificationOverlay
+          contrato={contractData}
+          onComplete={handleComplete}
+        />
+      )}
+    </div>
+  )
+}
+```
+
+#### Video Requirements
+- **File Location**: `public/novo-contrato-video.mp4`
+- **Supported Formats**: MP4 (primary), WebM (fallback)
+- **Recommended Specs**: 1920x1080, H.264 codec, 30fps
+- **Duration**: 5-10 seconds for optimal user experience
+
 ## Best Practices
 
 1. **Import from index files** when available
@@ -110,3 +173,5 @@ All components use:
 3. **Follow naming conventions** (PascalCase for components)
 4. **Compose components** rather than creating monolithic ones
 5. **Use the design system** consistently across components
+6. **Test video components** across different browsers and devices
+7. **Provide fallback content** for accessibility and error handling
