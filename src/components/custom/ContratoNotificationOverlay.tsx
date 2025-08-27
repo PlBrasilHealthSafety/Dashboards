@@ -196,7 +196,7 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
           <div className="relative z-10 w-full h-full flex flex-col items-center justify-center p-12">
             
             {/* Header principal - Com espaçamento aumentado */}
-            <div className="text-center mb-20 animate-in fade-in slide-in-from-top duration-1000">
+            <div className="text-center mb-22 animate-in fade-in slide-in-from-top duration-1000">
               <div className="mb-6">
                 <h1 className="text-7xl font-black text-white mb-4 tracking-tight">
                   BEM-VINDO
@@ -208,9 +208,9 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
               <div className="w-40 h-1 bg-white/60 mx-auto rounded-full"></div>
             </div>
 
-            {/* Card único centralizado - Com degradê PLBrasil */}
-            <div className="w-full max-w-5xl mb-20">
-              <div className="bg-gradient-to-br from-white/95 via-[#AECECB]/20 to-white/90 backdrop-blur-sm rounded-3xl p-12 shadow-2xl border border-[#00A298]/20 animate-in fade-in slide-in-from-bottom duration-1000 delay-300">
+            {/* Card único centralizado - Com degradê PLBrasil suave */}
+            <div className="w-full max-w-5xl mb-22">
+              <div className="bg-gradient-to-br from-white/98 via-[#AECECB]/8 to-white/95 backdrop-blur-sm rounded-3xl p-12 shadow-2xl border border-[#00A298]/20 animate-in fade-in slide-in-from-bottom duration-1000 delay-300">
                 <div className="text-center space-y-10">
                   
                   {/* Razão Social */}
