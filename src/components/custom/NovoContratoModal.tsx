@@ -1,7 +1,9 @@
 import { useState } from 'react'
-import { X, FileText } from 'lucide-react'
+import { X, FileText, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/useAuth'
+import { FirestoreService, queryConstraints } from '@/lib/firestore-services'
+import type { Contrato } from '@/lib/types'
 
 interface NovoContratoModalProps {
   isOpen: boolean
@@ -14,10 +16,28 @@ export function NovoContratoModal({ isOpen, onClose }: NovoContratoModalProps) {
   const [nomeFantasia, setNomeFantasia] = useState('')
   const [dataInicioContrato, setDataInicioContrato] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const contratoService = new FirestoreService<Contrato>('contratos')
 
   if (!isOpen) return null
 
 
+
+  const checkForDuplicates = async (razaoSocial: string, nomeFantasia: string): Promise<boolean> => {
+    try {
+      // Verificar se já existe um contrato com a mesma razão social E nome fantasia
+      const existingContratos = await contratoService.query([
+        queryConstraints.where('razaoSocial', '==', razaoSocial.trim()),
+        queryConstraints.where('nomeFantasia', '==', nomeFantasia.trim())
+      ])
+
+      return existingContratos.length > 0
+    } catch (error) {
+      console.error('Erro ao verificar duplicatas:', error)
+      return false
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,11 +47,20 @@ export function NovoContratoModal({ isOpen, onClose }: NovoContratoModalProps) {
     }
 
     setIsLoading(true)
+    setError('')
     
     try {
-      // Teste direto com Firebase
-      const { addDoc, collection, serverTimestamp } = await import('firebase/firestore')
-      const { db } = await import('@/lib/firebase')
+      // Verificar se já existe um contrato com os mesmos dados
+      const isDuplicate = await checkForDuplicates(razaoSocial, nomeFantasia)
+      
+      if (isDuplicate) {
+        setError('Já existe um contrato cadastrado com essa Razão Social e Nome Fantasia. Por favor, verifique os dados.')
+        setIsLoading(false)
+        return
+      }
+
+      // Verificar se o usuário tem um token válido
+      await user.getIdToken()
       
       const docData = {
         razaoSocial: razaoSocial.trim(),
@@ -39,26 +68,23 @@ export function NovoContratoModal({ isOpen, onClose }: NovoContratoModalProps) {
         dataInicioContrato: dataInicioContrato.trim(),
         userId: user.uid,
         displayedOnTV: false, // Novo campo para controlar exibição na TV
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
       }
       
-      // Verificar se o usuário tem um token válido
-      await user.getIdToken()
-      
-      // Salvar no Firestore - a TV detectará automaticamente
+      // Salvar no Firestore usando o serviço - a TV detectará automaticamente
       console.log('NovoContratoModal: Salvando contrato no Firestore:', docData)
-      const docRef = await addDoc(collection(db, 'contratos'), docData)
-      console.log('NovoContratoModal: Contrato salvo com ID:', docRef.id)
+      const docId = await contratoService.create(docData)
+      console.log('NovoContratoModal: Contrato salvo com ID:', docId)
       
       // Limpar campos e fechar modal
       setRazaoSocial('')
       setNomeFantasia('')
       setDataInicioContrato('')
+      setError('')
       onClose()
       
     } catch (error) {
       console.error('Erro ao criar contrato:', error)
+      setError('Erro ao criar contrato. Tente novamente.')
     } finally {
       setIsLoading(false)
     }
@@ -68,6 +94,7 @@ export function NovoContratoModal({ isOpen, onClose }: NovoContratoModalProps) {
     setRazaoSocial('')
     setNomeFantasia('')
     setDataInicioContrato('')
+    setError('')
     onClose()
   }
 
@@ -110,6 +137,21 @@ export function NovoContratoModal({ isOpen, onClose }: NovoContratoModalProps) {
             </h3>
             <div className="w-16 h-1 bg-gradient-to-r from-[#00A298] to-[#1D3C44] mx-auto rounded-full"></div>
           </div>
+
+          {/* Mensagem de erro */}
+          {error && (
+            <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm text-red-700 font-medium">
+                  Contrato duplicado
+                </p>
+                <p className="text-sm text-red-600 mt-1">
+                  {error}
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Campo Razão Social */}
           <div className="space-y-2">
