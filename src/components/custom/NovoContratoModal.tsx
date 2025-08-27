@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { X, FileText, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/useAuth'
-import { FirestoreService, queryConstraints } from '@/lib/firestore-services'
+import { FirestoreService } from '@/lib/firestore-services'
 import type { Contrato } from '@/lib/types'
 
 interface NovoContratoModalProps {
@@ -26,13 +26,24 @@ export function NovoContratoModal({ isOpen, onClose }: NovoContratoModalProps) {
 
   const checkForDuplicates = async (razaoSocial: string, nomeFantasia: string): Promise<boolean> => {
     try {
-      // Verificar se já existe um contrato com a mesma razão social E nome fantasia
-      const existingContratos = await contratoService.query([
-        queryConstraints.where('razaoSocial', '==', razaoSocial.trim()),
-        queryConstraints.where('nomeFantasia', '==', nomeFantasia.trim())
-      ])
+      // Normalizar os valores de entrada para comparação case-insensitive
+      const normalizedRazaoSocial = razaoSocial.trim().toLowerCase()
+      const normalizedNomeFantasia = nomeFantasia.trim().toLowerCase()
 
-      return existingContratos.length > 0
+      // Buscar todos os contratos (como não podemos fazer consulta case-insensitive no Firestore)
+      // Vamos buscar todos e filtrar no cliente
+      const allContratos = await contratoService.getAll()
+
+      // Verificar se já existe um contrato com a mesma razão social E nome fantasia (case-insensitive)
+      const duplicateExists = allContratos.some(contrato => {
+        const existingRazaoSocial = contrato.razaoSocial.toLowerCase()
+        const existingNomeFantasia = contrato.nomeFantasia.toLowerCase()
+        
+        return existingRazaoSocial === normalizedRazaoSocial && 
+               existingNomeFantasia === normalizedNomeFantasia
+      })
+
+      return duplicateExists
     } catch (error) {
       console.error('Erro ao verificar duplicatas:', error)
       return false
@@ -54,7 +65,7 @@ export function NovoContratoModal({ isOpen, onClose }: NovoContratoModalProps) {
       const isDuplicate = await checkForDuplicates(razaoSocial, nomeFantasia)
       
       if (isDuplicate) {
-        setError('Já existe um contrato cadastrado com essa Razão Social e Nome Fantasia. Por favor, verifique os dados.')
+        setError('Já existe um contrato cadastrado com essa Razão Social e Nome Fantasia (independente de maiúsculas/minúsculas). Por favor, verifique os dados.')
         setIsLoading(false)
         return
       }
