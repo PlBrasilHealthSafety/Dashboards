@@ -195,8 +195,8 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
           {/* Conteúdo principal - Otimizado para TV 55" com zoom 125% */}
           <div className="relative z-10 w-full h-full flex flex-col items-center justify-center p-12">
             
-            {/* Header principal - Aumentado para compensar zoom */}
-            <div className="text-center mb-12 animate-in fade-in slide-in-from-top duration-1000">
+            {/* Header principal - Com espaçamento aumentado */}
+            <div className="text-center mb-20 animate-in fade-in slide-in-from-top duration-1000">
               <div className="mb-6">
                 <h1 className="text-7xl font-black text-white mb-4 tracking-tight">
                   BEM-VINDO
@@ -208,13 +208,13 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
               <div className="w-40 h-1 bg-white/60 mx-auto rounded-full"></div>
             </div>
 
-            {/* Card único centralizado - Aumentado para TV com zoom */}
-            <div className="w-full max-w-5xl mb-10">
-              <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-12 shadow-2xl border border-white/20 animate-in fade-in slide-in-from-bottom duration-1000 delay-300">
+            {/* Card único centralizado - Com degradê PLBrasil */}
+            <div className="w-full max-w-5xl mb-20">
+              <div className="bg-gradient-to-br from-white/95 via-[#AECECB]/20 to-white/90 backdrop-blur-sm rounded-3xl p-12 shadow-2xl border border-[#00A298]/20 animate-in fade-in slide-in-from-bottom duration-1000 delay-300">
                 <div className="text-center space-y-10">
                   
                   {/* Razão Social */}
-                  <div className="border-b border-gray-200 pb-6">
+                  <div className="border-b border-[#00A298]/30 pb-6">
                     <h3 className="text-2xl font-bold text-[#00A298] uppercase tracking-wider mb-4">
                       Razão Social
                     </h3>
@@ -224,7 +224,7 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
                   </div>
 
                   {/* Nome Fantasia */}
-                  <div className="border-b border-gray-200 pb-6">
+                  <div className="border-b border-[#00A298]/30 pb-6">
                     <h3 className="text-2xl font-bold text-[#00A298] uppercase tracking-wider mb-4">
                       Nome Fantasia
                     </h3>
@@ -238,7 +238,7 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
                     <h3 className="text-2xl font-bold text-[#00A298] uppercase tracking-wider mb-4">
                       Data de Início do Contrato
                     </h3>
-                    <p className="text-2xl font-bold text-black leading-tight">
+                    <p className="text-2xl font-bold text-[#1D3C44] leading-tight">
                       {new Date(contrato.dataInicioContrato).toLocaleDateString('pt-BR', {
                         day: '2-digit',
                         month: 'long',
@@ -250,7 +250,7 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
               </div>
             </div>
 
-            {/* Footer com indicador de progresso - Aumentado */}
+            {/* Footer com indicador de progresso - Com espaçamento aumentado */}
             <div className="text-center animate-in fade-in duration-1000 delay-1000">
               <div className="inline-flex items-center gap-4 px-8 py-4 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 shadow-lg">
                 <div className="flex space-x-2">
