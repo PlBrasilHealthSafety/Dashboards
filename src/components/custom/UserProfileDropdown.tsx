@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { UserCircle, Plus, ChevronDown, UserPlus } from 'lucide-react'
+import { UserCircle, Plus, ChevronDown, UserPlus, Calendar } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useLocation } from 'react-router-dom'
 import { ProfilePhotoUpload } from './ProfilePhotoUpload'
@@ -9,12 +9,14 @@ interface UserProfileDropdownProps {
   onViewProfile?: () => void
   onNovoContrato?: () => void
   onNovoCadastro?: () => void
+  onNovoAniversariante?: () => void
 }
 
 export function UserProfileDropdown({ 
   onViewProfile, 
   onNovoContrato,
-  onNovoCadastro 
+  onNovoCadastro,
+  onNovoAniversariante 
 }: UserProfileDropdownProps) {
   const { user } = useAuth()
   const location = useLocation()
@@ -118,6 +120,11 @@ export function UserProfileDropdown({
     onNovoCadastro?.()
   }
 
+  const handleNovoAniversariante = () => {
+    setIsOpen(false)
+    onNovoAniversariante?.()
+  }
+
   return (
     <>
       {/* Botão do perfil */}
@@ -187,6 +194,21 @@ export function UserProfileDropdown({
                 Novo Cadastro
               </span>
             </button>
+
+            {/* Novo Aniversariante - Funcional */}
+            {onNovoAniversariante && (
+              <button
+                onClick={handleNovoAniversariante}
+                className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gradient-to-r hover:from-[#00A298]/5 hover:to-[#1D3C44]/5 transition-all duration-200 group"
+              >
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#00A298]/10 to-[#1D3C44]/10 flex items-center justify-center group-hover:from-[#00A298]/20 group-hover:to-[#1D3C44]/20 transition-all duration-200">
+                  <Calendar className="w-4 h-4 text-[#00A298]" />
+                </div>
+                <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">
+                  Novo Aniversariante
+                </span>
+              </button>
+            )}
 
             {/* Novo Contrato - Apenas na página de diretoria */}
             {isDirectorPage && (

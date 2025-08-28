@@ -13,6 +13,7 @@ import {
   PowerPointSlide7, 
   PowerPointSlide8 
 } from '@/components/custom/PowerPointSlides'
+import { AniversariantesSlide } from '@/components/slides/AniversariantesSlide'
 import { ContratoNotificationOverlay } from '@/components/custom/ContratoNotificationOverlay'
 import { X } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
@@ -26,16 +27,17 @@ export function TVDashboard() {
   const [showOverlay, setShowOverlay] = useState(false)
 
   const carouselItems = useMemo(() => {
-    // 8 slides de PowerPoint
+    // 8 slides de PowerPoint + slide de aniversariantes
     const slides = [
       { id: 1, content: <PowerPointSlide1 /> },
       { id: 2, content: <PowerPointSlide2 /> },
       { id: 3, content: <PowerPointSlide3 /> },
       { id: 4, content: <PowerPointSlide4 /> },
-      { id: 5, content: <PowerPointSlide5 /> },
-      { id: 6, content: <PowerPointSlide6 /> },
-      { id: 7, content: <PowerPointSlide7 /> },
-      { id: 8, content: <PowerPointSlide8 /> },
+      { id: 5, content: <AniversariantesSlide /> }, // Slide de aniversariantes entre 4 e 5
+      { id: 6, content: <PowerPointSlide5 /> },
+      { id: 7, content: <PowerPointSlide6 /> },
+      { id: 8, content: <PowerPointSlide7 /> },
+      { id: 9, content: <PowerPointSlide8 /> },
     ]
     return slides
   }, [])

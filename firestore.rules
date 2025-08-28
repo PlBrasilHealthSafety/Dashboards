@@ -34,6 +34,13 @@ service cloud.firestore {
       allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
     }
     
+    // Aniversariantes collection - users can read all aniversariantes, but only create/update/delete their own
+    match /aniversariantes/{aniversarianteId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    
     // Public data that anyone can read
     match /public/{document=**} {
       allow read: if true;
