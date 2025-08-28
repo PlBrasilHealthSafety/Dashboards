@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState } from 'react'
+import { useMemo, useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Carousel } from '@/components/custom/Carousel'
 
@@ -25,6 +25,7 @@ export function TVDashboard() {
   const { user } = useAuth()
   const [currentContrato, setCurrentContrato] = useState<(Contrato & { id: string }) | null>(null)
   const [showOverlay, setShowOverlay] = useState(false)
+  const swiperRef = useRef<any>(null)
 
   const carouselItems = useMemo(() => {
     // 8 slides de PowerPoint + slide de aniversariantes
@@ -118,6 +119,31 @@ export function TVDashboard() {
     }
   }, [navigate])
 
+  // Controlar autoplay com diferentes tempos para cada slide
+  const handleSlideChange = (swiper: any) => {
+    const activeIndex = swiper.realIndex
+    
+    // Parar o autoplay atual
+    if (swiper.autoplay) {
+      swiper.autoplay.stop()
+    }
+    
+    // Definir novo delay baseado no slide
+    let delay = 30000 // 30 segundos por padrão
+    
+    // Slide 5 (índice 4) é o slide de aniversariantes - 3 minutos
+    if (activeIndex === 4) {
+      delay = 180000 // 3 minutos = 180 segundos
+    }
+    
+    // Reiniciar autoplay com novo delay
+    setTimeout(() => {
+      if (swiper.autoplay) {
+        swiper.autoplay.start()
+      }
+    }, delay)
+  }
+
   const handleNotificationComplete = async () => {
     if (currentContrato) {
       try {
@@ -171,10 +197,12 @@ export function TVDashboard() {
           showNavigation={false}
           showPagination={false}
           autoplay={{ 
-            delay: 30000, // 30 segundos por slide
+            delay: 30000, // 30 segundos por slide (padrão)
             disableOnInteraction: false,
             pauseOnMouseEnter: false
           }}
+          onSlideChange={handleSlideChange}
+          onSwiper={(swiper) => { swiperRef.current = swiper }}
         />
       </div>
 

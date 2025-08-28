@@ -27,6 +27,9 @@ export function UserProfileDropdown({
 
   // Verificar se está na página de diretoria
   const isDirectorPage = location.pathname === '/direcao'
+  
+  // Verificar se é perfil comercial
+  const isComercialProfile = user?.email?.split("@")[0].toLowerCase() === "comercial"
 
   // Calcular posição do dropdown baseada no espaço disponível
   useEffect(() => {
@@ -195,8 +198,8 @@ export function UserProfileDropdown({
               </span>
             </button>
 
-            {/* Novo Aniversariante - Funcional */}
-            {onNovoAniversariante && (
+            {/* Novo Aniversariante - Apenas para perfil comercial */}
+            {onNovoAniversariante && isComercialProfile && (
               <button
                 onClick={handleNovoAniversariante}
                 className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gradient-to-r hover:from-[#00A298]/5 hover:to-[#1D3C44]/5 transition-all duration-200 group"
