@@ -22,13 +22,13 @@ export function AniversariantesSlide() {
     const fetchAniversariantes = async () => {
       try {
         const data = await aniversariantesService.getAll()
-        
+
         // Filtrar aniversariantes do mês atual
         const currentMonth = new Date().getMonth()
         const aniversariantesDoMes = data.filter(aniversariante => {
           try {
             let dataAniversario: Date
-            
+
             if (typeof aniversariante.dataAniversario === 'string') {
               dataAniversario = new Date(aniversariante.dataAniversario)
             } else if (aniversariante.dataAniversario?.toDate) {
@@ -37,19 +37,19 @@ export function AniversariantesSlide() {
             } else {
               dataAniversario = new Date(aniversariante.dataAniversario)
             }
-            
+
             return dataAniversario.getMonth() === currentMonth
           } catch (error) {
             console.error('Erro ao processar data do aniversariante:', aniversariante, error)
             return false
           }
         })
-        
+
         // Ordenar por dia do mês
         aniversariantesDoMes.sort((a, b) => {
           try {
             let dataA: Date, dataB: Date
-            
+
             if (typeof a.dataAniversario === 'string') {
               dataA = new Date(a.dataAniversario)
             } else if (a.dataAniversario?.toDate) {
@@ -57,7 +57,7 @@ export function AniversariantesSlide() {
             } else {
               dataA = new Date(a.dataAniversario)
             }
-            
+
             if (typeof b.dataAniversario === 'string') {
               dataB = new Date(b.dataAniversario)
             } else if (b.dataAniversario?.toDate) {
@@ -65,14 +65,14 @@ export function AniversariantesSlide() {
             } else {
               dataB = new Date(b.dataAniversario)
             }
-            
+
             return dataA.getDate() - dataB.getDate()
           } catch (error) {
             console.error('Erro ao ordenar aniversariantes:', error)
             return 0
           }
         })
-        
+
         setAniversariantes(aniversariantesDoMes)
       } catch (error) {
         console.error('Erro ao buscar aniversariantes:', error)
@@ -93,7 +93,7 @@ export function AniversariantesSlide() {
           <div className="absolute top-3/4 right-1/4 w-24 h-24 bg-white rounded-full animate-pulse delay-1000"></div>
           <div className="absolute bottom-1/4 left-1/3 w-20 h-20 bg-white rounded-full animate-pulse delay-500"></div>
         </div>
-        
+
         <div className="text-center z-10">
           <div className="text-8xl mb-8 animate-bounce">🎂</div>
           <div className="text-white text-4xl font-bold animate-pulse">Carregando aniversariantes...</div>
@@ -113,7 +113,7 @@ export function AniversariantesSlide() {
           <div className="absolute bottom-10 right-10 text-6xl">🎈</div>
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-9xl opacity-30">🎊</div>
         </div>
-        
+
         {/* Conteúdo principal */}
         <div className="text-center z-10 max-w-4xl mx-auto px-8">
           <div className="text-9xl mb-12 animate-bounce">🎂</div>
@@ -126,7 +126,7 @@ export function AniversariantesSlide() {
           </p>
           <div className="mt-12 w-64 h-2 bg-gradient-to-r from-transparent via-white/50 to-transparent mx-auto rounded-full"></div>
         </div>
-        
+
         {/* Elementos decorativos flutuantes */}
         <div className="absolute top-1/4 left-1/4 w-4 h-4 bg-white/20 rounded-full animate-ping"></div>
         <div className="absolute top-3/4 right-1/4 w-6 h-6 bg-white/20 rounded-full animate-ping delay-1000"></div>
@@ -144,7 +144,7 @@ export function AniversariantesSlide() {
         <div className="absolute bottom-20 left-20 text-8xl animate-pulse delay-500">🥳</div>
         <div className="absolute bottom-10 right-10 text-6xl animate-pulse delay-700">🎈</div>
       </div>
-      
+
       {/* Elementos decorativos flutuantes */}
       <div className="absolute top-1/4 left-1/4 w-4 h-4 bg-white/10 rounded-full animate-ping"></div>
       <div className="absolute top-3/4 right-1/4 w-6 h-6 bg-white/10 rounded-full animate-ping delay-1000"></div>
@@ -166,11 +166,11 @@ export function AniversariantesSlide() {
           <div className="w-full h-full flex items-center justify-center">
             {(() => {
               const count = aniversariantes.length
-              
+
               // Função para renderizar um card de aniversariante
               const renderAniversariante = (aniversariante: Aniversariante, index: number, size: 'large' | 'medium' | 'medium-small' | 'small' | 'tiny') => {
                 let dataAniversario: Date
-                
+
                 if (typeof aniversariante.dataAniversario === 'string') {
                   dataAniversario = new Date(aniversariante.dataAniversario)
                 } else if (aniversariante.dataAniversario?.toDate) {
@@ -178,79 +178,62 @@ export function AniversariantesSlide() {
                 } else {
                   dataAniversario = new Date(aniversariante.dataAniversario)
                 }
-                
+
                 const dataFormatada = format(dataAniversario, "dd 'de' MMMM", { locale: ptBR })
-                
+
                 // Configurações baseadas no tamanho - otimizadas para o espaço disponível
                 const sizeConfig = {
                   large: {
-                    containerClass: "bg-white/15 backdrop-blur-lg rounded-3xl p-10 border border-white/30 shadow-2xl",
-                    avatarClass: "w-20 h-20 text-4xl",
+                    containerClass: "bg-white/15 backdrop-blur-lg rounded-3xl py-8 px-10 border border-white/30 shadow-2xl",
                     nameClass: "text-4xl md:text-5xl font-bold mb-2",
-                    dateClass: "text-xl md:text-2xl opacity-90 font-light",
-                    gap: "gap-6"
+                    dateClass: "text-xl md:text-2xl opacity-90 font-light"
                   },
                   medium: {
-                    containerClass: "bg-white/15 backdrop-blur-lg rounded-2xl p-8 border border-white/30 shadow-xl",
-                    avatarClass: "w-18 h-18 text-3xl",
+                    containerClass: "bg-white/15 backdrop-blur-lg rounded-2xl py-6 px-8 border border-white/30 shadow-xl",
                     nameClass: "text-3xl md:text-4xl font-bold mb-2",
-                    dateClass: "text-lg md:text-xl opacity-90 font-light",
-                    gap: "gap-5"
+                    dateClass: "text-lg md:text-xl opacity-90 font-light"
                   },
                   'medium-small': {
-                    containerClass: "bg-white/15 backdrop-blur-lg rounded-2xl p-6 border border-white/30 shadow-xl",
-                    avatarClass: "w-16 h-16 text-3xl",
+                    containerClass: "bg-white/15 backdrop-blur-lg rounded-2xl py-5 px-6 border border-white/30 shadow-xl",
                     nameClass: "text-2xl md:text-3xl font-bold mb-1",
-                    dateClass: "text-lg md:text-xl opacity-90 font-light",
-                    gap: "gap-4"
+                    dateClass: "text-lg md:text-xl opacity-90 font-light"
                   },
                   small: {
-                    containerClass: "bg-white/15 backdrop-blur-lg rounded-xl p-5 border border-white/30 shadow-lg",
-                    avatarClass: "w-14 h-14 text-2xl",
+                    containerClass: "bg-white/15 backdrop-blur-lg rounded-xl py-4 px-5 border border-white/30 shadow-lg",
                     nameClass: "text-xl md:text-2xl font-bold mb-1",
-                    dateClass: "text-base md:text-lg opacity-90 font-light",
-                    gap: "gap-4"
+                    dateClass: "text-base md:text-lg opacity-90 font-light"
                   },
                   tiny: {
-                    containerClass: "bg-white/15 backdrop-blur-lg rounded-xl p-4 border border-white/30 shadow-lg",
-                    avatarClass: "w-12 h-12 text-xl",
+                    containerClass: "bg-white/15 backdrop-blur-lg rounded-xl py-3 px-4 border border-white/30 shadow-lg",
                     nameClass: "text-lg md:text-xl font-bold mb-1",
-                    dateClass: "text-sm md:text-base opacity-90 font-light",
-                    gap: "gap-3"
+                    dateClass: "text-sm md:text-base opacity-90 font-light"
                   }
                 }
-                
+
                 const config = sizeConfig[size]
-                
+
                 return (
-                  <div 
+                  <div
                     key={aniversariante.id}
                     className={`${config.containerClass} transform hover:scale-105 transition-all duration-500 animate-in slide-in-from-bottom-4 fade-in`}
-                    style={{ 
+                    style={{
                       animationDelay: `${index * 0.2}s`
                     }}
                   >
-                    <div className="flex items-center justify-center">
-                      <div className={`flex items-center ${config.gap}`}>
-                        <div className={`${config.avatarClass} bg-gradient-to-br from-white/30 to-white/10 rounded-full flex items-center justify-center shadow-lg`}>
-                          <span className="leading-none">🎂</span>
-                        </div>
-                        <div>
-                          <h3 className={config.nameClass}>{aniversariante.nome}</h3>
-                          <p className={config.dateClass}>{dataFormatada}</p>
-                        </div>
-                      </div>
+                    <div className="text-center">
+                      <h3 className={config.nameClass}>{aniversariante.nome}</h3>
+                      <p className={config.dateClass}>{dataFormatada}</p>
                     </div>
                   </div>
                 )
               }
-              
+
               // Layout baseado na quantidade - redução gradual do tamanho
               if (count === 1) {
                 // 1 aniversariante: Card grande, centralizado
                 return (
                   <div className="max-w-4xl mx-auto">
-                    {aniversariantes.map((aniversariante, index) => 
+                    {aniversariantes.map((aniversariante, index) =>
                       renderAniversariante(aniversariante, index, 'large')
                     )}
                   </div>
@@ -259,7 +242,7 @@ export function AniversariantesSlide() {
                 // 2 aniversariantes: Cards médios, um abaixo do outro
                 return (
                   <div className="grid gap-4 max-w-4xl mx-auto">
-                    {aniversariantes.map((aniversariante, index) => 
+                    {aniversariantes.map((aniversariante, index) =>
                       renderAniversariante(aniversariante, index, 'medium')
                     )}
                   </div>
@@ -268,7 +251,7 @@ export function AniversariantesSlide() {
                 // 3 aniversariantes: Cards médios-pequenos, um abaixo do outro
                 return (
                   <div className="grid gap-3 max-w-4xl mx-auto">
-                    {aniversariantes.map((aniversariante, index) => 
+                    {aniversariantes.map((aniversariante, index) =>
                       renderAniversariante(aniversariante, index, 'medium-small')
                     )}
                   </div>
@@ -277,7 +260,7 @@ export function AniversariantesSlide() {
                 // 4 aniversariantes: Grid 2x2, cards pequenos
                 return (
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 max-w-5xl mx-auto">
-                    {aniversariantes.map((aniversariante, index) => 
+                    {aniversariantes.map((aniversariante, index) =>
                       renderAniversariante(aniversariante, index, 'small')
                     )}
                   </div>
@@ -286,7 +269,7 @@ export function AniversariantesSlide() {
                 // 5-6 aniversariantes: Grid 2 colunas, cards pequenos
                 return (
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 max-w-6xl mx-auto">
-                    {aniversariantes.map((aniversariante, index) => 
+                    {aniversariantes.map((aniversariante, index) =>
                       renderAniversariante(aniversariante, index, 'small')
                     )}
                   </div>
@@ -295,7 +278,7 @@ export function AniversariantesSlide() {
                 // 7-8 aniversariantes: Grid 2 colunas, cards muito pequenos
                 return (
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 max-w-6xl mx-auto">
-                    {aniversariantes.map((aniversariante, index) => 
+                    {aniversariantes.map((aniversariante, index) =>
                       renderAniversariante(aniversariante, index, 'tiny')
                     )}
                   </div>
@@ -304,7 +287,7 @@ export function AniversariantesSlide() {
                 // 9-12 aniversariantes: Grid 3 colunas, cards muito pequenos
                 return (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-w-7xl mx-auto">
-                    {aniversariantes.map((aniversariante, index) => 
+                    {aniversariantes.map((aniversariante, index) =>
                       renderAniversariante(aniversariante, index, 'tiny')
                     )}
                   </div>
@@ -313,7 +296,7 @@ export function AniversariantesSlide() {
                 // 13+ aniversariantes: Grid 4 colunas, cards muito pequenos
                 return (
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 max-w-7xl mx-auto">
-                    {aniversariantes.map((aniversariante, index) => 
+                    {aniversariantes.map((aniversariante, index) =>
                       renderAniversariante(aniversariante, index, 'tiny')
                     )}
                   </div>
@@ -325,7 +308,6 @@ export function AniversariantesSlide() {
 
         {/* Rodapé - sempre visível */}
         <div className="text-center mt-8 flex-shrink-0">
-          <div className="text-5xl mb-4">🥳</div>
           <p className="text-2xl md:text-3xl opacity-80 font-light">
             Parabéns a todos os aniversariantes!
           </p>
@@ -337,8 +319,6 @@ export function AniversariantesSlide() {
           </div>
         </div>
       </div>
-
-
     </div>
   )
 }
