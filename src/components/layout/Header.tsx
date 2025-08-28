@@ -7,6 +7,7 @@ import { UserProfileDropdown } from '@/components/custom/UserProfileDropdown'
 import { UserProfileModal } from '@/components/custom/UserProfileModal'
 import { NovoContratoModal } from '@/components/custom/NovoContratoModal'
 import { NovoCadastroModal } from '@/components/custom/NovoCadastroModal'
+import { NovoAniversarianteModal } from '@/components/custom/NovoAniversarianteModal'
 
 export function Header() {
   const { user, signOut } = useAuth()
@@ -15,6 +16,7 @@ export function Header() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
   const [isNovoContratoModalOpen, setIsNovoContratoModalOpen] = useState(false)
   const [isNovoCadastroModalOpen, setIsNovoCadastroModalOpen] = useState(false)
+  const [isNovoAniversarianteModalOpen, setIsNovoAniversarianteModalOpen] = useState(false)
   
   const handleLogoError = useCallback(() => {
     setLogoSrc(prev => {
@@ -38,6 +40,10 @@ export function Header() {
     setIsNovoCadastroModalOpen(true)
   }
 
+  const handleNovoAniversariante = () => {
+    setIsNovoAniversarianteModalOpen(true)
+  }
+
   return (
     <header className="relative w-full z-50 border-b border-gray-200 shadow-md">
       <div className="absolute inset-0 bg-gradient-to-r from-[#00A298]/10 via-white to-[#1D3C44]/10" />
@@ -56,6 +62,7 @@ export function Header() {
               onViewProfile={handleViewProfile}
               onNovoContrato={handleNovoContrato}
               onNovoCadastro={handleNovoCadastro}
+              onNovoAniversariante={handleNovoAniversariante}
             />
             <Button 
               variant="outline" 
@@ -89,6 +96,12 @@ export function Header() {
         <NovoCadastroModal
           isOpen={isNovoCadastroModalOpen}
           onClose={() => setIsNovoCadastroModalOpen(false)}
+        />
+        
+        {/* Modal Novo Aniversariante */}
+        <NovoAniversarianteModal
+          isOpen={isNovoAniversarianteModalOpen}
+          onClose={() => setIsNovoAniversarianteModalOpen(false)}
         />
       </div>
     </header>

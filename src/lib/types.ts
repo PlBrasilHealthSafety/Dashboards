@@ -47,6 +47,13 @@ export interface Contrato extends FirestoreDocument {
   displayedOnTV: boolean;
 }
 
+// Aniversariante document type
+export interface Aniversariante extends FirestoreDocument {
+  nome: string;
+  dataAniversario: string;
+  userId: string;
+}
+
 // Firebase configuration type
 export interface FirebaseConfig {
   apiKey: string;
