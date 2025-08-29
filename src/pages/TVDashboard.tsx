@@ -120,7 +120,7 @@ export function TVDashboard() {
   }, [navigate])
 
   // Controlar autoplay (30 segundos fixo para todos os slides)
-  const handleSlideChange = (swiper: any) => {
+  const handleSlideChange = () => {
     // Manter comportamento padrão do autoplay
     // Todos os slides terão 30 segundos
   }
