@@ -189,9 +189,9 @@ export function AniversariantesSlide() {
                     dateClass: "text-xl md:text-2xl opacity-90 font-light"
                   },
                   medium: {
-                    containerClass: "bg-white/15 backdrop-blur-lg rounded-2xl py-6 px-8 border border-white/30 shadow-xl",
-                    nameClass: "text-3xl md:text-4xl font-bold mb-2",
-                    dateClass: "text-lg md:text-xl opacity-90 font-light"
+                    containerClass: "bg-white/15 backdrop-blur-lg rounded-3xl py-8 px-12 border border-white/30 shadow-xl",
+                    nameClass: "text-4xl md:text-5xl font-bold mb-3",
+                    dateClass: "text-xl md:text-2xl opacity-90 font-light"
                   },
                   'medium-small': {
                     containerClass: "bg-white/15 backdrop-blur-lg rounded-2xl py-5 px-6 border border-white/30 shadow-xl",
@@ -239,29 +239,29 @@ export function AniversariantesSlide() {
                   </div>
                 )
               } else if (count === 2) {
-                // 2 aniversariantes: Cards médios, um abaixo do outro
+                // 2 aniversariantes: Cards médios, dispostos horizontalmente
                 return (
-                  <div className="grid gap-4 max-w-4xl mx-auto">
+                  <div className="flex justify-center gap-8 max-w-6xl mx-auto">
                     {aniversariantes.map((aniversariante, index) =>
                       renderAniversariante(aniversariante, index, 'medium')
                     )}
                   </div>
                 )
               } else if (count === 3) {
-                // 3 aniversariantes: Cards médios-pequenos, um abaixo do outro
+                // 3 aniversariantes: Cards médios, dispostos horizontalmente
                 return (
-                  <div className="grid gap-3 max-w-4xl mx-auto">
+                  <div className="flex flex-wrap justify-center gap-8 max-w-7xl mx-auto">
                     {aniversariantes.map((aniversariante, index) =>
-                      renderAniversariante(aniversariante, index, 'medium-small')
+                      renderAniversariante(aniversariante, index, 'medium')
                     )}
                   </div>
                 )
               } else if (count === 4) {
-                // 4 aniversariantes: Grid 2x2, cards pequenos
+                // 4 aniversariantes: Cards médios-pequenos, dispostos horizontalmente (2x2 se não couber)
                 return (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 max-w-5xl mx-auto">
+                  <div className="flex flex-wrap justify-center gap-4 max-w-7xl mx-auto">
                     {aniversariantes.map((aniversariante, index) =>
-                      renderAniversariante(aniversariante, index, 'small')
+                      renderAniversariante(aniversariante, index, 'medium-small')
                     )}
                   </div>
                 )
