@@ -257,9 +257,9 @@ export function AniversariantesSlide() {
                   </div>
                 )
               } else if (count === 4) {
-                // 4 aniversariantes: Cards médios-pequenos, dispostos horizontalmente (2x2 se não couber)
+                // 4 aniversariantes: Grid 2x2, cards médios-pequenos
                 return (
-                  <div className="flex flex-wrap justify-center gap-4 max-w-7xl mx-auto">
+                  <div className="grid grid-cols-2 gap-6 max-w-6xl mx-auto">
                     {aniversariantes.map((aniversariante, index) =>
                       renderAniversariante(aniversariante, index, 'medium-small')
                     )}
@@ -268,34 +268,34 @@ export function AniversariantesSlide() {
               } else if (count <= 6) {
                 // 5-6 aniversariantes: Grid 2 colunas, cards pequenos
                 return (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 max-w-6xl mx-auto">
+                  <div className="grid grid-cols-2 gap-4 max-w-6xl mx-auto">
                     {aniversariantes.map((aniversariante, index) =>
                       renderAniversariante(aniversariante, index, 'small')
                     )}
                   </div>
                 )
               } else if (count <= 8) {
-                // 7-8 aniversariantes: Grid 2 colunas, cards muito pequenos
+                // 7-8 aniversariantes: Grid 2 colunas, cards pequenos
                 return (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 max-w-6xl mx-auto">
+                  <div className="grid grid-cols-2 gap-3 max-w-6xl mx-auto">
                     {aniversariantes.map((aniversariante, index) =>
-                      renderAniversariante(aniversariante, index, 'tiny')
+                      renderAniversariante(aniversariante, index, 'small')
                     )}
                   </div>
                 )
               } else if (count <= 12) {
-                // 9-12 aniversariantes: Grid 3 colunas, cards muito pequenos
+                // 9-12 aniversariantes: Grid 2 colunas, cards muito pequenos
                 return (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-w-7xl mx-auto">
+                  <div className="grid grid-cols-2 gap-2 max-w-6xl mx-auto">
                     {aniversariantes.map((aniversariante, index) =>
                       renderAniversariante(aniversariante, index, 'tiny')
                     )}
                   </div>
                 )
               } else {
-                // 13+ aniversariantes: Grid 4 colunas, cards muito pequenos
+                // 13+ aniversariantes: Grid 2 colunas, cards muito pequenos
                 return (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 max-w-7xl mx-auto">
+                  <div className="grid grid-cols-2 gap-2 max-w-6xl mx-auto">
                     {aniversariantes.map((aniversariante, index) =>
                       renderAniversariante(aniversariante, index, 'tiny')
                     )}
