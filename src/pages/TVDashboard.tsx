@@ -136,12 +136,16 @@ export function TVDashboard() {
       delay = 180000 // 3 minutos = 180 segundos
     }
     
-    // Reiniciar autoplay com novo delay
+    // Configurar novo delay e reiniciar autoplay
+    if (swiper.params?.autoplay) {
+      swiper.params.autoplay.delay = delay
+    }
+    
     setTimeout(() => {
       if (swiper.autoplay) {
         swiper.autoplay.start()
       }
-    }, delay)
+    }, 100)
   }
 
   const handleNotificationComplete = async () => {

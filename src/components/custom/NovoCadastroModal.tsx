@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X, UserPlus, ChevronRight, TrendingUp, Users, Target, Award, Calendar, Activity, FileText, AlertTriangle } from 'lucide-react'
+import { X, UserPlus, ChevronRight, TrendingUp, Users, Target, Award, Calendar, Activity, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/useAuth'
 import { getUserRoute } from '@/lib/utils'
