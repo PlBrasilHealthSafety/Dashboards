@@ -1,6 +1,6 @@
 import { useMemo, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Carousel } from '@/components/custom/Carousel'
+import { DynamicTimerCarousel } from '@/components/custom/DynamicTimerCarousel'
 
 
 import { 
@@ -29,15 +29,15 @@ export function TVDashboard() {
   const carouselItems = useMemo(() => {
     // 8 slides de PowerPoint + slide de aniversariantes
     const slides = [
-      { id: 1, content: <PowerPointSlide1 /> },
-      { id: 2, content: <PowerPointSlide2 /> },
-      { id: 3, content: <PowerPointSlide3 /> },
-      { id: 4, content: <PowerPointSlide4 /> },
-      { id: 5, content: <AniversariantesSlide /> }, // Slide de aniversariantes entre 4 e 5
-      { id: 6, content: <PowerPointSlide5 /> },
-      { id: 7, content: <PowerPointSlide6 /> },
-      { id: 8, content: <PowerPointSlide7 /> },
-      { id: 9, content: <PowerPointSlide8 /> },
+      { id: 1, content: <PowerPointSlide1 />, duration: 30000 }, // 30 seconds
+      { id: 2, content: <PowerPointSlide2 />, duration: 30000 }, // 30 seconds
+      { id: 3, content: <PowerPointSlide3 />, duration: 30000 }, // 30 seconds
+      { id: 4, content: <PowerPointSlide4 />, duration: 30000 }, // 30 seconds
+      { id: 5, content: <AniversariantesSlide />, duration: 180000 }, // 3 minutes (180 seconds)
+      { id: 6, content: <PowerPointSlide5 />, duration: 30000 }, // 30 seconds
+      { id: 7, content: <PowerPointSlide6 />, duration: 30000 }, // 30 seconds
+      { id: 8, content: <PowerPointSlide7 />, duration: 30000 }, // 30 seconds
+      { id: 9, content: <PowerPointSlide8 />, duration: 30000 }, // 30 seconds
     ]
     return slides
   }, [])
@@ -161,20 +161,13 @@ export function TVDashboard() {
 
       {/* Carousel Fullscreen para TV 55 polegadas */}
       <div className="h-screen w-screen">
-        <Carousel
+        <DynamicTimerCarousel
           items={carouselItems}
           className="w-full h-full"
-          slidesPerView={1}
-          spaceBetween={0}
-          loop
-          centeredSlides
           showNavigation={false}
           showPagination={false}
-          autoplay={{ 
-            delay: 30000, // 30 segundos por slide
-            disableOnInteraction: false,
-            pauseOnMouseEnter: false
-          }}
+          showProgressBar={false}
+          pauseOnMouseEnter={false}
         />
       </div>
 
