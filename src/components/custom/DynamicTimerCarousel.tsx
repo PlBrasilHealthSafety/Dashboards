@@ -150,13 +150,8 @@ export const DynamicTimerCarousel: React.FC<DynamicTimerCarouselProps> = ({
     handleDragStart(e.clientX);
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    handleDragMove(e.clientX);
-  };
-
-  const handleMouseUp = () => {
-    handleDragEnd();
-  };
+  // Mouse move and up handlers are handled by global event listeners
+  // when dragging is active (see useEffect below)
 
   // Touch events for mobile
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -273,7 +268,7 @@ export const DynamicTimerCarousel: React.FC<DynamicTimerCarouselProps> = ({
         </div>
       )}
 
-      <style jsx>{`
+      <style>{`
         @keyframes progress {
           from { width: 0%; }
           to { width: 100%; }
