@@ -119,33 +119,10 @@ export function TVDashboard() {
     }
   }, [navigate])
 
-  // Controlar autoplay com diferentes tempos para cada slide
+  // Controlar autoplay (30 segundos fixo para todos os slides)
   const handleSlideChange = (swiper: any) => {
-    const activeIndex = swiper.realIndex
-    
-    // Parar o autoplay atual
-    if (swiper.autoplay) {
-      swiper.autoplay.stop()
-    }
-    
-    // Definir novo delay baseado no slide
-    let delay = 30000 // 30 segundos por padrão
-    
-    // Slide 5 (índice 4) é o slide de aniversariantes - 3 minutos
-    if (activeIndex === 4) {
-      delay = 180000 // 3 minutos = 180 segundos
-    }
-    
-    // Configurar novo delay e reiniciar autoplay
-    if (swiper.params?.autoplay) {
-      swiper.params.autoplay.delay = delay
-    }
-    
-    setTimeout(() => {
-      if (swiper.autoplay) {
-        swiper.autoplay.start()
-      }
-    }, 100)
+    // Manter comportamento padrão do autoplay
+    // Todos os slides terão 30 segundos
   }
 
   const handleNotificationComplete = async () => {
