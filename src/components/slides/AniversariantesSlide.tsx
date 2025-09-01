@@ -25,12 +25,19 @@ export function AniversariantesSlide() {
 
         // Filtrar aniversariantes do mês atual
         const currentMonth = new Date().getMonth()
+        
         const aniversariantesDoMes = data.filter(aniversariante => {
           try {
             let dataAniversario: Date
 
             if (typeof aniversariante.dataAniversario === 'string') {
-              dataAniversario = new Date(aniversariante.dataAniversario)
+              // Extrair ano, mês, dia da string e criar data local
+              const datePart = aniversariante.dataAniversario.includes('T') 
+                ? aniversariante.dataAniversario.split('T')[0] 
+                : aniversariante.dataAniversario
+              
+              const [year, month, day] = datePart.split('-').map(Number)
+              dataAniversario = new Date(year, month - 1, day) // month-1 pois Date usa 0-11
             } else if (aniversariante.dataAniversario?.toDate) {
               // Timestamp do Firebase
               dataAniversario = aniversariante.dataAniversario.toDate()
@@ -51,7 +58,11 @@ export function AniversariantesSlide() {
             let dataA: Date, dataB: Date
 
             if (typeof a.dataAniversario === 'string') {
-              dataA = new Date(a.dataAniversario)
+              const datePart = a.dataAniversario.includes('T') 
+                ? a.dataAniversario.split('T')[0] 
+                : a.dataAniversario
+              const [year, month, day] = datePart.split('-').map(Number)
+              dataA = new Date(year, month - 1, day)
             } else if (a.dataAniversario?.toDate) {
               dataA = a.dataAniversario.toDate()
             } else {
@@ -59,7 +70,11 @@ export function AniversariantesSlide() {
             }
 
             if (typeof b.dataAniversario === 'string') {
-              dataB = new Date(b.dataAniversario)
+              const datePart = b.dataAniversario.includes('T') 
+                ? b.dataAniversario.split('T')[0] 
+                : b.dataAniversario
+              const [year, month, day] = datePart.split('-').map(Number)
+              dataB = new Date(year, month - 1, day)
             } else if (b.dataAniversario?.toDate) {
               dataB = b.dataAniversario.toDate()
             } else {
@@ -172,7 +187,11 @@ export function AniversariantesSlide() {
                 let dataAniversario: Date
 
                 if (typeof aniversariante.dataAniversario === 'string') {
-                  dataAniversario = new Date(aniversariante.dataAniversario)
+                  const datePart = aniversariante.dataAniversario.includes('T') 
+                    ? aniversariante.dataAniversario.split('T')[0] 
+                    : aniversariante.dataAniversario
+                  const [year, month, day] = datePart.split('-').map(Number)
+                  dataAniversario = new Date(year, month - 1, day)
                 } else if (aniversariante.dataAniversario?.toDate) {
                   dataAniversario = aniversariante.dataAniversario.toDate()
                 } else {
