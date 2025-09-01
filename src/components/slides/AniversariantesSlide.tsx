@@ -25,12 +25,19 @@ export function AniversariantesSlide() {
 
         // Filtrar aniversariantes do mês atual
         const currentMonth = new Date().getMonth()
+        
         const aniversariantesDoMes = data.filter(aniversariante => {
           try {
             let dataAniversario: Date
 
             if (typeof aniversariante.dataAniversario === 'string') {
-              dataAniversario = new Date(aniversariante.dataAniversario)
+              // Extrair ano, mês, dia da string e criar data local
+              const datePart = aniversariante.dataAniversario.includes('T') 
+                ? aniversariante.dataAniversario.split('T')[0] 
+                : aniversariante.dataAniversario
+              
+              const [year, month, day] = datePart.split('-').map(Number)
+              dataAniversario = new Date(year, month - 1, day) // month-1 pois Date usa 0-11
             } else if (aniversariante.dataAniversario?.toDate) {
               // Timestamp do Firebase
               dataAniversario = aniversariante.dataAniversario.toDate()
@@ -51,7 +58,11 @@ export function AniversariantesSlide() {
             let dataA: Date, dataB: Date
 
             if (typeof a.dataAniversario === 'string') {
-              dataA = new Date(a.dataAniversario)
+              const datePart = a.dataAniversario.includes('T') 
+                ? a.dataAniversario.split('T')[0] 
+                : a.dataAniversario
+              const [year, month, day] = datePart.split('-').map(Number)
+              dataA = new Date(year, month - 1, day)
             } else if (a.dataAniversario?.toDate) {
               dataA = a.dataAniversario.toDate()
             } else {
@@ -59,7 +70,11 @@ export function AniversariantesSlide() {
             }
 
             if (typeof b.dataAniversario === 'string') {
-              dataB = new Date(b.dataAniversario)
+              const datePart = b.dataAniversario.includes('T') 
+                ? b.dataAniversario.split('T')[0] 
+                : b.dataAniversario
+              const [year, month, day] = datePart.split('-').map(Number)
+              dataB = new Date(year, month - 1, day)
             } else if (b.dataAniversario?.toDate) {
               dataB = b.dataAniversario.toDate()
             } else {
@@ -172,7 +187,11 @@ export function AniversariantesSlide() {
                 let dataAniversario: Date
 
                 if (typeof aniversariante.dataAniversario === 'string') {
-                  dataAniversario = new Date(aniversariante.dataAniversario)
+                  const datePart = aniversariante.dataAniversario.includes('T') 
+                    ? aniversariante.dataAniversario.split('T')[0] 
+                    : aniversariante.dataAniversario
+                  const [year, month, day] = datePart.split('-').map(Number)
+                  dataAniversario = new Date(year, month - 1, day)
                 } else if (aniversariante.dataAniversario?.toDate) {
                   dataAniversario = aniversariante.dataAniversario.toDate()
                 } else {
@@ -194,9 +213,9 @@ export function AniversariantesSlide() {
                     dateClass: "text-xl md:text-2xl opacity-90 font-light"
                   },
                   'medium-small': {
-                    containerClass: "bg-white/15 backdrop-blur-lg rounded-2xl py-5 px-6 border border-white/30 shadow-xl",
-                    nameClass: "text-2xl md:text-3xl font-bold mb-1",
-                    dateClass: "text-lg md:text-xl opacity-90 font-light"
+                    containerClass: "bg-white/15 backdrop-blur-lg rounded-2xl py-12 px-16 border border-white/30 shadow-xl",
+                    nameClass: "text-3xl md:text-4xl font-bold mb-4",
+                    dateClass: "text-xl md:text-2xl opacity-90 font-light"
                   },
                   small: {
                     containerClass: "bg-white/15 backdrop-blur-lg rounded-xl py-4 px-5 border border-white/30 shadow-lg",
@@ -256,46 +275,37 @@ export function AniversariantesSlide() {
                     )}
                   </div>
                 )
-              } else if (count === 4) {
-                // 4 aniversariantes: Grid 2x2, cards médios-pequenos
+              } else if (count <= 6) {
+                // 4-6 aniversariantes: Grid 3 colunas, cards médios-pequenos
                 return (
-                  <div className="grid grid-cols-2 gap-6 max-w-6xl mx-auto">
+                  <div className="grid grid-cols-3 gap-8 max-w-8xl mx-auto px-4">
                     {aniversariantes.map((aniversariante, index) =>
                       renderAniversariante(aniversariante, index, 'medium-small')
                     )}
                   </div>
                 )
-              } else if (count <= 6) {
-                // 5-6 aniversariantes: Grid 2 colunas, cards pequenos
+              } else if (count <= 9) {
+                // 7-9 aniversariantes: Grid 3 colunas, cards pequenos
                 return (
-                  <div className="grid grid-cols-2 gap-4 max-w-6xl mx-auto">
-                    {aniversariantes.map((aniversariante, index) =>
-                      renderAniversariante(aniversariante, index, 'small')
-                    )}
-                  </div>
-                )
-              } else if (count <= 8) {
-                // 7-8 aniversariantes: Grid 2 colunas, cards pequenos
-                return (
-                  <div className="grid grid-cols-2 gap-3 max-w-6xl mx-auto">
+                  <div className="grid grid-cols-3 gap-4 max-w-7xl mx-auto">
                     {aniversariantes.map((aniversariante, index) =>
                       renderAniversariante(aniversariante, index, 'small')
                     )}
                   </div>
                 )
               } else if (count <= 12) {
-                // 9-12 aniversariantes: Grid 2 colunas, cards muito pequenos
+                // 10-12 aniversariantes: Grid 3 colunas, cards pequenos
                 return (
-                  <div className="grid grid-cols-2 gap-2 max-w-6xl mx-auto">
+                  <div className="grid grid-cols-3 gap-3 max-w-7xl mx-auto">
                     {aniversariantes.map((aniversariante, index) =>
-                      renderAniversariante(aniversariante, index, 'tiny')
+                      renderAniversariante(aniversariante, index, 'small')
                     )}
                   </div>
                 )
               } else {
-                // 13+ aniversariantes: Grid 2 colunas, cards muito pequenos
+                // 13+ aniversariantes: Grid 3 colunas, cards muito pequenos
                 return (
-                  <div className="grid grid-cols-2 gap-2 max-w-6xl mx-auto">
+                  <div className="grid grid-cols-3 gap-2 max-w-7xl mx-auto">
                     {aniversariantes.map((aniversariante, index) =>
                       renderAniversariante(aniversariante, index, 'tiny')
                     )}
@@ -312,10 +322,10 @@ export function AniversariantesSlide() {
             Parabéns a todos os aniversariantes!
           </p>
           <div className="mt-6 flex justify-center gap-4 text-4xl">
-            <span className="animate-bounce">🎈</span>
-            <span className="animate-bounce delay-200">🎊</span>
-            <span className="animate-bounce delay-400">🎁</span>
-            <span className="animate-bounce delay-600">🍰</span>
+            <span>🎈</span>
+            <span>🎊</span>
+            <span>🎁</span>
+            <span>🍰</span>
           </div>
         </div>
       </div>
