@@ -322,10 +322,10 @@ export function AniversariantesSlide() {
             Parabéns a todos os aniversariantes!
           </p>
           <div className="mt-6 flex justify-center gap-4 text-4xl">
-            <span className="animate-bounce">🎈</span>
-            <span className="animate-bounce delay-200">🎊</span>
-            <span className="animate-bounce delay-400">🎁</span>
-            <span className="animate-bounce delay-600">🍰</span>
+            <span>🎈</span>
+            <span>🎊</span>
+            <span>🎁</span>
+            <span>🍰</span>
           </div>
         </div>
       </div>
