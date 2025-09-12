@@ -1,6 +1,8 @@
 import { Trophy, Star, Medal } from 'lucide-react'
 
 export function CampeoesKahootSlide() {
+  console.log('CampeoesKahootSlide renderizado - Timer deveria ser 120000ms (2 minutos)')
+  
   return (
     <div className="w-full h-full min-h-screen bg-gradient-to-bl from-[#1D3C44] via-[#0B5C5B] to-[#00A298] text-white relative overflow-hidden">
       {/* Padrão de fundo decorativo */}

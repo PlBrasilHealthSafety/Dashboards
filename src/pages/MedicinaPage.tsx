@@ -80,7 +80,7 @@ export function MedicinaPage() {
                     className="w-full h-full"
                     showNavigation
                     showPagination
-                    pauseOnMouseEnter={true}
+                    pauseOnMouseEnter={false}
                   />
                 </div>
               </div>
