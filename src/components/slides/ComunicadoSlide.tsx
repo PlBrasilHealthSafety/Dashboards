@@ -36,77 +36,77 @@ export function ComunicadoSlide() {
       {/* Overlay sutil para dar profundidade */}
       <div className="absolute inset-0 bg-gradient-to-r from-[#00A298]/5 via-transparent to-[#0B5C5B]/5"></div>
 
-      <div className="relative z-10 flex flex-col h-full min-h-screen p-6 md:p-8">
+      <div className="relative z-10 flex flex-col h-full min-h-screen p-4 md:p-6">
         {/* Título Principal */}
-        <div className="text-center mb-8 flex-shrink-0">
-          <div className="flex justify-center items-center gap-4 mb-6">
-            <div className="text-7xl">📢</div>
-            <h1 className="text-7xl md:text-9xl font-black bg-gradient-to-r from-[#00A298] via-[#0B5C5B] to-[#1D3C44] bg-clip-text text-transparent">
+        <div className="text-center mb-6 flex-shrink-0">
+          <div className="flex justify-center items-center gap-3 mb-4">
+            <div className="text-5xl">📢</div>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-black bg-gradient-to-r from-[#00A298] via-[#0B5C5B] to-[#1D3C44] bg-clip-text text-transparent">
               COMUNICADO!
             </h1>
-            <div className="text-7xl">📢</div>
+            <div className="text-5xl">📢</div>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-[#00A298] mb-4">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#00A298] mb-3">
             Aniversariantes de Setembro 🎉
           </h2>
-          <div className="w-96 h-3 bg-gradient-to-r from-transparent via-[#00A298]/60 to-transparent mx-auto rounded-full"></div>
+          <div className="w-64 h-2 bg-gradient-to-r from-transparent via-[#00A298]/60 to-transparent mx-auto rounded-full"></div>
         </div>
 
         {/* Data e Local - Destaque */}
-        <div className="bg-white/95 backdrop-blur-lg rounded-3xl p-8 md:p-10 border-3 border-[#00A298]/60 shadow-2xl mb-8 mx-auto max-w-5xl">
+        <div className="bg-white/95 backdrop-blur-lg rounded-3xl p-6 md:p-8 border-2 border-[#00A298]/60 shadow-2xl mb-6 mx-auto max-w-4xl">
           <div className="text-center">
-            <div className="flex justify-center items-center gap-6 mb-6">
-              <Calendar className="w-16 h-16 text-[#00A298]" />
+            <div className="flex justify-center items-center gap-4 mb-4">
+              <Calendar className="w-12 h-12 text-[#00A298]" />
               <div>
-                <p className="text-5xl md:text-6xl font-black text-[#1D3C44]">
+                <p className="text-3xl md:text-4xl lg:text-5xl font-black text-[#1D3C44]">
                   18 DE SETEMBRO
                 </p>
-                <div className="flex items-center justify-center gap-3 mt-3">
-                  <Clock className="w-8 h-8 text-[#00A298]" />
-                  <p className="text-3xl md:text-4xl font-bold text-[#0B5C5B]">
+                <div className="flex items-center justify-center gap-2 mt-2">
+                  <Clock className="w-6 h-6 text-[#00A298]" />
+                  <p className="text-2xl md:text-3xl font-bold text-[#0B5C5B]">
                     16h30
                   </p>
                 </div>
               </div>
-              <Calendar className="w-16 h-16 text-[#00A298]" />
+              <Calendar className="w-12 h-12 text-[#00A298]" />
             </div>
             
-            <div className="flex items-center justify-center gap-3 mt-6">
-              <MapPin className="w-8 h-8 text-[#00A298]" />
-              <p className="text-2xl md:text-3xl font-semibold text-[#1D3C44]">
+            <div className="flex items-center justify-center gap-2 mt-4">
+              <MapPin className="w-6 h-6 text-[#00A298]" />
+              <p className="text-xl md:text-2xl font-semibold text-[#1D3C44]">
                 Sede PLBrasil Health - Auditório Interno
               </p>
             </div>
           </div>
         </div>
 
-        {/* Conteúdo Principal - Grid de Programação - Cards ainda maiores e mais espalhados para TV 55" */}
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-16 max-w-full mx-auto px-8">
+        {/* Conteúdo Principal - Grid de Programação - Cards redimensionados para TV 55" */}
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto px-4">
           
           {/* Bloco 1: Palestras */}
-          <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-12 border-2 border-[#00A298]/40 shadow-2xl">
-            <div className="text-center mb-10">
-              <Users className="w-24 h-24 text-[#00A298] mx-auto mb-8" />
-              <h3 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#1D3C44] mb-8">
+          <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-6 border-2 border-[#00A298]/40 shadow-2xl">
+            <div className="text-center mb-6">
+              <Users className="w-16 h-16 text-[#00A298] mx-auto mb-4" />
+              <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#1D3C44] mb-4">
                 Palestras Saúde & IA
               </h3>
             </div>
             
-            <div className="space-y-10">
-              <div className="bg-[#00A298]/15 rounded-2xl p-10 border-2 border-[#00A298]/30">
-                <h4 className="text-3xl md:text-4xl font-bold text-[#1D3C44] mb-6">
+            <div className="space-y-6">
+              <div className="bg-[#00A298]/15 rounded-2xl p-6 border-2 border-[#00A298]/30">
+                <h4 className="text-xl md:text-2xl font-bold text-[#1D3C44] mb-3">
                   Saúde Mental
                 </h4>
-                <p className="text-2xl md:text-3xl text-[#0B5C5B] font-semibold">
+                <p className="text-lg md:text-xl text-[#0B5C5B] font-semibold">
                   Taymara 
                 </p>
               </div>
               
-              <div className="bg-[#00A298]/15 rounded-2xl p-10 border-2 border-[#00A298]/30">
-                <h4 className="text-3xl md:text-4xl font-bold text-[#1D3C44] mb-6">
+              <div className="bg-[#00A298]/15 rounded-2xl p-6 border-2 border-[#00A298]/30">
+                <h4 className="text-xl md:text-2xl font-bold text-[#1D3C44] mb-3">
                   Ferramentas de IA no Trabalho
                 </h4>
-                <p className="text-2xl md:text-3xl text-[#0B5C5B] font-semibold">
+                <p className="text-lg md:text-xl text-[#0B5C5B] font-semibold">
                   Evandro 
                 </p>
               </div>
@@ -114,31 +114,31 @@ export function ComunicadoSlide() {
           </div>
 
           {/* Bloco 2: Dinâmica Kahoot */}
-          <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-12 border-2 border-[#00A298]/40 shadow-2xl">
-            <div className="text-center mb-10">
-              <Trophy className="w-24 h-24 text-[#00A298] mx-auto mb-8" />
-              <h3 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#1D3C44] mb-8">
+          <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-6 border-2 border-[#00A298]/40 shadow-2xl">
+            <div className="text-center mb-6">
+              <Trophy className="w-16 h-16 text-[#00A298] mx-auto mb-4" />
+              <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#1D3C44] mb-4">
                 Dinâmica do Kahoot!
               </h3>
             </div>
             
-            <div className="space-y-10">
-              <div className="bg-[#00A298]/15 rounded-2xl p-10 border-2 border-[#00A298]/30">
-                <p className="text-2xl md:text-3xl text-[#1D3C44] font-semibold text-center mb-8">
+            <div className="space-y-6">
+              <div className="bg-[#00A298]/15 rounded-2xl p-6 border-2 border-[#00A298]/30">
+                <p className="text-lg md:text-xl text-[#1D3C44] font-semibold text-center mb-4">
                   Quiz com curiosidades sobre:
                 </p>
-                <ul className="text-xl md:text-2xl text-[#0B5C5B] space-y-4">
+                <ul className="text-base md:text-lg text-[#0B5C5B] space-y-2">
                   <li>• Empresa e cultura</li>
                   <li>• Valores PLBrasil</li>
                   <li>• Conteúdos das palestras</li>
                 </ul>
               </div>
               
-              <div className="bg-gradient-to-r from-[#00A298]/25 to-[#0B5C5B]/25 rounded-2xl p-8 border-2 border-[#00A298]/40">
-                <p className="text-center text-[#1D3C44] font-bold text-xl md:text-2xl">
+              <div className="bg-gradient-to-r from-[#00A298]/25 to-[#0B5C5B]/25 rounded-2xl p-4 border-2 border-[#00A298]/40">
+                <p className="text-center text-[#1D3C44] font-bold text-lg md:text-xl">
                   🏆 O vencedor entra para o
                 </p>
-                <p className="text-center text-[#00A298] font-black text-2xl md:text-3xl">
+                <p className="text-center text-[#00A298] font-black text-xl md:text-2xl">
                   Hall dos Sabe Tudo PLHealth!
                 </p>
               </div>
@@ -146,27 +146,27 @@ export function ComunicadoSlide() {
           </div>
 
           {/* Bloco 3: Celebração */}
-          <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-12 border-2 border-[#00A298]/40 shadow-2xl">
-            <div className="text-center mb-10">
-              <Cake className="w-24 h-24 text-[#00A298] mx-auto mb-8" />
-              <h3 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#1D3C44] mb-10">
+          <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-6 border-2 border-[#00A298]/40 shadow-2xl">
+            <div className="text-center mb-6">
+              <Cake className="w-16 h-16 text-[#00A298] mx-auto mb-4" />
+              <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#1D3C44] mb-6">
                 Celebração
               </h3>
             </div>
             
-            <div className="space-y-10">
-              <div className="bg-[#00A298]/15 rounded-2xl p-10 border-2 border-[#00A298]/30 text-center">
-                <div className="text-6xl md:text-7xl mb-8">🎂</div>
-                <h4 className="text-3xl md:text-4xl font-bold text-[#1D3C44] mb-6">
+            <div className="space-y-6">
+              <div className="bg-[#00A298]/15 rounded-2xl p-6 border-2 border-[#00A298]/30 text-center">
+                <div className="text-4xl md:text-5xl mb-4">🎂</div>
+                <h4 className="text-xl md:text-2xl font-bold text-[#1D3C44] mb-3">
                   Bolo e Parabéns
                 </h4>
-                <p className="text-2xl md:text-3xl text-[#0B5C5B] font-semibold">
+                <p className="text-lg md:text-xl text-[#0B5C5B] font-semibold">
                   Para todos os aniversariantes do mês!
                 </p>
               </div>
               
-              <div className="text-center mt-12">
-                <div className="flex justify-center gap-8 text-6xl md:text-7xl">
+              <div className="text-center mt-8">
+                <div className="flex justify-center gap-4 text-4xl md:text-5xl">
                   <span className="animate-bounce">🎉</span>
                   <span className="animate-bounce delay-300">🎈</span>
                   <span className="animate-bounce delay-500">🎊</span>
