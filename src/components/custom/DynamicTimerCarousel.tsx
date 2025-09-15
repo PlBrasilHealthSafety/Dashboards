@@ -43,47 +43,51 @@ export const DynamicTimerCarousel: React.FC<DynamicTimerCarouselProps> = ({
 
   const goToNext = () => {
     const nextIndex = (currentIndex + 1) % items.length;
+    console.log(`▶️ goToNext: ${currentIndex} → ${nextIndex} (total: ${items.length})`);
     setCurrentIndex(nextIndex);
     onSlideChange?.(nextIndex);
   };
 
   const goToPrevious = () => {
     const prevIndex = currentIndex === 0 ? items.length - 1 : currentIndex - 1;
+    console.log(`◀️ goToPrevious: ${currentIndex} → ${prevIndex} (total: ${items.length})`);
     setCurrentIndex(prevIndex);
     onSlideChange?.(prevIndex);
   };
 
   const goToSlide = (index: number) => {
+    console.log(`🎯 goToSlide: ${currentIndex} → ${index}`);
     setCurrentIndex(index);
     onSlideChange?.(index);
   };
 
   // Timer management
   useEffect(() => {
-    console.log(`Timer effect - currentIndex: ${currentIndex}, isPaused: ${isPaused}, currentDuration: ${currentDuration}ms, items.length: ${items.length}`);
+    console.log(`🔄 Timer effect - currentIndex: ${currentIndex}, isPaused: ${isPaused}, currentDuration: ${currentDuration}ms, items.length: ${items.length}`);
+    console.log(`🔄 Current slide item:`, currentItem);
     
     if (isPaused || items.length <= 1) {
-      console.log('Timer paused or single item - not setting timer');
+      console.log('⏸️ Timer paused or single item - not setting timer');
       return;
     }
 
     // Clear existing timer
     if (timerRef.current) {
       clearTimeout(timerRef.current);
-      console.log('Cleared existing timer');
+      console.log('🗑️ Cleared existing timer');
     }
 
     // Set new timer with current slide's duration
-    console.log(`Setting timer for ${currentDuration}ms for slide ${currentIndex}`);
+    console.log(`⏰ Setting timer for ${currentDuration}ms for slide ${currentIndex} (${Math.round(currentDuration/1000)} seconds)`);
     timerRef.current = setTimeout(() => {
-      console.log(`Timer expired for slide ${currentIndex} - moving to next`);
+      console.log(`⏰ Timer expired for slide ${currentIndex} - moving to next`);
       goToNext();
     }, currentDuration);
 
     return () => {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
-        console.log('Cleanup timer on unmount/change');
+        console.log('🧹 Cleanup timer on unmount/change');
       }
     };
   }, [currentIndex, isPaused, currentDuration, items.length]);

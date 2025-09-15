@@ -2,15 +2,15 @@ import { Trophy, Star } from 'lucide-react'
 import { useEffect } from 'react'
 
 export function CampeoesKahootSlide() {
-  console.log('CampeoesKahootSlide renderizado - Timer deveria ser 120000ms (2 minutos)')
+  console.log('CampeoesKahootSlide renderizado - Timer deveria ser 180000ms (3 minutos)')
   console.log('Slide dos Campeões Kahoot carregado - verificando se timer vai funcionar')
   
   // Log quando o componente é montado
   useEffect(() => {
     console.log('CampeoesKahootSlide montado - timer deveria iniciar')
     const timeout = setTimeout(() => {
-      console.log('2 minutos se passaram - slide deveria avançar agora')
-    }, 120000)
+      console.log('3 minutos se passaram - slide deveria avançar agora')
+    }, 180000)
     
     return () => clearTimeout(timeout)
   }, [])
