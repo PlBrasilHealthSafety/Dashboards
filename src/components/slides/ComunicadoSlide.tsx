@@ -28,42 +28,42 @@ export function ComunicadoSlide() {
 
       <div className="relative z-10 flex flex-col h-full min-h-screen p-3 md:p-4">
         {/* Título Principal */}
-        <div className="text-center mb-4 flex-shrink-0">
-          <div className="flex justify-center items-center gap-2 mb-3">
-            <div className="text-3xl">📢</div>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black bg-gradient-to-r from-[#00A298] via-[#0B5C5B] to-[#1D3C44] bg-clip-text text-transparent">
+        <div className="text-center mb-6 flex-shrink-0 mt-4">
+          <div className="flex justify-center items-center gap-3 mb-4">
+            <div className="text-4xl">📢</div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-[#00A298] via-[#0B5C5B] to-[#1D3C44] bg-clip-text text-transparent">
               COMUNICADO!
             </h1>
-            <div className="text-3xl">📢</div>
+            <div className="text-4xl">📢</div>
           </div>
-          <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-[#00A298] mb-2">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#00A298] mb-3">
             Aniversariantes de Setembro 🎉
           </h2>
-          <div className="w-48 h-1.5 bg-gradient-to-r from-transparent via-[#00A298]/60 to-transparent mx-auto rounded-full"></div>
+          <div className="w-56 h-2 bg-gradient-to-r from-transparent via-[#00A298]/60 to-transparent mx-auto rounded-full"></div>
         </div>
 
         {/* Data e Local - Destaque */}
-        <div className="bg-white/95 backdrop-blur-lg rounded-2xl p-4 md:p-5 border-2 border-[#00A298]/60 shadow-2xl mb-10 mx-auto max-w-3xl">
+        <div className="bg-white/95 backdrop-blur-lg rounded-2xl p-6 md:p-7 border-2 border-[#00A298]/60 shadow-2xl mb-12 mx-auto max-w-4xl">
           <div className="text-center">
-            <div className="flex justify-center items-center gap-3 mb-3">
-              <Calendar className="w-8 h-8 text-[#00A298]" />
+            <div className="flex justify-center items-center gap-4 mb-4">
+              <Calendar className="w-10 h-10 text-[#00A298]" />
               <div>
-                <p className="text-2xl md:text-3xl lg:text-4xl font-black text-[#1D3C44]">
+                <p className="text-3xl md:text-4xl lg:text-5xl font-black text-[#1D3C44]">
                   18 DE SETEMBRO
                 </p>
-                <div className="flex items-center justify-center gap-1.5 mt-1">
-                  <Clock className="w-5 h-5 text-[#00A298]" />
-                  <p className="text-xl md:text-2xl font-bold text-[#0B5C5B]">
+                <div className="flex items-center justify-center gap-2 mt-2">
+                  <Clock className="w-6 h-6 text-[#00A298]" />
+                  <p className="text-2xl md:text-3xl font-bold text-[#0B5C5B]">
                     16h30
                   </p>
                 </div>
               </div>
-              <Calendar className="w-8 h-8 text-[#00A298]" />
+              <Calendar className="w-10 h-10 text-[#00A298]" />
             </div>
             
-            <div className="flex items-center justify-center gap-1.5 mt-3">
-              <MapPin className="w-5 h-5 text-[#00A298]" />
-              <p className="text-lg md:text-xl font-semibold text-[#1D3C44]">
+            <div className="flex items-center justify-center gap-2 mt-4">
+              <MapPin className="w-6 h-6 text-[#00A298]" />
+              <p className="text-xl md:text-2xl font-semibold text-[#1D3C44]">
                 Sede PLBrasil Health - Auditório Interno
               </p>
             </div>
@@ -71,7 +71,7 @@ export function ComunicadoSlide() {
         </div>
 
         {/* Conteúdo Principal - Grid de Programação */}
-        <div className="flex-1 flex items-center justify-center py-4">
+        <div className="flex-1 flex items-center justify-center py-6 mt-4">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr_1fr] gap-10 max-w-8xl mx-auto px-3 w-full">
           
             {/* Bloco 1: Palestras - Cards verticais */}
