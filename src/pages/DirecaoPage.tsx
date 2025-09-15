@@ -15,6 +15,8 @@ import {
   PowerPointSlide8 
 } from '@/components/custom/PowerPointSlides'
 import { AniversariantesSlide } from '@/components/slides/AniversariantesSlide'
+import { CampeoesKahootSlide } from '@/components/slides/CampeoesKahootSlide'
+import { ComunicadoSlide } from '@/components/slides/ComunicadoSlide'
 import { DetailedSectorAnalysis } from '@/components/custom/DetailedSectorAnalysis'
 
 import {
@@ -39,17 +41,19 @@ const evolucaoTrimestralData = [
 export function DirecaoPage() {
 
   const carouselItems = useMemo(() => {
-    // 8 slides de PowerPoint + slide de aniversariantes
+    // 8 slides de PowerPoint + slide de aniversariantes + slide de campeões Kahoot + comunicado
     const slides = [
       { id: 1, content: <PowerPointSlide1 />, duration: 30000 }, // 30 seconds
       { id: 2, content: <PowerPointSlide2 />, duration: 30000 }, // 30 seconds
       { id: 3, content: <PowerPointSlide3 />, duration: 30000 }, // 30 seconds
       { id: 4, content: <PowerPointSlide4 />, duration: 30000 }, // 30 seconds
       { id: 5, content: <AniversariantesSlide />, duration: 180000 }, // 3 minutes (180 seconds)
-      { id: 6, content: <PowerPointSlide5 />, duration: 30000 }, // 30 seconds
-      { id: 7, content: <PowerPointSlide6 />, duration: 30000 }, // 30 seconds
-      { id: 8, content: <PowerPointSlide7 />, duration: 30000 }, // 30 seconds
-      { id: 9, content: <PowerPointSlide8 />, duration: 30000 }, // 30 seconds
+      { id: 6, content: <CampeoesKahootSlide />, duration: 120000 }, // 2 minutes (120 seconds)
+      { id: 7, content: <ComunicadoSlide />, duration: 180000 }, // 3 minutes (180 seconds)
+      { id: 8, content: <PowerPointSlide5 />, duration: 30000 }, // 30 seconds
+      { id: 9, content: <PowerPointSlide6 />, duration: 30000 }, // 30 seconds
+      { id: 10, content: <PowerPointSlide7 />, duration: 30000 }, // 30 seconds
+      { id: 11, content: <PowerPointSlide8 />, duration: 30000 }, // 30 seconds
     ]
     return slides
   }, [])
@@ -83,7 +87,7 @@ export function DirecaoPage() {
                   className="w-full h-full"
                   showNavigation
                   showPagination
-                  pauseOnMouseEnter={true}
+                  pauseOnMouseEnter={false}
                 />
               </div>
             </div>

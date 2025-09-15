@@ -60,21 +60,30 @@ export const DynamicTimerCarousel: React.FC<DynamicTimerCarouselProps> = ({
 
   // Timer management
   useEffect(() => {
-    if (isPaused || items.length <= 1) return;
+    console.log(`Timer effect - currentIndex: ${currentIndex}, isPaused: ${isPaused}, currentDuration: ${currentDuration}ms, items.length: ${items.length}`);
+    
+    if (isPaused || items.length <= 1) {
+      console.log('Timer paused or single item - not setting timer');
+      return;
+    }
 
     // Clear existing timer
     if (timerRef.current) {
       clearTimeout(timerRef.current);
+      console.log('Cleared existing timer');
     }
 
     // Set new timer with current slide's duration
+    console.log(`Setting timer for ${currentDuration}ms for slide ${currentIndex}`);
     timerRef.current = setTimeout(() => {
+      console.log(`Timer expired for slide ${currentIndex} - moving to next`);
       goToNext();
     }, currentDuration);
 
     return () => {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
+        console.log('Cleanup timer on unmount/change');
       }
     };
   }, [currentIndex, isPaused, currentDuration, items.length]);
