@@ -80,97 +80,83 @@ export function ComunicadoSlide() {
           </div>
         </div>
 
-        {/* Conteúdo Principal - Grid de Programação - Cards compactos horizontalmente */}
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-5 max-w-6xl mx-auto px-3">
+        {/* Conteúdo Principal - Grid de Programação - Cards horizontais compactos */}
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-4 max-w-6xl mx-auto px-3">
           
           {/* Bloco 1: Palestras */}
-          <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-3 border-2 border-[#00A298]/40 shadow-2xl">
-            <div className="text-center mb-2">
-              <Users className="w-10 h-10 text-[#00A298] mx-auto mb-1" />
-              <h3 className="text-lg md:text-xl lg:text-2xl font-bold text-[#1D3C44] mb-2">
+          <div className="bg-white/90 backdrop-blur-lg rounded-xl p-2 border-2 border-[#00A298]/40 shadow-2xl">
+            {/* Cabeçalho compacto */}
+            <div className="flex items-center gap-2 mb-2">
+              <Users className="w-8 h-8 text-[#00A298] flex-shrink-0" />
+              <h3 className="text-base md:text-lg font-bold text-[#1D3C44]">
                 Palestras Saúde & IA
               </h3>
             </div>
             
-            <div className="space-y-2">
-              <div className="bg-[#00A298]/15 rounded-xl p-3 border-2 border-[#00A298]/30">
-                <h4 className="text-base md:text-lg font-bold text-[#1D3C44] mb-1">
-                  Saúde Mental
-                </h4>
-                <p className="text-sm md:text-base text-[#0B5C5B] font-semibold">
-                  Taymara 
-                </p>
+            {/* Conteúdo em linha */}
+            <div className="flex gap-2">
+              <div className="flex-1 bg-[#00A298]/15 rounded-lg p-2 border border-[#00A298]/30">
+                <h4 className="text-sm font-bold text-[#1D3C44] mb-0.5">Saúde Mental</h4>
+                <p className="text-xs text-[#0B5C5B] font-semibold">Taymara</p>
               </div>
               
-              <div className="bg-[#00A298]/15 rounded-xl p-3 border-2 border-[#00A298]/30">
-                <h4 className="text-base md:text-lg font-bold text-[#1D3C44] mb-1">
-                  Ferramentas de IA no Trabalho
-                </h4>
-                <p className="text-sm md:text-base text-[#0B5C5B] font-semibold">
-                  Evandro 
-                </p>
+              <div className="flex-1 bg-[#00A298]/15 rounded-lg p-2 border border-[#00A298]/30">
+                <h4 className="text-sm font-bold text-[#1D3C44] mb-0.5">IA no Trabalho</h4>
+                <p className="text-xs text-[#0B5C5B] font-semibold">Evandro</p>
               </div>
             </div>
           </div>
 
           {/* Bloco 2: Dinâmica Kahoot */}
-          <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-3 border-2 border-[#00A298]/40 shadow-2xl">
-            <div className="text-center mb-2">
-              <Trophy className="w-10 h-10 text-[#00A298] mx-auto mb-1" />
-              <h3 className="text-lg md:text-xl lg:text-2xl font-bold text-[#1D3C44] mb-2">
+          <div className="bg-white/90 backdrop-blur-lg rounded-xl p-2 border-2 border-[#00A298]/40 shadow-2xl">
+            {/* Cabeçalho compacto */}
+            <div className="flex items-center gap-2 mb-2">
+              <Trophy className="w-8 h-8 text-[#00A298] flex-shrink-0" />
+              <h3 className="text-base md:text-lg font-bold text-[#1D3C44]">
                 Dinâmica do Kahoot!
               </h3>
             </div>
             
-            <div className="space-y-2">
-              <div className="bg-[#00A298]/15 rounded-xl p-3 border-2 border-[#00A298]/30">
-                <p className="text-sm md:text-base text-[#1D3C44] font-semibold text-center mb-2">
-                  Quiz com curiosidades sobre:
-                </p>
-                <ul className="text-xs md:text-sm text-[#0B5C5B] space-y-0.5">
-                  <li>• Empresa e cultura</li>
-                  <li>• Valores PLBrasil</li>
-                  <li>• Conteúdos das palestras</li>
-                </ul>
+            {/* Conteúdo dividido horizontalmente */}
+            <div className="flex gap-2">
+              <div className="flex-1 bg-[#00A298]/15 rounded-lg p-2 border border-[#00A298]/30">
+                <p className="text-xs text-[#1D3C44] font-semibold mb-1">Quiz sobre:</p>
+                <div className="text-xs text-[#0B5C5B] space-y-0">
+                  <div>• Empresa e cultura</div>
+                  <div>• Valores PLBrasil</div>
+                  <div>• Conteúdos das palestras</div>
+                </div>
               </div>
               
-              <div className="bg-gradient-to-r from-[#00A298]/25 to-[#0B5C5B]/25 rounded-xl p-2 border-2 border-[#00A298]/40">
-                <p className="text-center text-[#1D3C44] font-bold text-sm md:text-base">
-                  🏆 O vencedor entra para o
-                </p>
-                <p className="text-center text-[#00A298] font-black text-base md:text-lg">
-                  Hall dos Sabe Tudo PLHealth!
-                </p>
+              <div className="flex-1 bg-gradient-to-r from-[#00A298]/25 to-[#0B5C5B]/25 rounded-lg p-2 border border-[#00A298]/40 text-center">
+                <p className="text-xs text-[#1D3C44] font-bold">🏆 Vencedor entra no</p>
+                <p className="text-xs text-[#00A298] font-black">Hall dos Sabe Tudo!</p>
               </div>
             </div>
           </div>
 
           {/* Bloco 3: Celebração */}
-          <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-3 border-2 border-[#00A298]/40 shadow-2xl">
-            <div className="text-center mb-2">
-              <Cake className="w-10 h-10 text-[#00A298] mx-auto mb-1" />
-              <h3 className="text-lg md:text-xl lg:text-2xl font-bold text-[#1D3C44] mb-2">
+          <div className="bg-white/90 backdrop-blur-lg rounded-xl p-2 border-2 border-[#00A298]/40 shadow-2xl">
+            {/* Cabeçalho compacto */}
+            <div className="flex items-center gap-2 mb-2">
+              <Cake className="w-8 h-8 text-[#00A298] flex-shrink-0" />
+              <h3 className="text-base md:text-lg font-bold text-[#1D3C44]">
                 Celebração
               </h3>
             </div>
             
-            <div className="space-y-2">
-              <div className="bg-[#00A298]/15 rounded-xl p-3 border-2 border-[#00A298]/30 text-center">
-                <div className="text-2xl md:text-3xl mb-2">🎂</div>
-                <h4 className="text-base md:text-lg font-bold text-[#1D3C44] mb-1">
-                  Bolo e Parabéns
-                </h4>
-                <p className="text-sm md:text-base text-[#0B5C5B] font-semibold">
-                  Para todos os aniversariantes do mês!
-                </p>
+            {/* Conteúdo horizontal */}
+            <div className="flex items-center gap-2">
+              <div className="flex-1 bg-[#00A298]/15 rounded-lg p-2 border border-[#00A298]/30 text-center">
+                <div className="text-lg mb-1">🎂</div>
+                <h4 className="text-sm font-bold text-[#1D3C44] mb-0.5">Bolo e Parabéns</h4>
+                <p className="text-xs text-[#0B5C5B] font-semibold">Para todos os aniversariantes!</p>
               </div>
               
-              <div className="text-center mt-3">
-                <div className="flex justify-center gap-3 text-2xl md:text-3xl">
-                  <span className="animate-bounce">🎉</span>
-                  <span className="animate-bounce delay-300">🎈</span>
-                  <span className="animate-bounce delay-500">🎊</span>
-                </div>
+              <div className="flex gap-1 text-lg">
+                <span className="animate-bounce">🎉</span>
+                <span className="animate-bounce delay-300">🎈</span>
+                <span className="animate-bounce delay-500">🎊</span>
               </div>
             </div>
           </div>
