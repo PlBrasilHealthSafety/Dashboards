@@ -34,7 +34,7 @@ export function CampeoesKahootSlide() {
 
       <div className="relative z-10 flex flex-col h-full min-h-screen p-4 md:p-8">
         {/* Título Principal */}
-        <div className="text-center mb-5 flex-shrink-0">
+        <div className="text-center mb-8 flex-shrink-0">
           <div className="flex justify-center items-center gap-3 mb-4">
             <Trophy className="w-10 h-10 text-amber-400 animate-bounce" style={{ animationDuration: '2s' }} />
             <div className="text-4xl animate-bounce" style={{ animationDuration: '2s', animationDelay: '0.3s' }}>🏆</div>
@@ -48,10 +48,10 @@ export function CampeoesKahootSlide() {
 
         {/* Conteúdo Principal - Layout Dividido */}
         <div className="flex-1 flex items-center justify-center min-h-0 py-2">
-          <div className="w-full max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-stretch">
+          <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-stretch">
             
             {/* Primeiro Bloco - Campeã Atual */}
-            <div className="bg-white/15 backdrop-blur-lg rounded-2xl p-5 md:p-7 border border-amber-400/30 shadow-2xl relative flex flex-col">
+            <div className="bg-white/15 backdrop-blur-lg rounded-2xl p-6 md:p-8 border border-amber-400/30 shadow-2xl relative flex flex-col">
               {/* Ícone de coroa */}
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                 <div className="bg-amber-400 rounded-full p-2">
@@ -91,7 +91,7 @@ export function CampeoesKahootSlide() {
             </div>
 
             {/* Segundo Bloco - Próximo Campeão */}
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-5 md:p-7 border border-white/20 shadow-2xl relative overflow-hidden flex flex-col">
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 md:p-8 border border-white/20 shadow-2xl relative overflow-hidden flex flex-col">
               {/* Efeito de mistério */}
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-teal-500/10 rounded-2xl"></div>
               
