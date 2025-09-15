@@ -1,4 +1,4 @@
-import { Trophy, Star, Medal } from 'lucide-react'
+import { Trophy, Star } from 'lucide-react'
 import { useEffect } from 'react'
 
 export function CampeoesKahootSlide() {
