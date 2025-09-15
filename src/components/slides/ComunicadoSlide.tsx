@@ -80,11 +80,11 @@ export function ComunicadoSlide() {
           </div>
         </div>
 
-        {/* Conteúdo Principal - Grid de Programação - Cards horizontais compactos */}
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-4 max-w-6xl mx-auto px-3">
+        {/* Conteúdo Principal - Grid de Programação - Cards compactos sem espaço extra */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 max-w-6xl mx-auto px-3">
           
           {/* Bloco 1: Palestras */}
-          <div className="bg-white/90 backdrop-blur-lg rounded-xl p-2 border-2 border-[#00A298]/40 shadow-2xl">
+          <div className="bg-white/90 backdrop-blur-lg rounded-xl p-2 border-2 border-[#00A298]/40 shadow-2xl h-fit">
             {/* Cabeçalho compacto */}
             <div className="flex items-center gap-2 mb-2">
               <Users className="w-8 h-8 text-[#00A298] flex-shrink-0" />
@@ -108,7 +108,7 @@ export function ComunicadoSlide() {
           </div>
 
           {/* Bloco 2: Dinâmica Kahoot */}
-          <div className="bg-white/90 backdrop-blur-lg rounded-xl p-2 border-2 border-[#00A298]/40 shadow-2xl">
+          <div className="bg-white/90 backdrop-blur-lg rounded-xl p-2 border-2 border-[#00A298]/40 shadow-2xl h-fit">
             {/* Cabeçalho compacto */}
             <div className="flex items-center gap-2 mb-2">
               <Trophy className="w-8 h-8 text-[#00A298] flex-shrink-0" />
@@ -136,7 +136,7 @@ export function ComunicadoSlide() {
           </div>
 
           {/* Bloco 3: Celebração */}
-          <div className="bg-white/90 backdrop-blur-lg rounded-xl p-2 border-2 border-[#00A298]/40 shadow-2xl">
+          <div className="bg-white/90 backdrop-blur-lg rounded-xl p-2 border-2 border-[#00A298]/40 shadow-2xl h-fit">
             {/* Cabeçalho compacto */}
             <div className="flex items-center gap-2 mb-2">
               <Cake className="w-8 h-8 text-[#00A298] flex-shrink-0" />
