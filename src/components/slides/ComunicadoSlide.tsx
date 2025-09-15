@@ -17,16 +17,6 @@ export function ComunicadoSlide() {
   
   return (
     <div className="w-full h-full min-h-screen bg-gradient-to-br from-blue-50 via-emerald-50 to-green-100 text-gray-800 relative overflow-hidden">
-      {/* Padrão de fundo decorativo - mais visível */}
-      <div className="absolute inset-0 opacity-40">
-        <div className="absolute top-10 left-10 text-9xl animate-pulse text-[#00A298]">📢</div>
-        <div className="absolute top-20 right-20 text-7xl animate-pulse delay-1000 text-[#0B5C5B]">🎉</div>
-        <div className="absolute bottom-20 left-20 text-8xl animate-pulse delay-500 text-[#00A298]">🎂</div>
-        <div className="absolute bottom-10 right-10 text-6xl animate-pulse delay-700 text-[#1D3C44]">🏆</div>
-        <div className="absolute top-1/2 left-1/4 text-7xl opacity-50 text-[#AECECB]">🎊</div>
-        <div className="absolute top-1/3 right-1/3 text-6xl opacity-40 text-[#00A298]">📅</div>
-      </div>
-
       {/* Elementos decorativos flutuantes - mais visíveis */}
       <div className="absolute top-1/4 left-1/4 w-4 h-4 bg-[#00A298]/50 rounded-full animate-ping"></div>
       <div className="absolute top-3/4 right-1/4 w-5 h-5 bg-[#0B5C5B]/50 rounded-full animate-ping delay-1000"></div>
@@ -53,7 +43,7 @@ export function ComunicadoSlide() {
         </div>
 
         {/* Data e Local - Destaque */}
-        <div className="bg-white/95 backdrop-blur-lg rounded-2xl p-4 md:p-5 border-2 border-[#00A298]/60 shadow-2xl mb-8 mx-auto max-w-3xl">
+        <div className="bg-white/95 backdrop-blur-lg rounded-2xl p-4 md:p-5 border-2 border-[#00A298]/60 shadow-2xl mb-10 mx-auto max-w-3xl">
           <div className="text-center">
             <div className="flex justify-center items-center gap-3 mb-3">
               <Calendar className="w-8 h-8 text-[#00A298]" />
@@ -82,10 +72,10 @@ export function ComunicadoSlide() {
 
         {/* Conteúdo Principal - Grid de Programação */}
         <div className="flex-1 flex items-center justify-center py-4">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr_1fr] gap-8 max-w-7xl mx-auto px-3 w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr_1fr] gap-10 max-w-8xl mx-auto px-3 w-full">
           
             {/* Bloco 1: Palestras - Cards verticais */}
-            <div className="bg-white/90 backdrop-blur-lg rounded-xl p-6 border-2 border-[#00A298]/40 shadow-2xl">
+            <div className="bg-white/90 backdrop-blur-lg rounded-xl p-8 border-2 border-[#00A298]/40 shadow-2xl">
               {/* Cabeçalho centralizado */}
               <div className="flex items-center justify-center gap-2 mb-6">
                 <Users className="w-10 h-10 text-[#00A298] flex-shrink-0" />
@@ -109,7 +99,7 @@ export function ComunicadoSlide() {
             </div>
 
             {/* Bloco 2: Dinâmica Kahoot - Mais largo */}
-            <div className="bg-white/90 backdrop-blur-lg rounded-xl p-6 border-2 border-[#00A298]/40 shadow-2xl">
+            <div className="bg-white/90 backdrop-blur-lg rounded-xl p-8 border-2 border-[#00A298]/40 shadow-2xl">
               {/* Cabeçalho centralizado */}
               <div className="flex items-center justify-center gap-2 mb-6">
                 <Trophy className="w-10 h-10 text-[#00A298] flex-shrink-0" />
@@ -137,7 +127,7 @@ export function ComunicadoSlide() {
             </div>
 
             {/* Bloco 3: Celebração - Centralizado */}
-            <div className="bg-white/90 backdrop-blur-lg rounded-xl p-6 border-2 border-[#00A298]/40 shadow-2xl">
+            <div className="bg-white/90 backdrop-blur-lg rounded-xl p-8 border-2 border-[#00A298]/40 shadow-2xl">
               {/* Cabeçalho centralizado */}
               <div className="flex items-center justify-center gap-2 mb-6">
                 <Cake className="w-10 h-10 text-[#00A298] flex-shrink-0" />
