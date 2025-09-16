@@ -64,7 +64,7 @@ export function ComunicadoSlide() {
             <div className="flex items-center justify-center gap-2 mt-4">
               <MapPin className="w-6 h-6 text-[#00A298]" />
               <p className="text-xl md:text-2xl font-semibold text-[#1D3C44]">
-                Sede PLBrasil Health - Auditório Interno
+                Sede PLBrasil Health&Safety
               </p>
             </div>
           </div>
@@ -87,12 +87,12 @@ export function ComunicadoSlide() {
               {/* Conteúdo em coluna (um embaixo do outro) */}
               <div className="space-y-4">
                 <div className="bg-[#00A298]/15 rounded-lg p-4 border border-[#00A298]/30">
-                  <h4 className="text-base md:text-lg font-bold text-[#1D3C44] mb-2">Saúde Mental</h4>
+                  <h4 className="text-base md:text-lg font-bold text-[#1D3C44] mb-2">Saúde Mental - Setembro Amarelo</h4>
                   <p className="text-sm md:text-base text-[#0B5C5B] font-semibold">Taymara</p>
                 </div>
                 
                 <div className="bg-[#00A298]/15 rounded-lg p-4 border border-[#00A298]/30">
-                  <h4 className="text-base md:text-lg font-bold text-[#1D3C44] mb-2">IA no Trabalho</h4>
+                  <h4 className="text-base md:text-lg font-bold text-[#1D3C44] mb-2">Ferramentas de IA no Trabalho</h4>
                   <p className="text-sm md:text-base text-[#0B5C5B] font-semibold">Evandro</p>
                 </div>
               </div>
