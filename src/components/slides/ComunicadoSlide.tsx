@@ -37,7 +37,7 @@ export function ComunicadoSlide() {
             <div className="text-4xl">📢</div>
           </div>
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#00A298] mb-3">
-            Aniversariantes de Setembro 🎉
+            Dia 24 de Outubro!
           </h2>
           <div className="w-56 h-2 bg-gradient-to-r from-transparent via-[#00A298]/60 to-transparent mx-auto rounded-full"></div>
         </div>
@@ -49,7 +49,7 @@ export function ComunicadoSlide() {
               <Calendar className="w-10 h-10 text-[#00A298]" />
               <div>
                 <p className="text-3xl md:text-4xl lg:text-5xl font-black text-[#1D3C44]">
-                  18 DE SETEMBRO
+                  24 DE OUTUBRO
                 </p>
                 <div className="flex items-center justify-center gap-2 mt-2">
                   <Clock className="w-6 h-6 text-[#00A298]" />
@@ -80,20 +80,20 @@ export function ComunicadoSlide() {
               <div className="flex items-center justify-center gap-2 mb-6">
                 <Users className="w-10 h-10 text-[#00A298] flex-shrink-0" />
                 <h3 className="text-lg md:text-xl lg:text-2xl font-bold text-[#1D3C44]">
-                  Palestras Saúde & IA
+                  Palestras Saúde & AAA
                 </h3>
               </div>
               
               {/* Conteúdo em coluna (um embaixo do outro) */}
               <div className="space-y-4">
                 <div className="bg-[#00A298]/15 rounded-lg p-4 border border-[#00A298]/30">
-                  <h4 className="text-base md:text-lg font-bold text-[#1D3C44] mb-2">Saúde Mental - Setembro Amarelo</h4>
+                  <h4 className="text-base md:text-lg font-bold text-[#1D3C44] mb-2">Saúde da Mulher</h4>
                   <p className="text-sm md:text-base text-[#0B5C5B] font-semibold">Taymara</p>
                 </div>
                 
                 <div className="bg-[#00A298]/15 rounded-lg p-4 border border-[#00A298]/30">
-                  <h4 className="text-base md:text-lg font-bold text-[#1D3C44] mb-2">Ferramentas de IA no Trabalho</h4>
-                  <p className="text-sm md:text-base text-[#0B5C5B] font-semibold">Evandro</p>
+                  <h4 className="text-base md:text-lg font-bold text-[#1D3C44] mb-2">Qualidade do Cliente e Sucesso do Cliente</h4>
+                  <p className="text-sm md:text-base text-[#0B5C5B] font-semibold">Diego Gloria</p>
                 </div>
               </div>
             </div>
@@ -111,17 +111,18 @@ export function ComunicadoSlide() {
               {/* Conteúdo dividido horizontalmente */}
               <div className="flex gap-4">
                 <div className="flex-1 bg-[#00A298]/15 rounded-lg p-4 border border-[#00A298]/30">
-                  <p className="text-base md:text-lg text-[#1D3C44] font-semibold mb-3">Quiz sobre:</p>
+                  <p className="text-base md:text-lg text-[#1D3C44] font-semibold mb-3">Quiz com curiosidades:</p>
                   <div className="text-base md:text-lg text-[#0B5C5B] space-y-2">
                     <div>• Empresa e cultura</div>
-                    <div>• Valores PLBrasil</div>
+                    <div>• Valores</div>
                     <div>• Conteúdos das palestras</div>
                   </div>
                 </div>
                 
                 <div className="flex-1 bg-gradient-to-r from-[#00A298]/25 to-[#0B5C5B]/25 rounded-lg p-4 border border-[#00A298]/40 text-center flex flex-col justify-center">
-                  <p className="text-base md:text-lg text-[#1D3C44] font-bold">🏆 Vencedor entra no</p>
-                  <p className="text-base md:text-lg text-[#00A298] font-black">Hall dos Sabe Tudo!</p>
+                  <p className="text-base md:text-lg text-[#1D3C44] font-bold">🏆 O vencedor entra para o</p>
+                  <p className="text-base md:text-lg text-[#00A298] font-black">Hall dos Sabe Tudo PLHealth</p>
+                  <p className="text-sm md:text-base text-[#0B5C5B] font-semibold mt-1">e garante 1 vaga na Final de Dezembro!</p>
                 </div>
               </div>
             </div>
@@ -140,8 +141,8 @@ export function ComunicadoSlide() {
               <div className="text-center">
                 <div className="bg-[#00A298]/15 rounded-lg p-4 border border-[#00A298]/30 mb-4">
                   <div className="text-2xl mb-3">🎂</div>
-                  <h4 className="text-base md:text-lg font-bold text-[#1D3C44] mb-2">Bolo e Parabéns</h4>
-                  <p className="text-sm md:text-base text-[#0B5C5B] font-semibold">Para todos os aniversariantes!</p>
+                  <h4 className="text-base md:text-lg font-bold text-[#1D3C44] mb-2">Celebração 🎂</h4>
+                  <p className="text-sm md:text-base text-[#0B5C5B] font-semibold">Bolo e parabéns para os aniversariantes do mês.</p>
                 </div>
                 
                 {/* Emojis pulando embaixo */}

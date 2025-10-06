@@ -16,6 +16,7 @@ import {
 } from '@/components/custom/PowerPointSlides'
 import { AniversariantesSlide } from '@/components/slides/AniversariantesSlide'
 import { CampeoesKahootSlide } from '@/components/slides/CampeoesKahootSlide'
+import { ComunicadoSlide } from '@/components/slides/ComunicadoSlide'
 import { DetailedSectorAnalysis } from '@/components/custom/DetailedSectorAnalysis'
 
 import {
@@ -47,7 +48,8 @@ export function DirecaoPage() {
       { id: 3, content: <PowerPointSlide3 />, duration: 30000 }, // 30 seconds
       { id: 4, content: <PowerPointSlide4 />, duration: 30000 }, // 30 seconds
       { id: 5, content: <AniversariantesSlide />, duration: 180000 }, // 3 minutes (180 seconds)
-      { id: 6, content: <CampeoesKahootSlide />, duration: 180000 }, // 3 minutes (180 seconds)
+  { id: 6, content: <CampeoesKahootSlide />, duration: 180000 }, // 3 minutes (180 seconds)
+  { id: 7, content: <ComunicadoSlide />, duration: 180000 }, // 3 minutes (180 seconds)
       { id: 8, content: <PowerPointSlide5 />, duration: 30000 }, // 30 seconds
       { id: 9, content: <PowerPointSlide6 />, duration: 30000 }, // 30 seconds
       { id: 10, content: <PowerPointSlide7 />, duration: 30000 }, // 30 seconds
