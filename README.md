@@ -183,6 +183,8 @@ dashboards/
 - Dashboard executivo com análise setorial
 - Carrosséis customizáveis com Swiper.js
 - Slides para TV Dashboard
+- Slide de Comunicado desativado temporariamente nas páginas e modo TV
+- Campeões Kahoot com destaque para a campeã de outubro e card "Próximo Campeão"
 - Sistema de notificação com vídeo para novos contratos
 
 ### 🎬 Animações
