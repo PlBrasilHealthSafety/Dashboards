@@ -37,7 +37,7 @@ export function ComunicadoSlide() {
             <div className="text-4xl">📢</div>
           </div>
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#00A298] mb-3">
-            Dia 24 de Outubro!
+            Sexta-feira, 21 de Novembro!
           </h2>
           <div className="w-56 h-2 bg-gradient-to-r from-transparent via-[#00A298]/60 to-transparent mx-auto rounded-full"></div>
         </div>
@@ -49,7 +49,7 @@ export function ComunicadoSlide() {
               <Calendar className="w-10 h-10 text-[#00A298]" />
               <div>
                 <p className="text-3xl md:text-4xl lg:text-5xl font-black text-[#1D3C44]">
-                  24 DE OUTUBRO
+                  21 DE NOVEMBRO
                 </p>
                 <div className="flex items-center justify-center gap-2 mt-2">
                   <Clock className="w-6 h-6 text-[#00A298]" />
@@ -87,13 +87,13 @@ export function ComunicadoSlide() {
               {/* Conteúdo em coluna (um embaixo do outro) */}
               <div className="space-y-4">
                 <div className="bg-[#00A298]/15 rounded-lg p-4 border border-[#00A298]/30">
-                  <h4 className="text-base md:text-lg font-bold text-[#1D3C44] mb-2">Saúde da Mulher</h4>
-                  <p className="text-sm md:text-base text-[#0B5C5B] font-semibold">Taymara</p>
+                  <h4 className="text-base md:text-lg font-bold text-[#1D3C44] mb-2">Saúde do Homem</h4>
+                  <p className="text-sm md:text-base text-[#0B5C5B] font-semibold">Taymara Lorencini</p>
                 </div>
                 
                 <div className="bg-[#00A298]/15 rounded-lg p-4 border border-[#00A298]/30">
-                  <h4 className="text-base md:text-lg font-bold text-[#1D3C44] mb-2">Qualidade do Cliente e Sucesso do Cliente</h4>
-                  <p className="text-sm md:text-base text-[#0B5C5B] font-semibold">Diego Gloria</p>
+                  <h4 className="text-base md:text-lg font-bold text-[#1D3C44] mb-2">Organização de Dados e BI na PLBrasil</h4>
+                  <p className="text-sm md:text-base text-[#0B5C5B] font-semibold">Alan Araujo</p>
                 </div>
               </div>
             </div>
@@ -113,16 +113,16 @@ export function ComunicadoSlide() {
                 <div className="flex-1 bg-[#00A298]/15 rounded-lg p-4 border border-[#00A298]/30">
                   <p className="text-base md:text-lg text-[#1D3C44] font-semibold mb-3">Quiz com curiosidades:</p>
                   <div className="text-base md:text-lg text-[#0B5C5B] space-y-2">
-                    <div>• Empresa e cultura</div>
-                    <div>• Valores</div>
-                    <div>• Conteúdos das palestras</div>
+                    <div>• PLBrasil</div>
+                    <div>• Valores e cultura</div>
+                    <div>• Temas das palestras</div>
                   </div>
                 </div>
                 
                 <div className="flex-1 bg-gradient-to-r from-[#00A298]/25 to-[#0B5C5B]/25 rounded-lg p-4 border border-[#00A298]/40 text-center flex flex-col justify-center">
-                  <p className="text-base md:text-lg text-[#1D3C44] font-bold">🏆 O vencedor entra para o</p>
+                  <p className="text-base md:text-lg text-[#1D3C44] font-bold">🏆 Quem vencer entra para o</p>
                   <p className="text-base md:text-lg text-[#00A298] font-black">Hall dos Sabe Tudo PLHealth</p>
-                  <p className="text-sm md:text-base text-[#0B5C5B] font-semibold mt-1">e garante 1 vaga na Final de Dezembro!</p>
+                  <p className="text-sm md:text-base text-[#0B5C5B] font-semibold mt-1">e garante vaga na final de Dezembro!</p>
                 </div>
               </div>
             </div>
