@@ -88,7 +88,7 @@ export function ComunicadoSlide() {
               <div className="space-y-4">
                 <div className="bg-[#00A298]/15 rounded-lg p-4 border border-[#00A298]/30">
                   <h4 className="text-base md:text-lg font-bold text-[#1D3C44] mb-2">Saúde do Homem</h4>
-                  <p className="text-sm md:text-base text-[#0B5C5B] font-semibold">Taymara Lorencini</p>
+                  <p className="text-sm md:text-base text-[#0B5C5B] font-semibold">Rafael Lima</p>
                 </div>
                 
                 <div className="bg-[#00A298]/15 rounded-lg p-4 border border-[#00A298]/30">
