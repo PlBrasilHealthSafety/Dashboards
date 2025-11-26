@@ -187,7 +187,7 @@ export function CampeoesKahootSlide() {
                     <img
                       src="/Dani-e-Leticia.png"
                       alt="Dani Lima e Letícia - Campeãs Kahoot PLHealth"
-                      className="w-full h-full object-cover object-bottom"
+                      className="w-full h-full object-cover object-top"
                     />
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent rounded-full animate-pulse"></div>
                   </div>
