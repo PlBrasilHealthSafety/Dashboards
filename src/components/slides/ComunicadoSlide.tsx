@@ -99,7 +99,7 @@ export function ComunicadoSlide() {
             </div>
 
             {/* Bloco 2: Palestra Especial - Tainara */}
-            <div className="bg-white/90 backdrop-blur-lg rounded-xl p-5 border-2 border-orange-500/40 shadow-2xl">
+            <div className="bg-white/90 backdrop-blur-lg rounded-xl p-5 border-2 border-orange-500/40 shadow-2xl flex flex-col justify-center">
               <div className="flex items-center justify-center gap-2 mb-4">
                 <Users className="w-8 h-8 text-orange-600 flex-shrink-0" />
                 <h3 className="text-base md:text-lg lg:text-xl font-bold text-gray-800">
@@ -107,8 +107,8 @@ export function ComunicadoSlide() {
                 </h3>
               </div>
               
-              <div className="bg-orange-500/15 rounded-lg p-4 border border-orange-500/30">
-                <div className="text-center">
+              <div className="bg-orange-500/15 rounded-lg p-4 border border-orange-500/30 flex-1 flex items-center">
+                <div className="text-center w-full">
                   <p className="text-sm md:text-base font-bold text-orange-700 mb-2">🤝 Tainara</p>
                   <h4 className="text-sm md:text-base font-bold text-gray-800 mb-2">"Como Ser um Time Sinérgico e Multidisciplinar?"</h4>
                   <p className="text-xs text-gray-600">Conectando Engenharia, Saúde, Comercial e Admin para 2026!</p>
@@ -121,7 +121,7 @@ export function ComunicadoSlide() {
               <div className="flex items-center justify-center gap-2 mb-3">
                 <Trophy className="w-8 h-8 text-amber-600 flex-shrink-0" />
                 <h3 className="text-base md:text-lg lg:text-xl font-bold text-gray-800">
-                  🏆 A GRANDE FINAL!
+                  A GRANDE FINAL!
                 </h3>
               </div>
               
@@ -150,7 +150,7 @@ export function ComunicadoSlide() {
             </div>
 
             {/* Bloco 4: Celebração */}
-            <div className="bg-white/90 backdrop-blur-lg rounded-xl p-5 border-2 border-red-500/40 shadow-2xl">
+            <div className="bg-white/90 backdrop-blur-lg rounded-xl p-5 border-2 border-red-500/40 shadow-2xl flex flex-col justify-center">
               <div className="flex items-center justify-center gap-2 mb-4">
                 <Cake className="w-8 h-8 text-red-600 flex-shrink-0" />
                 <h3 className="text-base md:text-lg lg:text-xl font-bold text-gray-800">
@@ -158,7 +158,7 @@ export function ComunicadoSlide() {
                 </h3>
               </div>
               
-              <div className="text-center">
+              <div className="text-center flex-1 flex flex-col justify-center">
                 <div className="bg-red-500/15 rounded-lg p-4 border border-red-500/30 mb-3">
                   <div className="text-3xl mb-2">🎂</div>
                   <p className="text-sm md:text-base text-gray-700 font-semibold">Bolo e parabéns para os aniversariantes de Dezembro!</p>
