@@ -75,7 +75,7 @@ export function ComunicadoSlide() {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 max-w-8xl mx-auto px-3 w-full">
           
             {/* Bloco 1: Papo Sério - Dezembro Vermelho & Laranja */}
-            <div className="bg-white/90 backdrop-blur-lg rounded-xl p-5 border-2 border-red-500/40 shadow-2xl">
+            <div className="bg-white/90 backdrop-blur-lg rounded-xl p-5 border-2 border-red-500/40 shadow-2xl flex flex-col justify-center">
               <div className="flex items-center justify-center gap-2 mb-4">
                 <Heart className="w-8 h-8 text-red-600 flex-shrink-0" />
                 <h3 className="text-base md:text-lg lg:text-xl font-bold text-gray-800">
@@ -83,7 +83,7 @@ export function ComunicadoSlide() {
                 </h3>
               </div>
               
-              <div className="space-y-3">
+              <div className="space-y-3 flex-1 flex flex-col justify-center">
                 <div className="bg-gradient-to-r from-red-500/20 to-orange-500/20 rounded-lg p-3 border border-red-500/30">
                   <h4 className="text-sm md:text-base font-bold text-red-700 mb-1">🔴 Dezembro Vermelho</h4>
                   <p className="text-xs md:text-sm text-gray-700">Combate ao HIV/AIDS</p>
