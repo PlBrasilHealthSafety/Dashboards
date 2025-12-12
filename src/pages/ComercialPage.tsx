@@ -14,7 +14,7 @@ import {
 } from '@/components/custom/PowerPointSlides'
 import { AniversariantesSlide } from '@/components/slides/AniversariantesSlide'
 import { CampeoesKahootSlide } from '@/components/slides/CampeoesKahootSlide'
-// import { ComunicadoSlide } from '@/components/slides/ComunicadoSlide' // Temporariamente oculto
+import { ComunicadoSlide } from '@/components/slides/ComunicadoSlide'
 
 import {
   LineChart,
@@ -43,11 +43,11 @@ export function ComercialPage() {
       { id: 4, content: <PowerPointSlide4 />, duration: 30000 }, // 30 seconds
       { id: 5, content: <AniversariantesSlide />, duration: 180000 }, // 3 minutes (180 seconds)
       { id: 6, content: <CampeoesKahootSlide />, duration: 180000 }, // 3 minutes (180 seconds)
-      // { id: 7, content: <ComunicadoSlide />, duration: 180000 }, // Temporariamente oculto
-      { id: 7, content: <PowerPointSlide5 />, duration: 30000 }, // 30 seconds
-      { id: 8, content: <PowerPointSlide6 />, duration: 30000 }, // 30 seconds
-      { id: 9, content: <PowerPointSlide7 />, duration: 30000 }, // 30 seconds
-      { id: 10, content: <PowerPointSlide8 />, duration: 30000 }, // 30 seconds
+      { id: 7, content: <ComunicadoSlide />, duration: 180000 }, // 3 minutes (180 seconds)
+      { id: 8, content: <PowerPointSlide5 />, duration: 30000 }, // 30 seconds
+      { id: 9, content: <PowerPointSlide6 />, duration: 30000 }, // 30 seconds
+      { id: 10, content: <PowerPointSlide7 />, duration: 30000 }, // 30 seconds
+      { id: 11, content: <PowerPointSlide8 />, duration: 30000 }, // 30 seconds
     ] 
     return slides
   }, [])
