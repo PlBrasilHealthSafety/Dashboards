@@ -146,7 +146,6 @@ export function ComunicadoSlide() {
               
               <div className="bg-gradient-to-r from-amber-500/30 to-orange-500/30 rounded-lg p-2 text-center mt-3">
                 <p className="text-xs md:text-sm text-gray-800 font-bold">🏅 Quem será o Campeão Supremo 2025?</p>
-                </div>
               </div>
             </div>
 
