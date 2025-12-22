@@ -208,7 +208,7 @@ export function PodioKahootSlide() {
         {/* Rodapé */}
         <div className="text-center mt-5 flex-shrink-0">
           <p className="text-lg md:text-xl lg:text-2xl opacity-80 font-light">
-            Ano que vem tem mais!
+            Parabéns a todos os participantes!
           </p>
         </div>
       </div>
