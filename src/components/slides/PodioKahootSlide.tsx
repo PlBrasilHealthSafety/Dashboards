@@ -96,23 +96,23 @@ export function PodioKahootSlide() {
       <div className="absolute bottom-1/4 left-1/3 w-3 h-3 bg-yellow-300/20 rounded-full animate-ping delay-500"></div>
       <div className="absolute top-1/2 right-1/3 w-5 h-5 bg-yellow-300/10 rounded-full animate-ping delay-300"></div>
 
-      <div className="relative z-10 flex flex-col h-full min-h-screen p-4 md:p-6">
+      <div className="relative z-10 flex flex-col h-full min-h-screen p-4 md:p-8">
         {/* Título Principal */}
-        <div className="text-center mb-4 flex-shrink-0">
-          <div className="flex justify-center items-center gap-3 mb-3">
-            <Trophy className="w-8 h-8 text-amber-400 animate-bounce" style={{ animationDuration: '2s' }} />
-            <div className="text-3xl animate-bounce" style={{ animationDuration: '2s', animationDelay: '0.3s' }}>🏆</div>
-            <Trophy className="w-8 h-8 text-amber-400 animate-bounce" style={{ animationDuration: '2s', animationDelay: '0.6s' }} />
+        <div className="text-center mb-12 flex-shrink-0">
+          <div className="flex justify-center items-center gap-3 mb-6">
+            <Trophy className="w-10 h-10 text-amber-400 animate-bounce" style={{ animationDuration: '2s' }} />
+            <div className="text-4xl animate-bounce" style={{ animationDuration: '2s', animationDelay: '0.3s' }}>🏆</div>
+            <Trophy className="w-10 h-10 text-amber-400 animate-bounce" style={{ animationDuration: '2s', animationDelay: '0.6s' }} />
           </div>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-2 bg-gradient-to-r from-yellow-100 via-yellow-200 to-yellow-100 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 bg-gradient-to-r from-yellow-100 via-yellow-200 to-yellow-100 bg-clip-text text-transparent">
             Pódio "Sabe Tudo PLHealth!"
           </h1>
-          <div className="w-48 h-1 bg-gradient-to-r from-transparent via-yellow-300/50 to-transparent mx-auto rounded-full"></div>
+          <div className="w-56 h-1.5 bg-gradient-to-r from-transparent via-yellow-300/50 to-transparent mx-auto rounded-full"></div>
         </div>
 
         {/* Conteúdo Principal - Layout horizontal em duas colunas */}
         <div className="flex-1 flex items-center justify-center min-h-0 py-2">
-          <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 items-start">
+          <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
             {/* Card 1 - Finalistas (agora primeiro) */}
             <div className="bg-white/15 backdrop-blur-lg rounded-2xl p-4 md:p-6 border border-amber-400/30 shadow-2xl relative flex flex-col min-h-[540px]">
               {/* Ícone de estrela */}
@@ -151,7 +151,7 @@ export function PodioKahootSlide() {
             </div>
 
             {/* Card 2 - Pódio/Campeãs (agora segundo) */}
-            <div className="bg-white/15 backdrop-blur-lg rounded-2xl p-4 md:p-6 border border-amber-400/30 shadow-2xl relative flex flex-col min-h-[540px]">
+            <div className="bg-white/15 backdrop-blur-lg rounded-2xl p-4 md:p-6 border border-amber-400/30 shadow-2xl relative flex flex-col h-[540px]">
               {/* Ícone de coroa */}
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                 <div className="bg-amber-400 rounded-full p-2">
@@ -177,27 +177,27 @@ export function PodioKahootSlide() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-white/5"></div>
                 </div>
 
-                {/* Lista do Pódio - posicionada na parte inferior */}
-                <div className="w-full space-y-1.5 mt-auto">
+                {/* Lista do Pódio - centralizada verticalmente */}
+                <div className="w-full space-y-2 my-auto">
                   {/* 1º Lugar - Ouro */}
-                  <div className="grid grid-cols-[auto_70px_1fr] items-center gap-2 bg-gradient-to-r from-amber-500/20 via-yellow-400/30 to-amber-500/20 rounded-lg py-1.5 px-2 border border-amber-400/40">
-                    <div className="flex justify-center w-8"><GoldMedal /></div>
-                    <span className="text-sm md:text-base font-bold text-yellow-200">1º Lugar</span>
-                    <span className="text-sm md:text-base font-semibold text-white">Daniela Silva</span>
+                  <div className="grid grid-cols-[auto_80px_1fr] items-center gap-3 bg-gradient-to-r from-amber-500/20 via-yellow-400/30 to-amber-500/20 rounded-lg py-2.5 px-3 border border-amber-400/40">
+                    <div className="flex justify-center w-10"><GoldMedal /></div>
+                    <span className="text-base md:text-lg font-bold text-yellow-200">1º Lugar</span>
+                    <span className="text-base md:text-lg font-semibold text-white">Daniela Silva</span>
                   </div>
 
                   {/* 2º Lugar - Prata */}
-                  <div className="grid grid-cols-[auto_70px_1fr] items-center gap-2 bg-gradient-to-r from-gray-400/20 via-gray-300/30 to-gray-400/20 rounded-lg py-1.5 px-2 border border-gray-300/40">
-                    <div className="flex justify-center w-8"><SilverMedal /></div>
-                    <span className="text-sm md:text-base font-bold text-gray-200">2º Lugar</span>
-                    <span className="text-sm md:text-base font-semibold text-white">Letícia Souza</span>
+                  <div className="grid grid-cols-[auto_80px_1fr] items-center gap-3 bg-gradient-to-r from-gray-400/20 via-gray-300/30 to-gray-400/20 rounded-lg py-2.5 px-3 border border-gray-300/40">
+                    <div className="flex justify-center w-10"><SilverMedal /></div>
+                    <span className="text-base md:text-lg font-bold text-gray-200">2º Lugar</span>
+                    <span className="text-base md:text-lg font-semibold text-white">Letícia Souza</span>
                   </div>
 
                   {/* 3º Lugar - Bronze */}
-                  <div className="grid grid-cols-[auto_70px_1fr] items-center gap-2 bg-gradient-to-r from-orange-600/20 via-orange-500/30 to-orange-600/20 rounded-lg py-1.5 px-2 border border-orange-400/40">
-                    <div className="flex justify-center w-8"><BronzeMedal /></div>
-                    <span className="text-sm md:text-base font-bold text-orange-200">3º Lugar</span>
-                    <span className="text-sm md:text-base font-semibold text-white">Marcely Soeiro</span>
+                  <div className="grid grid-cols-[auto_80px_1fr] items-center gap-3 bg-gradient-to-r from-orange-600/20 via-orange-500/30 to-orange-600/20 rounded-lg py-2.5 px-3 border border-orange-400/40">
+                    <div className="flex justify-center w-10"><BronzeMedal /></div>
+                    <span className="text-base md:text-lg font-bold text-orange-200">3º Lugar</span>
+                    <span className="text-base md:text-lg font-semibold text-white">Marcely Soeiro</span>
                   </div>
                 </div>
               </div>
@@ -206,8 +206,8 @@ export function PodioKahootSlide() {
         </div>
 
         {/* Rodapé */}
-        <div className="text-center mt-3 flex-shrink-0">
-          <p className="text-base md:text-lg lg:text-xl opacity-80 font-light">
+        <div className="text-center mt-5 flex-shrink-0">
+          <p className="text-lg md:text-xl lg:text-2xl opacity-80 font-light">
             Ano que vem tem mais!
           </p>
         </div>
