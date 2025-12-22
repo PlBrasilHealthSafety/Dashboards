@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 
 // Componentes SVG para medalhas de alta qualidade
 const GoldMedal = () => (
-  <svg className="w-8 h-8 md:w-10 md:h-10" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg className="w-6 h-6 md:w-8 md:h-8" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="32" cy="40" r="20" fill="url(#goldGradient)" stroke="#B8860B" strokeWidth="2"/>
     <circle cx="32" cy="40" r="14" fill="url(#goldInner)" stroke="#DAA520" strokeWidth="1"/>
     <text x="32" y="45" textAnchor="middle" fill="#8B4513" fontSize="14" fontWeight="bold">1</text>
@@ -24,7 +24,7 @@ const GoldMedal = () => (
 )
 
 const SilverMedal = () => (
-  <svg className="w-8 h-8 md:w-10 md:h-10" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg className="w-6 h-6 md:w-8 md:h-8" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="32" cy="40" r="20" fill="url(#silverGradient)" stroke="#708090" strokeWidth="2"/>
     <circle cx="32" cy="40" r="14" fill="url(#silverInner)" stroke="#A9A9A9" strokeWidth="1"/>
     <text x="32" y="45" textAnchor="middle" fill="#4A4A4A" fontSize="14" fontWeight="bold">2</text>
@@ -45,7 +45,7 @@ const SilverMedal = () => (
 )
 
 const BronzeMedal = () => (
-  <svg className="w-8 h-8 md:w-10 md:h-10" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg className="w-6 h-6 md:w-8 md:h-8" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="32" cy="40" r="20" fill="url(#bronzeGradient)" stroke="#8B4513" strokeWidth="2"/>
     <circle cx="32" cy="40" r="14" fill="url(#bronzeInner)" stroke="#CD853F" strokeWidth="1"/>
     <text x="32" y="45" textAnchor="middle" fill="#5C3317" fontSize="14" fontWeight="bold">3</text>
@@ -113,59 +113,8 @@ export function PodioKahootSlide() {
         {/* Conteúdo Principal - Layout horizontal em duas colunas */}
         <div className="flex-1 flex items-center justify-center min-h-0 py-2">
           <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 items-start">
-            {/* Card Principal - Pódio */}
-            <div className="bg-white/15 backdrop-blur-lg rounded-2xl p-4 md:p-6 border border-amber-400/30 shadow-2xl relative flex flex-col">
-              {/* Ícone de coroa */}
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <div className="bg-amber-400 rounded-full p-2">
-                  <Trophy className="w-5 h-5 text-[#1D3C44]" />
-                </div>
-              </div>
-
-              <div className="text-center pt-4 flex flex-col items-center">
-                {/* Subtítulo - Nossas Campeãs */}
-                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-3 text-amber-100">
-                  Nossas Campeãs!
-                </h2>
-                <div className="w-32 h-1 bg-gradient-to-r from-transparent via-amber-400/50 to-transparent mx-auto rounded-full mb-4"></div>
-
-                {/* Foto das Campeãs - formato retangular */}
-                <div className="mx-auto mb-4 w-full max-w-md h-32 md:h-40 lg:h-48 rounded-xl border-3 border-amber-400/50 shadow-xl overflow-hidden bg-gradient-to-br from-amber-300 to-amber-500 relative">
-                  <img
-                    src="/campeoes.jpg"
-                    alt="Pódio Kahoot PLHealth - Daniela, Letícia e Marcely"
-                    className="w-full h-full object-cover object-[25%_center]"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse"></div>
-                </div>
-
-                {/* Lista do Pódio */}
-                <div className="w-full space-y-2">
-                  {/* 1º Lugar - Ouro */}
-                  <div className="flex items-center justify-center gap-3 bg-gradient-to-r from-amber-500/20 via-yellow-400/30 to-amber-500/20 rounded-xl p-2 border border-amber-400/40">
-                    <GoldMedal />
-                    <span className="text-base md:text-lg lg:text-xl font-bold text-yellow-200">1º Lugar</span>
-                    <span className="text-base md:text-lg lg:text-xl font-semibold text-white">Daniela Silva</span>
-                  </div>
-
-                  {/* 2º Lugar - Prata */}
-                  <div className="flex items-center justify-center gap-3 bg-gradient-to-r from-gray-400/20 via-gray-300/30 to-gray-400/20 rounded-xl p-2 border border-gray-300/40">
-                    <SilverMedal />
-                    <span className="text-base md:text-lg lg:text-xl font-bold text-gray-200">2º Lugar</span>
-                    <span className="text-base md:text-lg lg:text-xl font-semibold text-white">Letícia Souza</span>
-                  </div>
-
-                  {/* 3º Lugar - Bronze */}
-                  <div className="flex items-center justify-center gap-3 bg-gradient-to-r from-orange-600/20 via-orange-500/30 to-orange-600/20 rounded-xl p-2 border border-orange-400/40">
-                    <BronzeMedal />
-                    <span className="text-base md:text-lg lg:text-xl font-bold text-orange-200">3º Lugar</span>
-                    <span className="text-base md:text-lg lg:text-xl font-semibold text-white">Marcely Soeiro</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {/* Card Secundário - Finalistas */}
-            <div className="bg-white/15 backdrop-blur-lg rounded-2xl p-4 md:p-6 border border-amber-400/30 shadow-2xl relative flex flex-col">
+            {/* Card 1 - Finalistas (agora primeiro) */}
+            <div className="bg-white/15 backdrop-blur-lg rounded-2xl p-4 md:p-6 border border-amber-400/30 shadow-2xl relative flex flex-col min-h-[540px]">
               {/* Ícone de estrela */}
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                 <div className="bg-amber-400 rounded-full p-2">
@@ -180,7 +129,7 @@ export function PodioKahootSlide() {
                 </h2>
                 <div className="w-32 h-1 bg-gradient-to-r from-transparent via-amber-400/50 to-transparent mx-auto rounded-full mb-4"></div>
 
-                {/* Foto das Finalistas - Altura aumentada para corresponder ao card das campeãs */}
+                {/* Foto das Finalistas - Altura grande */}
                 <div className="mx-auto w-full max-w-md h-48 md:h-56 lg:h-72 rounded-xl border-3 border-amber-400/50 shadow-xl overflow-hidden bg-gradient-to-br from-amber-300 to-amber-500 relative flex-1">
                   <img
                     src="/finalistas.jpg"
@@ -196,6 +145,59 @@ export function PodioKahootSlide() {
                     <Star className="w-5 h-5 text-amber-400 fill-current" />
                     <span className="text-base md:text-lg font-semibold">Parabéns a todas!</span>
                     <Star className="w-5 h-5 text-amber-400 fill-current" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 2 - Pódio/Campeãs (agora segundo) */}
+            <div className="bg-white/15 backdrop-blur-lg rounded-2xl p-4 md:p-6 border border-amber-400/30 shadow-2xl relative flex flex-col min-h-[540px]">
+              {/* Ícone de coroa */}
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                <div className="bg-amber-400 rounded-full p-2">
+                  <Trophy className="w-5 h-5 text-[#1D3C44]" />
+                </div>
+              </div>
+
+              <div className="text-center pt-4 flex flex-col items-center flex-1">
+                {/* Subtítulo - Nossas Campeãs */}
+                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-3 text-amber-100">
+                  Nossas Campeãs!
+                </h2>
+                <div className="w-32 h-1 bg-gradient-to-r from-transparent via-amber-400/50 to-transparent mx-auto rounded-full mb-4"></div>
+
+                {/* Foto das Campeãs - imagem maior com melhor qualidade */}
+                <div className="mx-auto mb-3 w-full max-w-md h-40 md:h-48 lg:h-56 rounded-xl border-3 border-amber-400/50 shadow-xl overflow-hidden bg-gradient-to-br from-amber-300 to-amber-500 relative">
+                  <img
+                    src="/campeoes.jpg"
+                    alt="Pódio Kahoot PLHealth - Daniela, Letícia e Marcely"
+                    className="w-full h-full object-cover object-[25%_center]"
+                    style={{ imageRendering: 'crisp-edges' }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-white/5"></div>
+                </div>
+
+                {/* Lista do Pódio - posicionada na parte inferior */}
+                <div className="w-full space-y-1.5 mt-auto">
+                  {/* 1º Lugar - Ouro */}
+                  <div className="grid grid-cols-[auto_70px_1fr] items-center gap-2 bg-gradient-to-r from-amber-500/20 via-yellow-400/30 to-amber-500/20 rounded-lg py-1.5 px-2 border border-amber-400/40">
+                    <div className="flex justify-center w-8"><GoldMedal /></div>
+                    <span className="text-sm md:text-base font-bold text-yellow-200">1º Lugar</span>
+                    <span className="text-sm md:text-base font-semibold text-white">Daniela Silva</span>
+                  </div>
+
+                  {/* 2º Lugar - Prata */}
+                  <div className="grid grid-cols-[auto_70px_1fr] items-center gap-2 bg-gradient-to-r from-gray-400/20 via-gray-300/30 to-gray-400/20 rounded-lg py-1.5 px-2 border border-gray-300/40">
+                    <div className="flex justify-center w-8"><SilverMedal /></div>
+                    <span className="text-sm md:text-base font-bold text-gray-200">2º Lugar</span>
+                    <span className="text-sm md:text-base font-semibold text-white">Letícia Souza</span>
+                  </div>
+
+                  {/* 3º Lugar - Bronze */}
+                  <div className="grid grid-cols-[auto_70px_1fr] items-center gap-2 bg-gradient-to-r from-orange-600/20 via-orange-500/30 to-orange-600/20 rounded-lg py-1.5 px-2 border border-orange-400/40">
+                    <div className="flex justify-center w-8"><BronzeMedal /></div>
+                    <span className="text-sm md:text-base font-bold text-orange-200">3º Lugar</span>
+                    <span className="text-sm md:text-base font-semibold text-white">Marcely Soeiro</span>
                   </div>
                 </div>
               </div>
