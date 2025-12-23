@@ -14,7 +14,7 @@ import {
   PowerPointSlide8 
 } from '@/components/custom/PowerPointSlides'
 import { AniversariantesSlide } from '@/components/slides/AniversariantesSlide'
-import { CampeoesKahootSlide } from '@/components/slides/CampeoesKahootSlide'
+// import { CampeoesKahootSlide } from '@/components/slides/CampeoesKahootSlide' // Slide desativado temporariamente
 import { PodioKahootSlide } from '@/components/slides/PodioKahootSlide'
 // import { ComunicadoSlide } from '@/components/slides/ComunicadoSlide' // Slide desativado temporariamente
 import { ContratoNotificationOverlay } from '@/components/custom/ContratoNotificationOverlay'
@@ -37,8 +37,8 @@ export function TVDashboard() {
       { id: 3, content: <PowerPointSlide3 />, duration: 30000 }, // 30 seconds
       { id: 4, content: <PowerPointSlide4 />, duration: 30000 }, // 30 seconds
       { id: 5, content: <AniversariantesSlide />, duration: 180000 }, // 3 minutes (180 seconds)
-      { id: 6, content: <CampeoesKahootSlide />, duration: 180000 }, // 3 minutes (180 seconds)
-      { id: 7, content: <PodioKahootSlide />, duration: 180000 }, // 3 minutes (180 seconds)
+      // { id: 6, content: <CampeoesKahootSlide />, duration: 180000 }, // 3 minutes (180 seconds) - Slide desativado temporariamente
+      { id: 6, content: <PodioKahootSlide />, duration: 180000 }, // 3 minutes (180 seconds)
       // { id: 8, content: <ComunicadoSlide />, duration: 180000 }, // 3 minutes (180 seconds) - Slide desativado temporariamente
       { id: 8, content: <PowerPointSlide5 />, duration: 30000 }, // 30 seconds
       { id: 9, content: <PowerPointSlide6 />, duration: 30000 }, // 30 seconds
