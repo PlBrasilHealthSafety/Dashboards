@@ -185,7 +185,18 @@ dashboards/
 - Slides para TV Dashboard
 - Slide de Comunicado desativado temporariamente nas páginas e modo TV
 - Campeões Kahoot com destaque para a campeã de outubro e card "Próximo Campeão"
+- Pódio Kahoot "Sabe Tudo PLHealth!" com medalhas SVG personalizadas (ouro, prata, bronze)
 - Sistema de notificação com vídeo para novos contratos
+
+### 🏆 Slide Pódio Kahoot (PodioKahootSlide)
+- Layout em duas colunas: "Nossas Finalistas!" (esquerda) e "Nossas Campeãs!" (direita)
+- Foto das finalistas e foto das campeãs com troféus
+- Medalhas SVG de alta qualidade com gradientes (ouro, prata, bronze)
+- Layout em grid para alinhamento perfeito das medalhas independente do tamanho dos nomes
+- Cards com altura fixa de 540px para consistência visual
+- Seção de medalhas posicionada no rodapé do card usando flex e mt-auto
+- Design responsivo com Tailwind CSS
+- Animações decorativas de fundo com emojis
 
 ### 🎬 Animações
 - Framer Motion para animações declarativas
