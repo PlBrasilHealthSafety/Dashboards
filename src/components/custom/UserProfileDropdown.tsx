@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { UserCircle, Plus, ChevronDown, UserPlus, Calendar } from 'lucide-react'
+import { UserCircle, Plus, ChevronDown, UserPlus, Calendar, Image } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useLocation } from 'react-router-dom'
 import { ProfilePhotoUpload } from './ProfilePhotoUpload'
+import { useImageNotification } from '@/contexts/ImageNotificationContext'
 
 interface UserProfileDropdownProps {
   onViewProfile?: () => void
@@ -20,6 +21,7 @@ export function UserProfileDropdown({
 }: UserProfileDropdownProps) {
   const { user } = useAuth()
   const location = useLocation()
+  const { showImage } = useImageNotification()
   const [isOpen, setIsOpen] = useState(false)
   const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; minWidth?: number }>({ top: -9999, left: -9999 })
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -130,6 +132,11 @@ export function UserProfileDropdown({
     onNovoAniversariante?.()
   }
 
+  const handleVerImagem = () => {
+    setIsOpen(false)
+    showImage()
+  }
+
   return (
     <>
       {/* Botão do perfil */}
@@ -226,6 +233,21 @@ export function UserProfileDropdown({
                 </div>
                 <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">
                   Novo Contrato
+                </span>
+              </button>
+            )}
+
+            {/* Ver Imagem - Apenas na página de diretoria */}
+            {isDirectorPage && (
+              <button
+                onClick={handleVerImagem}
+                className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gradient-to-r hover:from-[#00A298]/5 hover:to-[#1D3C44]/5 transition-all duration-200 group"
+              >
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#00A298]/10 to-[#1D3C44]/10 flex items-center justify-center group-hover:from-[#00A298]/20 group-hover:to-[#1D3C44]/20 transition-all duration-200">
+                  <Image className="w-4 h-4 text-[#00A298]" />
+                </div>
+                <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">
+                  Ver Imagem
                 </span>
               </button>
             )}

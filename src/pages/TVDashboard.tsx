@@ -18,6 +18,7 @@ import { AniversariantesSlide } from '@/components/slides/AniversariantesSlide'
 import { PodioKahootSlide } from '@/components/slides/PodioKahootSlide'
 // import { ComunicadoSlide } from '@/components/slides/ComunicadoSlide' // Slide desativado temporariamente
 import { ContratoNotificationOverlay } from '@/components/custom/ContratoNotificationOverlay'
+import { ImageNotificationOverlay } from '@/components/custom/ImageNotificationOverlay'
 import { X } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { getUserRoute } from '@/lib/utils'
@@ -189,6 +190,9 @@ export function TVDashboard() {
           onComplete={handleNotificationComplete}
         />
       )}
+
+      {/* Overlay de imagem fixa */}
+      <ImageNotificationOverlay />
     </div>
   )
 }

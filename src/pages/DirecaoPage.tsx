@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { DynamicTimerCarousel } from '@/components/custom/DynamicTimerCarousel'
 import { ScrollToTopButton } from '@/components/ui/scroll-to-top-button'
 import { ExecutiveLayoutDashboard } from '@/components/custom/ExecutiveLayoutDashboard'
+import { ImageNotificationOverlay } from '@/components/custom/ImageNotificationOverlay'
 
 
 import { 
@@ -184,6 +185,9 @@ export function DirecaoPage() {
       </div>
       
       <ScrollToTopButton />
+      
+      {/* Overlay de imagem fixa */}
+      <ImageNotificationOverlay />
     </div>
   )
 }

@@ -1,32 +1,22 @@
 import { useAuth } from '@/hooks/useAuth'
-import { useDocument } from '@/hooks/useFirestore'
 import { useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { Monitor, Image, X } from 'lucide-react'
+import { Monitor } from 'lucide-react'
 import { UserProfileDropdown } from '@/components/custom/UserProfileDropdown'
 import { UserProfileModal } from '@/components/custom/UserProfileModal'
 import { NovoContratoModal } from '@/components/custom/NovoContratoModal'
 import { NovoCadastroModal } from '@/components/custom/NovoCadastroModal'
 import { NovoAniversarianteModal } from '@/components/custom/NovoAniversarianteModal'
 
-interface UserProfile {
-  role?: 'diretoria' | 'medicina' | 'comercial'
-}
-
 export function Header() {
   const { user, signOut } = useAuth()
-  const { data: profile } = useDocument<UserProfile>('users', user?.uid ?? null)
   const navigate = useNavigate()
   const [logoSrc, setLogoSrc] = useState<string>('/plbrasil-logo.svg')
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
   const [isNovoContratoModalOpen, setIsNovoContratoModalOpen] = useState(false)
   const [isNovoCadastroModalOpen, setIsNovoCadastroModalOpen] = useState(false)
   const [isNovoAniversarianteModalOpen, setIsNovoAniversarianteModalOpen] = useState(false)
-  const [isImageOverlayOpen, setIsImageOverlayOpen] = useState(false)
-
-  // Verifica se é usuário comercial
-  const isComercialUser = user?.email?.includes('comercial') || profile?.role === 'comercial'
   
   const handleLogoError = useCallback(() => {
     setLogoSrc(prev => {
@@ -84,19 +74,6 @@ export function Header() {
               <Monitor className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline">Modo TV</span>
             </Button>
-            {/* Botão Ver Imagem - apenas para usuário comercial */}
-            {isComercialUser && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="border-[#00A298]/30 text-[#00A298] hover:bg-[#00A298]/10 hover:border-[#00A298]/50"
-                onClick={() => setIsImageOverlayOpen(true)}
-                title="Ver Imagem"
-              >
-                <Image className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Ver Imagem</span>
-              </Button>
-            )}
             <Button variant="outline" size="sm" className="border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400" onClick={signOut}>
               Logout
             </Button>
@@ -127,27 +104,6 @@ export function Header() {
           onClose={() => setIsNovoAniversarianteModalOpen(false)}
         />
       </div>
-
-      {/* Overlay da Imagem Comercial - Tela Cheia Fixa */}
-      {isImageOverlayOpen && (
-        <div className="fixed inset-0 z-[9999] bg-black">
-          {/* Botão de fechar */}
-          <button
-            onClick={() => setIsImageOverlayOpen(false)}
-            className="absolute top-4 right-4 z-[10000] p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors"
-            title="Fechar"
-          >
-            <X className="w-8 h-8 text-white" />
-          </button>
-          
-          {/* Imagem em tela cheia */}
-          <img 
-            src="/dadada.png" 
-            alt="Imagem Comercial"
-            className="w-full h-full object-contain"
-          />
-        </div>
-      )}
     </header>
   )
 }

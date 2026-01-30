@@ -3,6 +3,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from '@/components/custom/AuthProvider'
 import { AppRoutes } from '@/routes'
 import { testFirebaseConnection } from '@/lib/firebase-test'
+import { ImageNotificationProvider } from '@/contexts/ImageNotificationContext'
 
 function App() {
   useEffect(() => {
@@ -15,7 +16,9 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppRoutes />
+        <ImageNotificationProvider>
+          <AppRoutes />
+        </ImageNotificationProvider>
       </AuthProvider>
     </BrowserRouter>
   )
