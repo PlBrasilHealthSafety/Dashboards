@@ -21,7 +21,7 @@ export function UserProfileDropdown({
 }: UserProfileDropdownProps) {
   const { user } = useAuth()
   const location = useLocation()
-  const { showImage } = useImageNotification()
+  const { toggleImage, isImageVisible } = useImageNotification()
   const [isOpen, setIsOpen] = useState(false)
   const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; minWidth?: number }>({ top: -9999, left: -9999 })
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -132,9 +132,9 @@ export function UserProfileDropdown({
     onNovoAniversariante?.()
   }
 
-  const handleVerImagem = () => {
+  const handleVerImagem = async () => {
     setIsOpen(false)
-    showImage()
+    await toggleImage()
   }
 
   return (
@@ -241,14 +241,19 @@ export function UserProfileDropdown({
             {isDirectorPage && (
               <button
                 onClick={handleVerImagem}
-                className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gradient-to-r hover:from-[#00A298]/5 hover:to-[#1D3C44]/5 transition-all duration-200 group"
+                className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gradient-to-r hover:from-[#00A298]/5 hover:to-[#1D3C44]/5 transition-all duration-200 group ${isImageVisible ? 'bg-green-50 border-l-4 border-green-500' : ''}`}
               >
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#00A298]/10 to-[#1D3C44]/10 flex items-center justify-center group-hover:from-[#00A298]/20 group-hover:to-[#1D3C44]/20 transition-all duration-200">
-                  <Image className="w-4 h-4 text-[#00A298]" />
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 ${isImageVisible ? 'bg-green-500' : 'bg-gradient-to-br from-[#00A298]/10 to-[#1D3C44]/10 group-hover:from-[#00A298]/20 group-hover:to-[#1D3C44]/20'}`}>
+                  <Image className={`w-4 h-4 ${isImageVisible ? 'text-white' : 'text-[#00A298]'}`} />
                 </div>
-                <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">
-                  Ver Imagem
-                </span>
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">
+                    {isImageVisible ? 'Ocultar Imagem' : 'Ver Imagem'}
+                  </span>
+                  {isImageVisible && (
+                    <span className="text-xs text-green-600">Exibindo em todas as TVs</span>
+                  )}
+                </div>
               </button>
             )}
           </div>
