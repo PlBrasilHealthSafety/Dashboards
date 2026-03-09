@@ -35,7 +35,7 @@ export function TVDashboard() {
     // Ordem: Looker1 → PPT1-3 → Looker2 → PPT4 → Looker3,4 → Aniversário → Pódio → PPT5-8 → Looker5
     const slides = [
       // 1. Convocação (primeiro de tudo)
-      { id: 100, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_0uqh1u4wqc" title="Painel de Gestão - Medicina | Convocação" />, duration: 120000 },
+      { id: 100, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_0uqh1u4wqc" title="Painel de Gestão - Medicina | Convocação" />, duration: 170000 },
 
       // 2-4. PowerPoint slides 1-3
       { id: 1, content: <PowerPointSlide1 />, duration: 30000 },
@@ -43,14 +43,14 @@ export function TVDashboard() {
       { id: 3, content: <PowerPointSlide3 />, duration: 30000 },
 
       // 5. Liberação Dados Gerais (após slide 3)
-      { id: 101, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_yh591qsi1d" title="Painel de Gestão - Medicina | Liberação Dados Gerais" />, duration: 120000 },
+      { id: 101, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_yh591qsi1d" title="Painel de Gestão - Medicina | Liberação Dados Gerais" />, duration: 170000 },
 
       // 6. PowerPoint slide 4
       { id: 4, content: <PowerPointSlide4 />, duration: 30000 },
 
       // 7-8. Agendamento + Desempenho Agendamento (antes do aniversário)
-      { id: 102, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_awpgjxuj1d" title="Painel de Gestão - Medicina | Agendamento" />, duration: 120000 },
-      { id: 103, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_r7a8jh4j1d" title="Painel de Gestão - Medicina | Desempenho Agendamento" />, duration: 120000 },
+      { id: 102, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_awpgjxuj1d" title="Painel de Gestão - Medicina | Agendamento" />, duration: 170000 },
+      { id: 103, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_r7a8jh4j1d" title="Painel de Gestão - Medicina | Desempenho Agendamento" />, duration: 170000 },
 
       // 9-10. Slides especiais
       { id: 5, content: <AniversariantesSlide />, duration: 180000 },
@@ -63,7 +63,7 @@ export function TVDashboard() {
       { id: 11, content: <PowerPointSlide8 />, duration: 30000 },
 
       // 15. ASOs Dados Gerais (último de tudo)
-      { id: 104, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_4mmpny8c0c" title="Painel de Gestão - Medicina | ASOs Dados Gerais" />, duration: 120000 },
+      { id: 104, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_4mmpny8c0c" title="Painel de Gestão - Medicina | ASOs Dados Gerais" />, duration: 170000 },
     ]
     return slides
   }, [])

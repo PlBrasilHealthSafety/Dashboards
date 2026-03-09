@@ -93,12 +93,13 @@ export function LookerStudioSlide({
             className="relative w-full h-full overflow-hidden"
             style={{ backgroundColor: '#f8f9fa' }}
         >
-            {/* Animação de scroll dinâmica */}
+            {/* Animação de scroll ping-pong: desce e sobe */}
             {needsScroll && !isLoading && (
                 <style>{`
           @keyframes ${animId} {
-            0%, 8% { transform: translateY(0) scale(${scale}); }
-            85%, 100% { transform: translateY(-${scrollDistance}px) scale(${scale}); }
+            0%, 5% { transform: translateY(0) scale(${scale}); }
+            45%, 55% { transform: translateY(-${scrollDistance}px) scale(${scale}); }
+            95%, 100% { transform: translateY(0) scale(${scale}); }
           }
         `}</style>
             )}
@@ -165,7 +166,7 @@ export function LookerStudioSlide({
                     transformOrigin: 'top left',
                     // Se precisa scroll: anima. Se não: apenas escala.
                     ...(needsScroll && !isLoading
-                        ? { animation: `${animId} 110s ease-in-out infinite` }
+                        ? { animation: `${animId} 140s ease-in-out infinite` }
                         : { transform: `scale(${scale})` }
                     ),
                 }}
