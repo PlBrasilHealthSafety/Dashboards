@@ -8,49 +8,44 @@ interface LookerStudioSlideProps {
     title: string
     /** Intervalo de auto-refresh em ms (padrão: 5 minutos) */
     refreshInterval?: number
-    /** Altura virtual do iframe em px (padrão: 1500). Ajuste se o dashboard for mais alto/curto */
-    iframeHeight?: number
 }
 
 /**
  * Componente de slide que exibe um dashboard do Looker Studio via iframe.
  * 
- * Otimizado para TV (sem interação):
- * - Renderiza o iframe escalado para caber na largura da TV
- * - Se o conteúdo for maior que a tela, faz scroll automático suave
- * - Se couber na tela, exibe estático sem scroll
+ * Otimizado para TV:
+ * - Renderiza o iframe em 1920x1080 e escala para caber na tela
+ * - Mostra apenas a parte superior do dashboard (sem scroll)
+ * - Tudo que não cabe é cortado (overflow hidden)
  * - Auto-refresh periódico para manter dados atualizados
  */
 export function LookerStudioSlide({
     url,
     title,
     refreshInterval = 300000,
-    iframeHeight = 1500,
 }: LookerStudioSlideProps) {
     const [isLoading, setIsLoading] = useState(true)
     const [hasError, setHasError] = useState(false)
     const [refreshKey, setRefreshKey] = useState(0)
     const containerRef = useRef<HTMLDivElement>(null)
-    const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
+    const [scale, setScale] = useState(1)
 
-    // Largura fixa do iframe (Full HD)
     const iframeWidth = 1920
+    const iframeHeight = 1080
     const embedUrl = toEmbedUrl(url)
 
-    // Captura as dimensões do container (viewport da TV)
+    // Calcula escala para caber na largura da TV
     useEffect(() => {
-        const updateSize = () => {
+        const updateScale = () => {
             if (containerRef.current) {
-                setContainerSize({
-                    width: containerRef.current.offsetWidth,
-                    height: containerRef.current.offsetHeight,
-                })
+                const containerWidth = containerRef.current.offsetWidth
+                setScale(containerWidth / iframeWidth)
             }
         }
 
-        updateSize()
-        window.addEventListener('resize', updateSize)
-        return () => window.removeEventListener('resize', updateSize)
+        updateScale()
+        window.addEventListener('resize', updateScale)
+        return () => window.removeEventListener('resize', updateScale)
     }, [])
 
     // Auto-refresh
@@ -74,36 +69,12 @@ export function LookerStudioSlide({
         setHasError(true)
     }, [])
 
-    // Escala para o iframe caber na largura da TV
-    const scale = containerSize.width > 0 ? containerSize.width / iframeWidth : 1
-
-    // Altura real do iframe após escalar
-    const scaledHeight = iframeHeight * scale
-
-    // Se o conteúdo escalado for maior que a tela, precisa rolar
-    const needsScroll = scaledHeight > containerSize.height
-    const scrollDistance = needsScroll ? scaledHeight - containerSize.height : 0
-
-    // ID único para a animação
-    const animId = `ls-${refreshKey}`
-
     return (
         <div
             ref={containerRef}
             className="relative w-full h-full overflow-hidden"
             style={{ backgroundColor: '#f8f9fa' }}
         >
-            {/* Animação de scroll ping-pong: desce e sobe */}
-            {needsScroll && !isLoading && (
-                <style>{`
-          @keyframes ${animId} {
-            0%, 5% { transform: translateY(0) scale(${scale}); }
-            45%, 55% { transform: translateY(-${scrollDistance}px) scale(${scale}); }
-            95%, 100% { transform: translateY(0) scale(${scale}); }
-          }
-        `}</style>
-            )}
-
             {/* Loading overlay */}
             {isLoading && (
                 <div className="absolute inset-0 z-10 flex flex-col items-center justify-center" style={{ backgroundColor: '#0a1628' }}>
@@ -155,7 +126,7 @@ export function LookerStudioSlide({
                 </div>
             )}
 
-            {/* Iframe do Dashboard */}
+            {/* Iframe fixo — mostra apenas o que cabe na tela, sem scroll */}
             <div
                 style={{
                     position: 'absolute',
@@ -164,11 +135,8 @@ export function LookerStudioSlide({
                     width: `${iframeWidth}px`,
                     height: `${iframeHeight}px`,
                     transformOrigin: 'top left',
-                    // Se precisa scroll: anima. Se não: apenas escala.
-                    ...(needsScroll && !isLoading
-                        ? { animation: `${animId} 140s ease-in-out infinite` }
-                        : { transform: `scale(${scale})` }
-                    ),
+                    transform: `scale(${scale})`,
+                    overflow: 'hidden',
                 }}
             >
                 <iframe
