@@ -14,8 +14,6 @@ import {
   PowerPointSlide8
 } from '@/components/custom/PowerPointSlides'
 import { AniversariantesSlide } from '@/components/slides/AniversariantesSlide'
-// import { CampeoesKahootSlide } from '@/components/slides/CampeoesKahootSlide' // Slide desativado temporariamente
-// import { ComunicadoSlide } from '@/components/slides/ComunicadoSlide' // Slide desativado temporariamente
 import { LookerStudioSlide } from '@/components/slides/LookerStudioSlide'
 import { ContratoNotificationOverlay } from '@/components/custom/ContratoNotificationOverlay'
 import { ImageNotificationOverlay } from '@/components/custom/ImageNotificationOverlay'
@@ -36,7 +34,7 @@ export function TVDashboard() {
   const { currentBirthdaySlideSlot, shouldShowBirthdaySlide, markBirthdaySlideShown } = useBirthdaySlideSchedule()
 
   const carouselItems = useMemo(() => {
-    // Ordem: Looker1 -> PPT1-3 -> Looker2 -> PPT4 -> Looker3,4 -> Aniversario agendado -> PPT5-8 -> Looker5
+    // Ordem: Looker1 -> PPT1-3 -> Looker2 -> PPT4 -> Looker3,4 -> aniversario agendado -> PPT5-8 -> Looker5
     const slides = [
       // 1. Convocação (primeiro de tudo)
       { id: 100, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_0uqh1u4wqc" title="Painel de Gestão - Medicina | Convocação" />, duration: 170000 },
@@ -56,7 +54,7 @@ export function TVDashboard() {
       { id: 102, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_awpgjxuj1d" title="Painel de Gestão - Medicina | Agendamento" />, duration: 170000 },
       { id: 103, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_r7a8jh4j1d" title="Painel de Gestão - Medicina | Desempenho Agendamento" />, duration: 170000 },
 
-      // 9. Slide especial com controle de exibicao por periodo do dia
+      // 9. Slide especial com controle de uma exibicao por dia
       ...(shouldShowBirthdaySlide
         ? [{ id: BIRTHDAY_SLIDE_ID, content: <AniversariantesSlide />, duration: 180000 }]
         : []),

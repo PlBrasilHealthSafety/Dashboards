@@ -15,8 +15,6 @@ import {
   PowerPointSlide8
 } from '@/components/custom/PowerPointSlides'
 import { AniversariantesSlide } from '@/components/slides/AniversariantesSlide'
-// import { CampeoesKahootSlide } from '@/components/slides/CampeoesKahootSlide' // Slide desativado temporariamente
-// import { ComunicadoSlide } from '@/components/slides/ComunicadoSlide' // Slide desativado temporariamente
 
 import {
   LineChart,
@@ -40,7 +38,7 @@ export function ComercialPage() {
   const { currentBirthdaySlideSlot, shouldShowBirthdaySlide, markBirthdaySlideShown } = useBirthdaySlideSchedule()
 
   const carouselItems = useMemo(() => {
-    // 8 slides de PowerPoint + slide de aniversariantes controlado por periodo do dia
+    // 8 slides de PowerPoint + slide de aniversariantes com uma exibicao por dia
     const slides = [
       { id: 1, content: <PowerPointSlide1 />, duration: 30000 }, // 30 seconds
       { id: 2, content: <PowerPointSlide2 />, duration: 30000 }, // 30 seconds
@@ -49,8 +47,6 @@ export function ComercialPage() {
       ...(shouldShowBirthdaySlide
         ? [{ id: BIRTHDAY_SLIDE_ID, content: <AniversariantesSlide />, duration: 180000 }]
         : []),
-      // { id: 6, content: <CampeoesKahootSlide />, duration: 180000 }, // 3 minutes (180 seconds) - Slide desativado temporariamente
-      // { id: 8, content: <ComunicadoSlide />, duration: 180000 }, // 3 minutes (180 seconds) - Slide desativado temporariamente
       { id: 7, content: <PowerPointSlide5 />, duration: 30000 }, // 30 seconds
       { id: 9, content: <PowerPointSlide6 />, duration: 30000 }, // 30 seconds
       { id: 10, content: <PowerPointSlide7 />, duration: 30000 }, // 30 seconds

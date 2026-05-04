@@ -14,6 +14,7 @@ interface MarkBirthdaySlideOptions {
 const CLOCK_TICK_INTERVAL_MS = 60000
 const SERVER_TIME_SYNC_INTERVAL_MS = 5 * 60000
 const SERVER_TIME_REQUEST_TIMEOUT_MS = 4000
+const BIRTHDAY_SLIDE_STORAGE_KEY = 'plbrasil:birthday-slide-shown-date'
 
 const BIRTHDAY_SLIDE_WINDOW = {
   slotId: 'daily' as const,
@@ -24,6 +25,31 @@ const BIRTHDAY_SLIDE_WINDOW = {
 }
 
 const minutesSinceMidnight = (date: Date) => date.getHours() * 60 + date.getMinutes()
+
+const formatLocalDateKey = (date: Date) => {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
+
+const readLastShownDate = () => {
+  try {
+    return window.localStorage.getItem(BIRTHDAY_SLIDE_STORAGE_KEY)
+  } catch (error) {
+    console.warn('Nao foi possivel ler o registro local do slide de aniversariantes.', error)
+    return null
+  }
+}
+
+const writeLastShownDate = (date: Date) => {
+  try {
+    window.localStorage.setItem(BIRTHDAY_SLIDE_STORAGE_KEY, formatLocalDateKey(date))
+  } catch (error) {
+    console.warn('Nao foi possivel salvar o registro local do slide de aniversariantes.', error)
+  }
+}
 
 const readServerDateHeader = async (signal: AbortSignal) => {
   const response = await fetch(window.location.origin, {
@@ -51,7 +77,7 @@ const isInsideBirthdaySlideWindow = (date: Date) => {
 
 export function useBirthdaySlideSchedule() {
   const [now, setNow] = useState(() => new Date())
-  const [hasShownInCurrentWindow, setHasShownInCurrentWindow] = useState(false)
+  const [lastShownDate, setLastShownDate] = useState(() => readLastShownDate())
   const [timeSource, setTimeSource] = useState<BirthdaySlideTimeSource>('local')
   const [isTimeReady, setIsTimeReady] = useState(false)
   const serverTimeOffsetRef = useRef<number | null>(null)
@@ -106,13 +132,17 @@ export function useBirthdaySlideSchedule() {
   }, [readEffectiveNow, syncTimeWithServer])
 
   const isInsideWindow = useMemo(() => isInsideBirthdaySlideWindow(now), [now])
-  const shouldShowBirthdaySlide = isTimeReady && isInsideWindow && !hasShownInCurrentWindow
+  const currentDateKey = useMemo(() => formatLocalDateKey(now), [now])
+  const hasShownToday = lastShownDate === currentDateKey
+  const shouldShowBirthdaySlide = isTimeReady && isInsideWindow && !hasShownToday
 
   useEffect(() => {
-    if (!isInsideWindow && hasShownInCurrentWindow) {
-      setHasShownInCurrentWindow(false)
+    const storedShownDate = readLastShownDate()
+
+    if (storedShownDate !== lastShownDate) {
+      setLastShownDate(storedShownDate)
     }
-  }, [hasShownInCurrentWindow, isInsideWindow])
+  }, [currentDateKey, isInsideWindow, lastShownDate])
 
   return {
     currentBirthdaySlideSlot: shouldShowBirthdaySlide ? BIRTHDAY_SLIDE_WINDOW.slotId : null,
@@ -120,11 +150,13 @@ export function useBirthdaySlideSchedule() {
     birthdaySlideTimeSource: timeSource,
     shouldShowBirthdaySlide,
     markBirthdaySlideShown: (options?: MarkBirthdaySlideOptions) => {
+      writeLastShownDate(now)
+
       if (options?.updateState === false) {
         return
       }
 
-      setHasShownInCurrentWindow(true)
+      setLastShownDate(formatLocalDateKey(now))
     },
   }
 }
