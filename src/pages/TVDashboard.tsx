@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState } from 'react'
+import { useMemo, useEffect, useState, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { DynamicTimerCarousel } from '@/components/custom/DynamicTimerCarousel'
 
@@ -15,13 +15,14 @@ import {
 } from '@/components/custom/PowerPointSlides'
 import { AniversariantesSlide } from '@/components/slides/AniversariantesSlide'
 // import { CampeoesKahootSlide } from '@/components/slides/CampeoesKahootSlide' // Slide desativado temporariamente
-import { PodioKahootSlide } from '@/components/slides/PodioKahootSlide'
 // import { ComunicadoSlide } from '@/components/slides/ComunicadoSlide' // Slide desativado temporariamente
 import { LookerStudioSlide } from '@/components/slides/LookerStudioSlide'
 import { ContratoNotificationOverlay } from '@/components/custom/ContratoNotificationOverlay'
 import { ImageNotificationOverlay } from '@/components/custom/ImageNotificationOverlay'
 import { X } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
+import { BIRTHDAY_SLIDE_ID, useBirthdaySlideSchedule } from '@/hooks/useBirthdaySlideSchedule'
+import type { BirthdaySlideSlotId } from '@/hooks/useBirthdaySlideSchedule'
 import { getUserRoute } from '@/lib/utils'
 import type { Contrato } from '@/lib/types'
 
@@ -30,9 +31,12 @@ export function TVDashboard() {
   const { user } = useAuth()
   const [currentContrato, setCurrentContrato] = useState<(Contrato & { id: string }) | null>(null)
   const [showOverlay, setShowOverlay] = useState(false)
+  const activeSlideIndexRef = useRef(0)
+  const activeBirthdaySlideSlotRef = useRef<BirthdaySlideSlotId | null>(null)
+  const { currentBirthdaySlideSlot, shouldShowBirthdaySlide, markBirthdaySlideShown } = useBirthdaySlideSchedule()
 
   const carouselItems = useMemo(() => {
-    // Ordem: Looker1 → PPT1-3 → Looker2 → PPT4 → Looker3,4 → Aniversário → Pódio → PPT5-8 → Looker5
+    // Ordem: Looker1 -> PPT1-3 -> Looker2 -> PPT4 -> Looker3,4 -> Aniversario agendado -> PPT5-8 -> Looker5
     const slides = [
       // 1. Convocação (primeiro de tudo)
       { id: 100, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_0uqh1u4wqc" title="Painel de Gestão - Medicina | Convocação" />, duration: 170000 },
@@ -52,21 +56,45 @@ export function TVDashboard() {
       { id: 102, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_awpgjxuj1d" title="Painel de Gestão - Medicina | Agendamento" />, duration: 170000 },
       { id: 103, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_r7a8jh4j1d" title="Painel de Gestão - Medicina | Desempenho Agendamento" />, duration: 170000 },
 
-      // 9-10. Slides especiais
-      { id: 5, content: <AniversariantesSlide />, duration: 180000 },
-      { id: 6, content: <PodioKahootSlide />, duration: 180000 },
+      // 9. Slide especial com controle de exibicao por periodo do dia
+      ...(shouldShowBirthdaySlide
+        ? [{ id: BIRTHDAY_SLIDE_ID, content: <AniversariantesSlide />, duration: 180000 }]
+        : []),
 
-      // 11-14. PowerPoint slides 5-8
+      // 10-13. PowerPoint slides 5-8
       { id: 8, content: <PowerPointSlide5 />, duration: 30000 },
       { id: 9, content: <PowerPointSlide6 />, duration: 30000 },
       { id: 10, content: <PowerPointSlide7 />, duration: 30000 },
       { id: 11, content: <PowerPointSlide8 />, duration: 30000 },
 
-      // 15. ASOs Dados Gerais (último de tudo)
+      // 14. ASOs Dados Gerais (último de tudo)
       { id: 104, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_4mmpny8c0c" title="Painel de Gestão - Medicina | ASOs Dados Gerais" />, duration: 170000 },
     ]
     return slides
-  }, [])
+  }, [shouldShowBirthdaySlide])
+
+  const handleSlideChange = useCallback((nextIndex: number) => {
+    const previousItem = carouselItems[activeSlideIndexRef.current]
+    const nextItem = carouselItems[nextIndex]
+
+    if (previousItem?.id === BIRTHDAY_SLIDE_ID) {
+      markBirthdaySlideShown({ slotId: activeBirthdaySlideSlotRef.current })
+      activeBirthdaySlideSlotRef.current = null
+    }
+
+    if (nextItem?.id === BIRTHDAY_SLIDE_ID) {
+      activeBirthdaySlideSlotRef.current = currentBirthdaySlideSlot
+      markBirthdaySlideShown({ slotId: currentBirthdaySlideSlot, updateState: false })
+    }
+
+    activeSlideIndexRef.current = nextIndex
+  }, [carouselItems, currentBirthdaySlideSlot, markBirthdaySlideShown])
+
+  useEffect(() => {
+    if (activeSlideIndexRef.current >= carouselItems.length) {
+      activeSlideIndexRef.current = 0
+    }
+  }, [carouselItems.length])
 
   // Listener em tempo real para novos contratos
   useEffect(() => {
@@ -194,6 +222,7 @@ export function TVDashboard() {
           showPagination={false}
           showProgressBar={false}
           pauseOnMouseEnter={false}
+          onSlideChange={handleSlideChange}
         />
       </div>
 

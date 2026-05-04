@@ -29,7 +29,7 @@ export const DynamicTimerCarousel: React.FC<DynamicTimerCarouselProps> = ({
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   // Drag/swipe functionality
   const [isDragging, setIsDragging] = useState(false);
@@ -40,6 +40,13 @@ export const DynamicTimerCarousel: React.FC<DynamicTimerCarouselProps> = ({
 
   const currentItem = items[currentIndex];
   const currentDuration = currentItem?.duration || 30000; // Default 30 seconds
+
+  useEffect(() => {
+    if (items.length > 0 && currentIndex >= items.length) {
+      setCurrentIndex(0);
+      onSlideChange?.(0);
+    }
+  }, [currentIndex, items.length, onSlideChange]);
 
   const goToNext = () => {
     const nextIndex = (currentIndex + 1) % items.length;

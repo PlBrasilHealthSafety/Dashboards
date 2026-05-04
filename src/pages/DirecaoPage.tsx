@@ -1,8 +1,10 @@
-import { useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { DynamicTimerCarousel } from '@/components/custom/DynamicTimerCarousel'
 import { ScrollToTopButton } from '@/components/ui/scroll-to-top-button'
 import { ExecutiveLayoutDashboard } from '@/components/custom/ExecutiveLayoutDashboard'
 import { ImageNotificationOverlay } from '@/components/custom/ImageNotificationOverlay'
+import { BIRTHDAY_SLIDE_ID, useBirthdaySlideSchedule } from '@/hooks/useBirthdaySlideSchedule'
+import type { BirthdaySlideSlotId } from '@/hooks/useBirthdaySlideSchedule'
 
 
 import { 
@@ -17,7 +19,6 @@ import {
 } from '@/components/custom/PowerPointSlides'
 import { AniversariantesSlide } from '@/components/slides/AniversariantesSlide'
 // import { CampeoesKahootSlide } from '@/components/slides/CampeoesKahootSlide' // Slide desativado temporariamente
-import { PodioKahootSlide } from '@/components/slides/PodioKahootSlide'
 // import { ComunicadoSlide } from '@/components/slides/ComunicadoSlide' // Slide desativado temporariamente
 import { DetailedSectorAnalysis } from '@/components/custom/DetailedSectorAnalysis'
 
@@ -41,17 +42,21 @@ const evolucaoTrimestralData = [
 ]
 
 export function DirecaoPage() {
+  const activeSlideIndexRef = useRef(0)
+  const activeBirthdaySlideSlotRef = useRef<BirthdaySlideSlotId | null>(null)
+  const { currentBirthdaySlideSlot, shouldShowBirthdaySlide, markBirthdaySlideShown } = useBirthdaySlideSchedule()
 
   const carouselItems = useMemo(() => {
-    // 8 slides de PowerPoint + slides especiais (aniversariantes, campeões Kahoot, comunicado)
+    // 8 slides de PowerPoint + slide de aniversariantes controlado por periodo do dia
     const slides = [
       { id: 1, content: <PowerPointSlide1 />, duration: 30000 }, // 30 seconds
       { id: 2, content: <PowerPointSlide2 />, duration: 30000 }, // 30 seconds
       { id: 3, content: <PowerPointSlide3 />, duration: 30000 }, // 30 seconds
       { id: 4, content: <PowerPointSlide4 />, duration: 30000 }, // 30 seconds
-      { id: 5, content: <AniversariantesSlide />, duration: 180000 }, // 3 minutes (180 seconds)
+      ...(shouldShowBirthdaySlide
+        ? [{ id: BIRTHDAY_SLIDE_ID, content: <AniversariantesSlide />, duration: 180000 }]
+        : []),
       // { id: 6, content: <CampeoesKahootSlide />, duration: 180000 }, // 3 minutes (180 seconds) - Slide desativado temporariamente
-      { id: 6, content: <PodioKahootSlide />, duration: 180000 }, // 3 minutes (180 seconds)
       // { id: 8, content: <ComunicadoSlide />, duration: 180000 }, // 3 minutes (180 seconds) - Slide desativado temporariamente
       { id: 7, content: <PowerPointSlide5 />, duration: 30000 }, // 30 seconds
       { id: 9, content: <PowerPointSlide6 />, duration: 30000 }, // 30 seconds
@@ -59,7 +64,30 @@ export function DirecaoPage() {
       { id: 11, content: <PowerPointSlide8 />, duration: 30000 }, // 30 seconds
     ]
     return slides
-  }, [])
+  }, [shouldShowBirthdaySlide])
+
+  const handleSlideChange = useCallback((nextIndex: number) => {
+    const previousItem = carouselItems[activeSlideIndexRef.current]
+    const nextItem = carouselItems[nextIndex]
+
+    if (previousItem?.id === BIRTHDAY_SLIDE_ID) {
+      markBirthdaySlideShown({ slotId: activeBirthdaySlideSlotRef.current })
+      activeBirthdaySlideSlotRef.current = null
+    }
+
+    if (nextItem?.id === BIRTHDAY_SLIDE_ID) {
+      activeBirthdaySlideSlotRef.current = currentBirthdaySlideSlot
+      markBirthdaySlideShown({ slotId: currentBirthdaySlideSlot, updateState: false })
+    }
+
+    activeSlideIndexRef.current = nextIndex
+  }, [carouselItems, currentBirthdaySlideSlot, markBirthdaySlideShown])
+
+  useEffect(() => {
+    if (activeSlideIndexRef.current >= carouselItems.length) {
+      activeSlideIndexRef.current = 0
+    }
+  }, [carouselItems.length])
 
   return (
     <div className="relative min-h-screen bg-transparent">
@@ -91,6 +119,7 @@ export function DirecaoPage() {
                   showNavigation
                   showPagination
                   pauseOnMouseEnter={false}
+                  onSlideChange={handleSlideChange}
                 />
               </div>
             </div>

@@ -14,7 +14,7 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
   const [phase, setPhase] = useState<'video' | 'info'>('video')
   const [videoMuted, setVideoMuted] = useState(false) // Começar sem mute
   const videoRef = useRef<HTMLVideoElement>(null)
-  const safetyTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const safetyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Timer de segurança dinâmico baseado na duração do vídeo
   const setupSafetyTimer = (videoDuration?: number) => {
