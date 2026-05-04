@@ -4,8 +4,11 @@ import { AuthProvider } from '@/components/custom/AuthProvider'
 import { AppRoutes } from '@/routes'
 import { testFirebaseConnection } from '@/lib/firebase-test'
 import { ImageNotificationProvider } from '@/contexts/ImageNotificationContext'
+import { useBuildVersionMonitor } from '@/hooks'
 
 function App() {
+  useBuildVersionMonitor()
+
   useEffect(() => {
     // Test Firebase connection on app load (only in development)
     if (import.meta.env.DEV) {

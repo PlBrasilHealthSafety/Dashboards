@@ -1,11 +1,33 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import { fileURLToPath, URL } from 'node:url'
+
+const appVersion = process.env.npm_package_version ?? '0.0.0'
+const appBuildId = process.env.VERCEL_GIT_COMMIT_SHA ?? new Date().toISOString()
+
+const createVersionManifestPlugin = (): Plugin => ({
+  name: 'build-version-manifest',
+  generateBundle() {
+    this.emitFile({
+      type: 'asset',
+      fileName: 'version.json',
+      source: JSON.stringify(
+        {
+          appVersion,
+          buildId: appBuildId,
+          generatedAt: new Date().toISOString(),
+        },
+        null,
+        2,
+      ),
+    })
+  },
+})
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   return {
-    plugins: [react()],
+    plugins: [react(), createVersionManifestPlugin()],
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
@@ -55,7 +77,8 @@ export default defineConfig(({ mode }) => {
       ],
     },
     define: {
-      __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
+      __APP_VERSION__: JSON.stringify(appVersion),
+      __APP_BUILD_ID__: JSON.stringify(appBuildId),
     },
   }
 })
