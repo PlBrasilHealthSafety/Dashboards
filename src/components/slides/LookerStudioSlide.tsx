@@ -10,6 +10,30 @@ interface LookerStudioSlideProps {
     refreshInterval?: number
 }
 
+const LOOKER_CONNECTION_HINTS = [
+    'https://lookerstudio.google.com',
+    'https://www.gstatic.com',
+    'https://accounts.google.com',
+]
+
+const ensureConnectionHint = (rel: 'preconnect' | 'dns-prefetch', href: string) => {
+    const selector = `link[rel="${rel}"][href="${href}"]`
+
+    if (document.head.querySelector(selector)) {
+        return
+    }
+
+    const link = document.createElement('link')
+    link.rel = rel
+    link.href = href
+
+    if (rel === 'preconnect') {
+        link.crossOrigin = 'anonymous'
+    }
+
+    document.head.appendChild(link)
+}
+
 /**
  * Componente de slide que exibe um dashboard do Looker Studio via iframe.
  * 
@@ -33,6 +57,13 @@ export function LookerStudioSlide({
     const iframeWidth = 1920
     const iframeHeight = 1080
     const embedUrl = toEmbedUrl(url)
+
+    useEffect(() => {
+        LOOKER_CONNECTION_HINTS.forEach(href => {
+            ensureConnectionHint('preconnect', href)
+            ensureConnectionHint('dns-prefetch', href)
+        })
+    }, [])
 
     // Calcula escala para caber na largura da TV
     useEffect(() => {
@@ -152,6 +183,7 @@ export function LookerStudioSlide({
                         display: 'block',
                     }}
                     allowFullScreen
+                    loading="eager"
                     onLoad={handleLoad}
                     onError={handleError}
                     sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-storage-access-by-user-activation"

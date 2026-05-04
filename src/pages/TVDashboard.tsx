@@ -222,6 +222,7 @@ export function TVDashboard() {
           showPagination={false}
           showProgressBar={false}
           pauseOnMouseEnter={false}
+          preloadAhead={2}
           onSlideChange={handleSlideChange}
         />
       </div>

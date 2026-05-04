@@ -15,6 +15,7 @@ export interface DynamicTimerCarouselProps {
   showPagination?: boolean;
   showProgressBar?: boolean;
   pauseOnMouseEnter?: boolean;
+  preloadAhead?: number;
   onSlideChange?: (index: number) => void;
 }
 
@@ -25,6 +26,7 @@ export const DynamicTimerCarousel: React.FC<DynamicTimerCarouselProps> = ({
   showPagination = true,
   showProgressBar = true,
   pauseOnMouseEnter = true,
+  preloadAhead = 0,
   onSlideChange,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -40,6 +42,13 @@ export const DynamicTimerCarousel: React.FC<DynamicTimerCarouselProps> = ({
 
   const currentItem = items[currentIndex];
   const currentDuration = currentItem?.duration || 30000; // Default 30 seconds
+  const shouldRenderSlide = (index: number) => {
+    if (index === currentIndex) return true;
+    if (preloadAhead <= 0 || items.length <= 1) return false;
+
+    const distanceAhead = (index - currentIndex + items.length) % items.length;
+    return distanceAhead > 0 && distanceAhead <= preloadAhead;
+  };
 
   useEffect(() => {
     if (items.length > 0 && currentIndex >= items.length) {
@@ -227,13 +236,34 @@ export const DynamicTimerCarousel: React.FC<DynamicTimerCarouselProps> = ({
     >
       {/* Slide Content */}
       <div 
-        className="w-full h-full transition-transform duration-200 ease-out"
+        className="relative w-full h-full transition-transform duration-200 ease-out"
         style={{
           transform: isDragging ? `translateX(${dragOffset}px)` : 'translateX(0)',
           userSelect: 'none'
         }}
       >
-        {currentItem.content}
+        {items.map((item, index) => {
+          if (!shouldRenderSlide(index)) {
+            return null;
+          }
+
+          const isActive = index === currentIndex;
+
+          return (
+            <div
+              key={item.id}
+              className="absolute inset-0 w-full h-full"
+              aria-hidden={!isActive}
+              style={{
+                opacity: isActive ? 1 : 0,
+                pointerEvents: isActive ? 'auto' : 'none',
+                visibility: isActive ? 'visible' : 'hidden',
+              }}
+            >
+              {item.content}
+            </div>
+          );
+        })}
       </div>
 
       {/* Navigation Arrows */}
