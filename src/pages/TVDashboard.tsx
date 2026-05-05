@@ -29,6 +29,7 @@ export function TVDashboard() {
   const { user } = useAuth()
   const [currentContrato, setCurrentContrato] = useState<(Contrato & { id: string }) | null>(null)
   const [showOverlay, setShowOverlay] = useState(false)
+  const [isBirthdaySlideActive, setIsBirthdaySlideActive] = useState(false)
   const activeSlideIndexRef = useRef(0)
   const activeBirthdaySlideSlotRef = useRef<BirthdaySlideSlotId | null>(null)
   const { currentBirthdaySlideSlot, shouldShowBirthdaySlide, markBirthdaySlideShown } = useBirthdaySlideSchedule()
@@ -55,7 +56,7 @@ export function TVDashboard() {
       { id: 103, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_r7a8jh4j1d" title="Painel de Gestão - Medicina | Desempenho Agendamento" />, duration: 170000 },
 
       // 9. Slide especial com controle de uma exibicao por dia
-      ...(shouldShowBirthdaySlide
+      ...(shouldShowBirthdaySlide || isBirthdaySlideActive
         ? [{ id: BIRTHDAY_SLIDE_ID, content: <AniversariantesSlide />, duration: 180000 }]
         : []),
 
@@ -69,19 +70,21 @@ export function TVDashboard() {
       { id: 104, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_4mmpny8c0c" title="Painel de Gestão - Medicina | ASOs Dados Gerais" />, duration: 170000 },
     ]
     return slides
-  }, [shouldShowBirthdaySlide])
+  }, [isBirthdaySlideActive, shouldShowBirthdaySlide])
 
   const handleSlideChange = useCallback((nextIndex: number) => {
     const previousItem = carouselItems[activeSlideIndexRef.current]
     const nextItem = carouselItems[nextIndex]
 
     if (previousItem?.id === BIRTHDAY_SLIDE_ID) {
+      setIsBirthdaySlideActive(false)
       markBirthdaySlideShown({ slotId: activeBirthdaySlideSlotRef.current })
       activeBirthdaySlideSlotRef.current = null
     }
 
     if (nextItem?.id === BIRTHDAY_SLIDE_ID) {
       activeBirthdaySlideSlotRef.current = currentBirthdaySlideSlot
+      setIsBirthdaySlideActive(true)
       markBirthdaySlideShown({ slotId: currentBirthdaySlideSlot, updateState: false })
     }
 

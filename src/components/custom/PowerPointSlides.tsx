@@ -6,11 +6,13 @@ interface ImageSlideProps {
   altText: string
 }
 
+const withBuildVersion = (imagePath: string) => `${imagePath}?v=${encodeURIComponent(__APP_BUILD_ID__)}`
+
 function ImageSlide({ imagePath, altText }: ImageSlideProps) {
   return (
     <div className="relative h-full w-full bg-white overflow-hidden">
       <img 
-        src={imagePath}
+        src={withBuildVersion(imagePath)}
         alt={altText}
         className="w-full h-full object-fill"
         style={{ width: '100%', height: '100%' }}

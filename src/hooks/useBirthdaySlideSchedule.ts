@@ -6,6 +6,10 @@ export type BirthdaySlideSlotId = 'daily'
 
 type BirthdaySlideTimeSource = 'server' | 'local'
 
+interface BusinessClockSnapshot {
+  dateKey: string
+}
+
 interface MarkBirthdaySlideOptions {
   slotId?: BirthdaySlideSlotId | null
   updateState?: boolean
@@ -15,23 +19,32 @@ const CLOCK_TICK_INTERVAL_MS = 60000
 const SERVER_TIME_SYNC_INTERVAL_MS = 5 * 60000
 const SERVER_TIME_REQUEST_TIMEOUT_MS = 4000
 const BIRTHDAY_SLIDE_STORAGE_KEY = 'plbrasil:birthday-slide-shown-date'
+const BUSINESS_TIME_ZONE = 'America/Sao_Paulo'
 
 const BIRTHDAY_SLIDE_WINDOW = {
   slotId: 'daily' as const,
-  startHour: 10,
-  startMinute: 0,
-  endHour: 10,
-  endMinute: 30,
 }
 
-const minutesSinceMidnight = (date: Date) => date.getHours() * 60 + date.getMinutes()
+const businessClockFormatter = new Intl.DateTimeFormat('en-CA', {
+  timeZone: BUSINESS_TIME_ZONE,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+})
 
-const formatLocalDateKey = (date: Date) => {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
+const readBusinessClockSnapshot = (date: Date): BusinessClockSnapshot => {
+  const parts = businessClockFormatter.formatToParts(date)
 
-  return `${year}-${month}-${day}`
+  const year = parts.find((part) => part.type === 'year')?.value ?? '0000'
+  const month = parts.find((part) => part.type === 'month')?.value ?? '01'
+  const day = parts.find((part) => part.type === 'day')?.value ?? '01'
+
+  return {
+    dateKey: `${year}-${month}-${day}`,
+  }
 }
 
 const readLastShownDate = () => {
@@ -43,9 +56,9 @@ const readLastShownDate = () => {
   }
 }
 
-const writeLastShownDate = (date: Date) => {
+const writeLastShownDate = (dateKey: string) => {
   try {
-    window.localStorage.setItem(BIRTHDAY_SLIDE_STORAGE_KEY, formatLocalDateKey(date))
+    window.localStorage.setItem(BIRTHDAY_SLIDE_STORAGE_KEY, dateKey)
   } catch (error) {
     console.warn('Nao foi possivel salvar o registro local do slide de aniversariantes.', error)
   }
@@ -67,19 +80,12 @@ const readServerDateHeader = async (signal: AbortSignal) => {
   return Number.isNaN(serverDate.getTime()) ? null : serverDate
 }
 
-const isInsideBirthdaySlideWindow = (date: Date) => {
-  const currentMinute = minutesSinceMidnight(date)
-  const startMinute = BIRTHDAY_SLIDE_WINDOW.startHour * 60 + BIRTHDAY_SLIDE_WINDOW.startMinute
-  const endMinute = BIRTHDAY_SLIDE_WINDOW.endHour * 60 + BIRTHDAY_SLIDE_WINDOW.endMinute
-
-  return currentMinute >= startMinute && currentMinute < endMinute
-}
-
 export function useBirthdaySlideSchedule() {
   const [now, setNow] = useState(() => new Date())
   const [lastShownDate, setLastShownDate] = useState(() => readLastShownDate())
   const [timeSource, setTimeSource] = useState<BirthdaySlideTimeSource>('local')
   const [isTimeReady, setIsTimeReady] = useState(false)
+  const [isBirthdaySlidePresentationInProgress, setIsBirthdaySlidePresentationInProgress] = useState(false)
   const serverTimeOffsetRef = useRef<number | null>(null)
 
   const readEffectiveNow = useCallback(() => {
@@ -131,10 +137,10 @@ export function useBirthdaySlideSchedule() {
     }
   }, [readEffectiveNow, syncTimeWithServer])
 
-  const isInsideWindow = useMemo(() => isInsideBirthdaySlideWindow(now), [now])
-  const currentDateKey = useMemo(() => formatLocalDateKey(now), [now])
+  const currentClockSnapshot = useMemo(() => readBusinessClockSnapshot(now), [now])
+  const currentDateKey = currentClockSnapshot.dateKey
   const hasShownToday = lastShownDate === currentDateKey
-  const shouldShowBirthdaySlide = isTimeReady && isInsideWindow && !hasShownToday
+  const shouldShowBirthdaySlide = isBirthdaySlidePresentationInProgress || (isTimeReady && !hasShownToday)
 
   useEffect(() => {
     const storedShownDate = readLastShownDate()
@@ -142,7 +148,7 @@ export function useBirthdaySlideSchedule() {
     if (storedShownDate !== lastShownDate) {
       setLastShownDate(storedShownDate)
     }
-  }, [currentDateKey, isInsideWindow, lastShownDate])
+  }, [currentDateKey, lastShownDate])
 
   return {
     currentBirthdaySlideSlot: shouldShowBirthdaySlide ? BIRTHDAY_SLIDE_WINDOW.slotId : null,
@@ -150,13 +156,15 @@ export function useBirthdaySlideSchedule() {
     birthdaySlideTimeSource: timeSource,
     shouldShowBirthdaySlide,
     markBirthdaySlideShown: (options?: MarkBirthdaySlideOptions) => {
-      writeLastShownDate(now)
+      writeLastShownDate(currentDateKey)
+      setLastShownDate(currentDateKey)
 
       if (options?.updateState === false) {
+        setIsBirthdaySlidePresentationInProgress(true)
         return
       }
 
-      setLastShownDate(formatLocalDateKey(now))
+      setIsBirthdaySlidePresentationInProgress(false)
     },
   }
 }
