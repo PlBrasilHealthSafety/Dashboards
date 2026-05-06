@@ -2,12 +2,22 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 export const BIRTHDAY_SLIDE_ID = 'aniversariantes'
 
-export type BirthdaySlideSlotId = 'daily'
+export type BirthdaySlideSlotId = 'morning' | 'afternoon'
 
 type BirthdaySlideTimeSource = 'server' | 'local'
 
 interface BusinessClockSnapshot {
   dateKey: string
+  minutesFromStartOfDay: number
+}
+
+interface BirthdaySlideHistory {
+  dateKey: string | null
+  shownSlotIds: BirthdaySlideSlotId[]
+}
+
+type StoredBirthdaySlideHistory = Partial<BirthdaySlideHistory> & {
+  count?: number
 }
 
 interface MarkBirthdaySlideOptions {
@@ -21,9 +31,18 @@ const SERVER_TIME_REQUEST_TIMEOUT_MS = 4000
 const BIRTHDAY_SLIDE_STORAGE_KEY = 'plbrasil:birthday-slide-shown-date'
 const BUSINESS_TIME_ZONE = 'America/Sao_Paulo'
 
-const BIRTHDAY_SLIDE_WINDOW = {
-  slotId: 'daily' as const,
-}
+const BIRTHDAY_SLIDE_WINDOWS = [
+  {
+    slotId: 'morning' as const,
+    startMinute: 10 * 60,
+    endMinute: 10 * 60 + 30,
+  },
+  {
+    slotId: 'afternoon' as const,
+    startMinute: 15 * 60,
+    endMinute: 15 * 60 + 30,
+  },
+]
 
 const businessClockFormatter = new Intl.DateTimeFormat('en-CA', {
   timeZone: BUSINESS_TIME_ZONE,
@@ -41,27 +60,85 @@ const readBusinessClockSnapshot = (date: Date): BusinessClockSnapshot => {
   const year = parts.find((part) => part.type === 'year')?.value ?? '0000'
   const month = parts.find((part) => part.type === 'month')?.value ?? '01'
   const day = parts.find((part) => part.type === 'day')?.value ?? '01'
+  const hour = Number(parts.find((part) => part.type === 'hour')?.value ?? '0')
+  const minute = Number(parts.find((part) => part.type === 'minute')?.value ?? '0')
 
   return {
     dateKey: `${year}-${month}-${day}`,
+    minutesFromStartOfDay: hour * 60 + minute,
   }
 }
 
-const readLastShownDate = () => {
+const createEmptyBirthdaySlideHistory = (): BirthdaySlideHistory => ({
+  dateKey: null,
+  shownSlotIds: [],
+})
+
+const createSlotIdsFromLegacyCount = (count: number): BirthdaySlideSlotId[] => {
+  if (count >= 2) {
+    return ['morning', 'afternoon']
+  }
+
+  if (count === 1) {
+    return ['morning']
+  }
+
+  return []
+}
+
+const parseBirthdaySlideHistory = (storedValue: string | null): BirthdaySlideHistory => {
+  if (!storedValue) {
+    return createEmptyBirthdaySlideHistory()
+  }
+
   try {
-    return window.localStorage.getItem(BIRTHDAY_SLIDE_STORAGE_KEY)
+    const parsedValue = JSON.parse(storedValue) as StoredBirthdaySlideHistory
+
+    if (typeof parsedValue.dateKey === 'string') {
+      return {
+        dateKey: parsedValue.dateKey,
+        shownSlotIds: Array.isArray(parsedValue.shownSlotIds)
+          ? parsedValue.shownSlotIds.filter((slotId): slotId is BirthdaySlideSlotId => {
+              return slotId === 'morning' || slotId === 'afternoon'
+            })
+          : createSlotIdsFromLegacyCount(typeof parsedValue.count === 'number' ? parsedValue.count : 0),
+      }
+    }
+  } catch {
+    return {
+      dateKey: storedValue,
+      shownSlotIds: ['morning'],
+    }
+  }
+
+  return createEmptyBirthdaySlideHistory()
+}
+
+const readBirthdaySlideHistory = () => {
+  try {
+    return parseBirthdaySlideHistory(window.localStorage.getItem(BIRTHDAY_SLIDE_STORAGE_KEY))
   } catch (error) {
     console.warn('Nao foi possivel ler o registro local do slide de aniversariantes.', error)
-    return null
+    return createEmptyBirthdaySlideHistory()
   }
 }
 
-const writeLastShownDate = (dateKey: string) => {
+const writeBirthdaySlideHistory = (history: BirthdaySlideHistory) => {
   try {
-    window.localStorage.setItem(BIRTHDAY_SLIDE_STORAGE_KEY, dateKey)
+    window.localStorage.setItem(BIRTHDAY_SLIDE_STORAGE_KEY, JSON.stringify(history))
   } catch (error) {
     console.warn('Nao foi possivel salvar o registro local do slide de aniversariantes.', error)
   }
+}
+
+const areBirthdaySlideHistoriesEqual = (left: BirthdaySlideHistory, right: BirthdaySlideHistory) => {
+  return left.dateKey === right.dateKey && left.shownSlotIds.join('|') === right.shownSlotIds.join('|')
+}
+
+const readBirthdaySlideWindow = (minutesFromStartOfDay: number) => {
+  return BIRTHDAY_SLIDE_WINDOWS.find((window) => {
+    return minutesFromStartOfDay >= window.startMinute && minutesFromStartOfDay < window.endMinute
+  })
 }
 
 const readServerDateHeader = async (signal: AbortSignal) => {
@@ -82,7 +159,7 @@ const readServerDateHeader = async (signal: AbortSignal) => {
 
 export function useBirthdaySlideSchedule() {
   const [now, setNow] = useState(() => new Date())
-  const [lastShownDate, setLastShownDate] = useState(() => readLastShownDate())
+  const [birthdaySlideHistory, setBirthdaySlideHistory] = useState(() => readBirthdaySlideHistory())
   const [timeSource, setTimeSource] = useState<BirthdaySlideTimeSource>('local')
   const [isTimeReady, setIsTimeReady] = useState(false)
   const [isBirthdaySlidePresentationInProgress, setIsBirthdaySlidePresentationInProgress] = useState(false)
@@ -139,28 +216,44 @@ export function useBirthdaySlideSchedule() {
 
   const currentClockSnapshot = useMemo(() => readBusinessClockSnapshot(now), [now])
   const currentDateKey = currentClockSnapshot.dateKey
-  const hasShownToday = lastShownDate === currentDateKey
-  const shouldShowBirthdaySlide = isBirthdaySlidePresentationInProgress || (isTimeReady && !hasShownToday)
+  const currentBirthdaySlideWindow = readBirthdaySlideWindow(currentClockSnapshot.minutesFromStartOfDay)
+  const shownSlotIdsToday = birthdaySlideHistory.dateKey === currentDateKey ? birthdaySlideHistory.shownSlotIds : []
+  const hasShownCurrentSlot = currentBirthdaySlideWindow
+    ? shownSlotIdsToday.includes(currentBirthdaySlideWindow.slotId)
+    : true
+  const shouldShowBirthdaySlide = isBirthdaySlidePresentationInProgress || (isTimeReady && !hasShownCurrentSlot)
 
   useEffect(() => {
-    const storedShownDate = readLastShownDate()
+    const storedHistory = readBirthdaySlideHistory()
 
-    if (storedShownDate !== lastShownDate) {
-      setLastShownDate(storedShownDate)
+    if (!areBirthdaySlideHistoriesEqual(storedHistory, birthdaySlideHistory)) {
+      setBirthdaySlideHistory(storedHistory)
     }
-  }, [currentDateKey, lastShownDate])
+  }, [currentDateKey, birthdaySlideHistory])
+
+  const markBirthdaySlidePresentationStarted = () => {
+    if (!currentBirthdaySlideWindow) {
+      return
+    }
+
+    const nextHistory = {
+      dateKey: currentDateKey,
+      shownSlotIds: Array.from(new Set([...shownSlotIdsToday, currentBirthdaySlideWindow.slotId])),
+    }
+
+    writeBirthdaySlideHistory(nextHistory)
+    setBirthdaySlideHistory(nextHistory)
+    setIsBirthdaySlidePresentationInProgress(true)
+  }
 
   return {
-    currentBirthdaySlideSlot: shouldShowBirthdaySlide ? BIRTHDAY_SLIDE_WINDOW.slotId : null,
+    currentBirthdaySlideSlot: shouldShowBirthdaySlide ? currentBirthdaySlideWindow?.slotId ?? null : null,
     isUsingServerTime: timeSource === 'server',
     birthdaySlideTimeSource: timeSource,
     shouldShowBirthdaySlide,
     markBirthdaySlideShown: (options?: MarkBirthdaySlideOptions) => {
-      writeLastShownDate(currentDateKey)
-      setLastShownDate(currentDateKey)
-
       if (options?.updateState === false) {
-        setIsBirthdaySlidePresentationInProgress(true)
+        markBirthdaySlidePresentationStarted()
         return
       }
 

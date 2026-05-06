@@ -55,7 +55,7 @@ export function TVDashboard() {
       { id: 102, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_awpgjxuj1d" title="Painel de Gestão - Medicina | Agendamento" />, duration: 170000 },
       { id: 103, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_r7a8jh4j1d" title="Painel de Gestão - Medicina | Desempenho Agendamento" />, duration: 170000 },
 
-      // 9. Slide especial com controle de uma exibicao por dia
+      // 9. Slide especial com controle por janelas da manha e da tarde
       ...(shouldShowBirthdaySlide || isBirthdaySlideActive
         ? [{ id: BIRTHDAY_SLIDE_ID, content: <AniversariantesSlide />, duration: 180000 }]
         : []),

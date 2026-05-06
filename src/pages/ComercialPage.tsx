@@ -38,7 +38,7 @@ export function ComercialPage() {
   const { currentBirthdaySlideSlot, shouldShowBirthdaySlide, markBirthdaySlideShown } = useBirthdaySlideSchedule()
 
   const carouselItems = useMemo(() => {
-    // 8 slides de PowerPoint + slide de aniversariantes com uma exibicao por dia
+    // 8 slides de PowerPoint + slide de aniversariantes nas janelas da manha e da tarde
     const slides = [
       { id: 1, content: <PowerPointSlide1 />, duration: 30000 }, // 30 seconds
       { id: 2, content: <PowerPointSlide2 />, duration: 30000 }, // 30 seconds
