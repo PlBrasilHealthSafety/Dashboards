@@ -22,7 +22,8 @@ export class ContratosService extends FirestoreService<Contrato> {
       nomeFantasia,
       dataInicioContrato,
       userId,
-      displayedOnTV: false
+      displayedOnTV: false,
+      tvOverlayLockExpiresAt: null
     });
   }
 

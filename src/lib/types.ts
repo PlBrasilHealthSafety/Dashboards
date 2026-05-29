@@ -45,6 +45,7 @@ export interface Contrato extends FirestoreDocument {
   dataInicioContrato: string;
   userId: string;
   displayedOnTV: boolean;
+  tvOverlayLockExpiresAt?: Timestamp | Date | null;
 }
 
 // Aniversariante document type

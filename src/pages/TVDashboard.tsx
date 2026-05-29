@@ -24,6 +24,38 @@ import type { BirthdaySlideSlotId } from '@/hooks/useBirthdaySlideSchedule'
 import { getUserRoute } from '@/lib/utils'
 import type { Contrato } from '@/lib/types'
 
+const CONTRATO_OVERLAY_SHOW_DELAY_MS = 60000
+const CONTRATO_OVERLAY_INFO_DURATION_MS = 2 * 60 * 1000
+const CONTRATO_OVERLAY_RECOVERY_BUFFER_MS = 60000
+const CONTRATO_OVERLAY_LOCK_DURATION_MS =
+  CONTRATO_OVERLAY_SHOW_DELAY_MS + CONTRATO_OVERLAY_INFO_DURATION_MS + CONTRATO_OVERLAY_RECOVERY_BUFFER_MS
+
+const readContratoOverlayLockExpiresAt = (value: Contrato['tvOverlayLockExpiresAt']): number | null => {
+  if (!value) {
+    return null
+  }
+
+  if (value instanceof Date) {
+    return value.getTime()
+  }
+
+  if (typeof value === 'string') {
+    const parsedValue = new Date(value)
+    return Number.isNaN(parsedValue.getTime()) ? null : parsedValue.getTime()
+  }
+
+  if (typeof value === 'object' && 'toMillis' in value && typeof value.toMillis === 'function') {
+    return value.toMillis()
+  }
+
+  return null
+}
+
+const isContratoOverlayLocked = (contrato: Contrato) => {
+  const expiresAt = readContratoOverlayLockExpiresAt(contrato.tvOverlayLockExpiresAt)
+  return expiresAt !== null && expiresAt > Date.now()
+}
+
 export function TVDashboard() {
   const navigate = useNavigate()
   const { user } = useAuth()
@@ -32,7 +64,49 @@ export function TVDashboard() {
   const [isBirthdaySlideActive, setIsBirthdaySlideActive] = useState(false)
   const activeSlideIndexRef = useRef(0)
   const activeBirthdaySlideSlotRef = useRef<BirthdaySlideSlotId | null>(null)
+  const currentContratoRef = useRef<(Contrato & { id: string }) | null>(null)
+  const overlayDelayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pendingContratoClaimIdRef = useRef<string | null>(null)
   const { currentBirthdaySlideSlot, shouldShowBirthdaySlide, markBirthdaySlideShown } = useBirthdaySlideSchedule()
+
+  const clearOverlayDelayTimer = useCallback(() => {
+    if (overlayDelayTimerRef.current) {
+      window.clearTimeout(overlayDelayTimerRef.current)
+      overlayDelayTimerRef.current = null
+    }
+  }, [])
+
+  const markContratoAsDisplayed = useCallback(async (contratoId: string) => {
+    try {
+      const { doc, updateDoc } = await import('firebase/firestore')
+      const { db } = await import('@/lib/firebase')
+
+      await updateDoc(doc(db, 'contratos', contratoId), {
+        displayedOnTV: true,
+        tvOverlayLockExpiresAt: null,
+        updatedAt: new Date()
+      })
+    } catch (error) {
+      console.error('TVDashboard: Erro ao marcar contrato como exibido no inicio do overlay:', error)
+    }
+  }, [])
+
+  const claimContratoOverlay = useCallback(async (contratoId: string) => {
+    try {
+      const { doc, updateDoc } = await import('firebase/firestore')
+      const { db } = await import('@/lib/firebase')
+
+      await updateDoc(doc(db, 'contratos', contratoId), {
+        tvOverlayLockExpiresAt: new Date(Date.now() + CONTRATO_OVERLAY_LOCK_DURATION_MS),
+        updatedAt: new Date()
+      })
+
+      return true
+    } catch (error) {
+      console.error('TVDashboard: Erro ao registrar lock persistido do overlay de contrato:', error)
+      return false
+    }
+  }, [])
 
   const carouselItems = useMemo(() => {
     // Ordem: Looker1 -> PPT1-3 -> Looker2 -> PPT4 -> Looker3,4 -> aniversario agendado -> PPT5-8 -> Looker5
@@ -92,10 +166,21 @@ export function TVDashboard() {
   }, [carouselItems, currentBirthdaySlideSlot, markBirthdaySlideShown])
 
   useEffect(() => {
+    currentContratoRef.current = currentContrato
+  }, [currentContrato])
+
+  useEffect(() => {
     if (activeSlideIndexRef.current >= carouselItems.length) {
       activeSlideIndexRef.current = 0
     }
   }, [carouselItems.length])
+
+  useEffect(() => {
+    return () => {
+      pendingContratoClaimIdRef.current = null
+      clearOverlayDelayTimer()
+    }
+  }, [clearOverlayDelayTimer])
 
   // Listener em tempo real para novos contratos
   useEffect(() => {
@@ -118,7 +203,17 @@ export function TVDashboard() {
           // Filtrar contratos não exibidos
           const contratosNaoExibidos = snapshot.docs
             .map(doc => ({ id: doc.id, ...doc.data() } as Contrato & { id: string }))
-            .filter(contrato => contrato.displayedOnTV === false)
+            .filter(contrato => {
+              if (contrato.displayedOnTV !== false) {
+                return false
+              }
+
+              if (pendingContratoClaimIdRef.current === contrato.id) {
+                return false
+              }
+
+              return !isContratoOverlayLocked(contrato)
+            })
             .sort((a, b) => {
               // Ordenar por createdAt se disponível
               if (a.createdAt && b.createdAt) {
@@ -129,18 +224,32 @@ export function TVDashboard() {
 
           console.log('TVDashboard: Contratos não exibidos encontrados:', contratosNaoExibidos.length)
 
-          if (contratosNaoExibidos.length > 0 && !currentContrato) {
+          if (contratosNaoExibidos.length > 0 && !currentContratoRef.current && !pendingContratoClaimIdRef.current) {
             const contrato = contratosNaoExibidos[0]
             console.log('TVDashboard: Novo contrato detectado:', contrato)
-            setCurrentContrato(contrato)
+            pendingContratoClaimIdRef.current = contrato.id
 
-            // Delay de 1 minuto antes de mostrar o overlay
-            setTimeout(() => {
-              setShowOverlay(true)
-            }, 60000) // 1 minuto
+            void (async () => {
+              const claimSucceeded = await claimContratoOverlay(contrato.id)
+              pendingContratoClaimIdRef.current = null
+
+              if (!claimSucceeded || currentContratoRef.current) {
+                return
+              }
+
+              currentContratoRef.current = contrato
+              setCurrentContrato(contrato)
+
+              // Delay de 1 minuto antes de mostrar o overlay
+              clearOverlayDelayTimer()
+              overlayDelayTimerRef.current = window.setTimeout(() => {
+                void markContratoAsDisplayed(contrato.id)
+                setShowOverlay(true)
+              }, CONTRATO_OVERLAY_SHOW_DELAY_MS)
+            })()
           } else if (contratosNaoExibidos.length === 0) {
             console.log('TVDashboard: Nenhum contrato pendente encontrado')
-          } else if (currentContrato) {
+          } else if (currentContratoRef.current) {
             console.log('TVDashboard: Já existe um contrato sendo exibido')
           }
         })
@@ -152,11 +261,13 @@ export function TVDashboard() {
     setupListener()
 
     return () => {
+      pendingContratoClaimIdRef.current = null
+      clearOverlayDelayTimer()
       if (unsubscribe) {
         unsubscribe()
       }
     }
-  }, [currentContrato])
+  }, [claimContratoOverlay, clearOverlayDelayTimer, markContratoAsDisplayed])
 
   // Listener para tecla ESC
   useEffect(() => {
@@ -175,6 +286,8 @@ export function TVDashboard() {
 
   const handleNotificationComplete = async () => {
     if (currentContrato) {
+      clearOverlayDelayTimer()
+
       try {
         // Marcar contrato como exibido na TV
         const { doc, updateDoc } = await import('firebase/firestore')
@@ -182,13 +295,16 @@ export function TVDashboard() {
 
         await updateDoc(doc(db, 'contratos', currentContrato.id), {
           displayedOnTV: true,
+          tvOverlayLockExpiresAt: null,
           updatedAt: new Date()
         })
 
+        currentContratoRef.current = null
         setCurrentContrato(null)
         setShowOverlay(false)
       } catch (error) {
         console.error('Erro ao marcar contrato como exibido:', error)
+        currentContratoRef.current = null
         setCurrentContrato(null)
         setShowOverlay(false)
       }

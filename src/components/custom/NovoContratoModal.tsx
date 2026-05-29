@@ -79,6 +79,7 @@ export function NovoContratoModal({ isOpen, onClose }: NovoContratoModalProps) {
         dataInicioContrato: dataInicioContrato.trim(),
         userId: user.uid,
         displayedOnTV: false, // Novo campo para controlar exibição na TV
+        tvOverlayLockExpiresAt: null,
       }
       
       // Salvar no Firestore usando o serviço - a TV detectará automaticamente
