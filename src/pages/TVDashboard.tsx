@@ -189,43 +189,41 @@ export function TVDashboard() {
     const setupListener = async () => {
       try {
         console.log('TVDashboard: Configurando listener do Firestore...')
-        const { collection, onSnapshot } = await import('firebase/firestore')
+        const { collection, onSnapshot, query, where } = await import('firebase/firestore')
         const { db } = await import('@/lib/firebase')
 
-        // Escutar todos os contratos (simplificado para debug)
-        const q = collection(db, 'contratos')
+        const q = query(
+          collection(db, 'contratos'),
+          where('displayedOnTV', '==', false)
+        )
+        let isInitialSnapshot = true
 
         console.log('TVDashboard: Query configurada, iniciando listener...')
 
         unsubscribe = onSnapshot(q, (snapshot) => {
-          console.log('TVDashboard: Listener ativado, total de documentos:', snapshot.size)
+          console.log('TVDashboard: Listener ativado, contratos pendentes na query:', snapshot.size)
 
-          // Filtrar contratos não exibidos
-          const contratosNaoExibidos = snapshot.docs
-            .map(doc => ({ id: doc.id, ...doc.data() } as Contrato & { id: string }))
-            .filter(contrato => {
-              if (contrato.displayedOnTV !== false) {
-                return false
-              }
+          if (isInitialSnapshot) {
+            isInitialSnapshot = false
+            console.log('TVDashboard: Carga inicial ignorada para evitar aviso ao abrir/reiniciar a TV')
+            return
+          }
 
-              if (pendingContratoClaimIdRef.current === contrato.id) {
-                return false
-              }
-
-              return !isContratoOverlayLocked(contrato)
-            })
+          const contratosAdicionados = snapshot.docChanges()
+            .filter(change => change.type === 'added')
+            .map(change => ({ id: change.doc.id, ...change.doc.data() } as Contrato & { id: string }))
+            .filter(contrato => !isContratoOverlayLocked(contrato))
             .sort((a, b) => {
-              // Ordenar por createdAt se disponível
               if (a.createdAt && b.createdAt) {
                 return b.createdAt.toMillis() - a.createdAt.toMillis()
               }
               return 0
             })
 
-          console.log('TVDashboard: Contratos não exibidos encontrados:', contratosNaoExibidos.length)
+          console.log('TVDashboard: Novos contratos adicionados após a TV abrir:', contratosAdicionados.length)
 
-          if (contratosNaoExibidos.length > 0 && !currentContratoRef.current && !pendingContratoClaimIdRef.current) {
-            const contrato = contratosNaoExibidos[0]
+          if (contratosAdicionados.length > 0 && !currentContratoRef.current && !pendingContratoClaimIdRef.current) {
+            const contrato = contratosAdicionados[0]
             console.log('TVDashboard: Novo contrato detectado:', contrato)
             pendingContratoClaimIdRef.current = contrato.id
 
@@ -247,8 +245,8 @@ export function TVDashboard() {
                 setShowOverlay(true)
               }, CONTRATO_OVERLAY_SHOW_DELAY_MS)
             })()
-          } else if (contratosNaoExibidos.length === 0) {
-            console.log('TVDashboard: Nenhum contrato pendente encontrado')
+          } else if (contratosAdicionados.length === 0) {
+            console.log('TVDashboard: Nenhum contrato novo detectado nesta atualização')
           } else if (currentContratoRef.current) {
             console.log('TVDashboard: Já existe um contrato sendo exibido')
           }
@@ -282,7 +280,7 @@ export function TVDashboard() {
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [navigate])
+  }, [navigate, user?.email])
 
   const handleNotificationComplete = async () => {
     if (currentContrato) {
