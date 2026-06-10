@@ -39,6 +39,41 @@ export const DynamicTimerCarousel: React.FC<DynamicTimerCarouselProps> = ({
   const [currentX, setCurrentX] = useState(0);
   const [dragOffset, setDragOffset] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const previousItemsRef = useRef(items);
+
+  const findRemappedIndex = (
+    previousItems: DynamicCarouselItem[],
+    previousIndex: number,
+    nextItems: DynamicCarouselItem[],
+  ) => {
+    if (nextItems.length === 0) {
+      return 0;
+    }
+
+    const currentId = previousItems[previousIndex]?.id;
+    if (currentId !== undefined) {
+      const sameSlideIndex = nextItems.findIndex((item) => item.id === currentId);
+      if (sameSlideIndex >= 0) {
+        return sameSlideIndex;
+      }
+    }
+
+    for (let index = previousIndex + 1; index < previousItems.length; index += 1) {
+      const nextSlideIndex = nextItems.findIndex((item) => item.id === previousItems[index].id);
+      if (nextSlideIndex >= 0) {
+        return nextSlideIndex;
+      }
+    }
+
+    for (let index = previousIndex - 1; index >= 0; index -= 1) {
+      const nextSlideIndex = nextItems.findIndex((item) => item.id === previousItems[index].id);
+      if (nextSlideIndex >= 0) {
+        return nextSlideIndex;
+      }
+    }
+
+    return Math.min(previousIndex, nextItems.length - 1);
+  };
 
   const currentItem = items[currentIndex];
   const currentDuration = currentItem?.duration || 30000; // Default 30 seconds
@@ -56,6 +91,21 @@ export const DynamicTimerCarousel: React.FC<DynamicTimerCarouselProps> = ({
       onSlideChange?.(0);
     }
   }, [currentIndex, items.length, onSlideChange]);
+
+  useEffect(() => {
+    const previousItems = previousItemsRef.current;
+    if (previousItems === items) {
+      return;
+    }
+
+    const remappedIndex = findRemappedIndex(previousItems, currentIndex, items);
+    previousItemsRef.current = items;
+
+    if (remappedIndex !== currentIndex) {
+      setCurrentIndex(remappedIndex);
+      onSlideChange?.(remappedIndex);
+    }
+  }, [currentIndex, items, onSlideChange]);
 
   const goToNext = () => {
     const nextIndex = (currentIndex + 1) % items.length;
@@ -91,6 +141,19 @@ export const DynamicTimerCarousel: React.FC<DynamicTimerCarouselProps> = ({
     if (timerRef.current) {
       clearTimeout(timerRef.current);
       console.log('🗑️ Cleared existing timer');
+    }
+
+    if (currentDuration <= 200) {
+      console.log(`⏭️ Slide ${currentIndex} com duração curta (${currentDuration}ms) - avançando`);
+      timerRef.current = setTimeout(() => {
+        goToNext();
+      }, currentDuration);
+
+      return () => {
+        if (timerRef.current) {
+          clearTimeout(timerRef.current);
+        }
+      };
     }
 
     // Set new timer with current slide's duration

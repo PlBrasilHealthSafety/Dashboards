@@ -208,7 +208,7 @@ export function TVDashboard() {
     const previousItem = carouselItems[activeSlideIndexRef.current]
     const nextItem = carouselItems[nextIndex]
 
-    if (previousItem && isLookerCarouselId(previousItem.id)) {
+    if (previousItem && isLookerCarouselId(previousItem.id) && shouldShowLookerSlides) {
       handleLookerSlideExit(getLookerDashboardIdFromCarouselId(previousItem.id))
     }
 
@@ -218,7 +218,7 @@ export function TVDashboard() {
       activeBirthdaySlideSlotRef.current = null
     }
 
-    if (nextItem && isLookerCarouselId(nextItem.id)) {
+    if (nextItem && isLookerCarouselId(nextItem.id) && shouldShowLookerSlides) {
       handleLookerSlideEnter(getLookerDashboardIdFromCarouselId(nextItem.id))
     }
 
@@ -229,7 +229,7 @@ export function TVDashboard() {
     }
 
     activeSlideIndexRef.current = nextIndex
-  }, [carouselItems, currentBirthdaySlideSlot, handleLookerSlideEnter, handleLookerSlideExit, markBirthdaySlideShown])
+  }, [carouselItems, currentBirthdaySlideSlot, handleLookerSlideEnter, handleLookerSlideExit, markBirthdaySlideShown, shouldShowLookerSlides])
 
   useEffect(() => {
     currentContratoRef.current = currentContrato
