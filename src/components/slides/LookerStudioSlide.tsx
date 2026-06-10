@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { toEmbedUrl } from '@/lib/lookerConfig'
+import { isLookerEmbedLoaded, markLookerEmbedLoaded, prefetchLookerEmbed } from '@/lib/looker-preload-cache'
 
 interface LookerStudioSlideProps {
     /** URL do relatório no Looker Studio */
@@ -48,7 +49,8 @@ export function LookerStudioSlide({
     title,
     refreshInterval = 300000,
 }: LookerStudioSlideProps) {
-    const [isLoading, setIsLoading] = useState(true)
+    const embedUrl = toEmbedUrl(url)
+    const [isLoading, setIsLoading] = useState(() => !isLookerEmbedLoaded(url))
     const [hasError, setHasError] = useState(false)
     const [refreshKey, setRefreshKey] = useState(0)
     const containerRef = useRef<HTMLDivElement>(null)
@@ -56,14 +58,14 @@ export function LookerStudioSlide({
 
     const iframeWidth = 1920
     const iframeHeight = 1080
-    const embedUrl = toEmbedUrl(url)
 
     useEffect(() => {
         LOOKER_CONNECTION_HINTS.forEach(href => {
             ensureConnectionHint('preconnect', href)
             ensureConnectionHint('dns-prefetch', href)
         })
-    }, [])
+        prefetchLookerEmbed(url)
+    }, [url])
 
     // Calcula escala para caber na largura da TV
     useEffect(() => {
@@ -79,21 +81,32 @@ export function LookerStudioSlide({
         return () => window.removeEventListener('resize', updateScale)
     }, [])
 
-    // Auto-refresh
+    // Auto-refresh (desligado no Modo TV com refreshInterval={0})
     useEffect(() => {
-        const timer = setInterval(() => {
+        if (refreshInterval <= 0) {
+            return
+        }
+
+        const timer = window.setInterval(() => {
             setRefreshKey(prev => prev + 1)
             setIsLoading(true)
             setHasError(false)
         }, refreshInterval)
 
-        return () => clearInterval(timer)
+        return () => window.clearInterval(timer)
     }, [refreshInterval])
 
+    useEffect(() => {
+        if (isLookerEmbedLoaded(url)) {
+            setIsLoading(false)
+        }
+    }, [url])
+
     const handleLoad = useCallback(() => {
+        markLookerEmbedLoaded(url)
         setIsLoading(false)
         setHasError(false)
-    }, [])
+    }, [url])
 
     const handleError = useCallback(() => {
         setIsLoading(false)
@@ -179,7 +192,7 @@ export function LookerStudioSlide({
                         height: `${iframeHeight}px`,
                         border: 'none',
                         opacity: isLoading ? 0 : 1,
-                        transition: 'opacity 0.8s ease-in-out',
+                        transition: 'opacity 0.35s ease-in-out',
                         display: 'block',
                     }}
                     allowFullScreen

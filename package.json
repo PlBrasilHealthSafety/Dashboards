@@ -17,6 +17,7 @@
     "test": "echo \"No tests configured yet\"",
     "firebase:emulators": "firebase emulators:start",
     "firebase:deploy": "firebase deploy --only firestore:rules,firestore:indexes",
+    "firebase:delete-contratos": "node scripts/delete-all-contratos.mjs",
     "vercel:setup": "node scripts/setup-vercel-env.js",
     "vercel:deploy": "vercel --prod",
     "vercel:preview": "vercel",

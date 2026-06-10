@@ -1,6 +1,6 @@
 import { useMemo, useEffect, useState, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { DynamicTimerCarousel } from '@/components/custom/DynamicTimerCarousel'
+import { DynamicTimerCarousel, type DynamicCarouselItem } from '@/components/custom/DynamicTimerCarousel'
 
 
 import {
@@ -15,16 +15,29 @@ import {
 } from '@/components/custom/PowerPointSlides'
 import { AniversariantesSlide } from '@/components/slides/AniversariantesSlide'
 import { LookerStudioSlide } from '@/components/slides/LookerStudioSlide'
+import { LookerDashboardPreloader } from '@/components/slides/LookerDashboardPreloader'
 import { ContratoNotificationOverlay } from '@/components/custom/ContratoNotificationOverlay'
 import { ImageNotificationOverlay } from '@/components/custom/ImageNotificationOverlay'
 import { X } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { BIRTHDAY_SLIDE_ID, useBirthdaySlideSchedule } from '@/hooks/useBirthdaySlideSchedule'
 import type { BirthdaySlideSlotId } from '@/hooks/useBirthdaySlideSchedule'
+import { useLookerSlideSchedule } from '@/hooks/useLookerSlideSchedule'
 import { getUserRoute } from '@/lib/utils'
 import type { Contrato } from '@/lib/types'
+import { isContratoCreatedAfter, isContratoTooOldToDisplay } from '@/lib/tv-contrato-guard'
+import {
+  getLookerCarouselId,
+  getLookerDashboardIdFromCarouselId,
+  isLookerCarouselId,
+  LOOKER_DASHBOARD_MAP,
+  TV_MODE_CAROUSEL_LAYOUT,
+} from '@/lib/lookerConfig'
+
+type BrowserTimeoutHandle = number
 
 const CONTRATO_OVERLAY_SHOW_DELAY_MS = 60000
+const CONTRATO_LISTENER_BOOTSTRAP_TIMEOUT_MS = 8000
 const CONTRATO_OVERLAY_INFO_DURATION_MS = 2 * 60 * 1000
 const CONTRATO_OVERLAY_RECOVERY_BUFFER_MS = 60000
 const CONTRATO_OVERLAY_LOCK_DURATION_MS =
@@ -56,6 +69,17 @@ const isContratoOverlayLocked = (contrato: Contrato) => {
   return expiresAt !== null && expiresAt > Date.now()
 }
 
+const PPT_SLIDE_COMPONENTS = {
+  1: PowerPointSlide1,
+  2: PowerPointSlide2,
+  3: PowerPointSlide3,
+  4: PowerPointSlide4,
+  5: PowerPointSlide5,
+  6: PowerPointSlide6,
+  7: PowerPointSlide7,
+  8: PowerPointSlide8,
+} as const
+
 export function TVDashboard() {
   const navigate = useNavigate()
   const { user } = useAuth()
@@ -65,9 +89,21 @@ export function TVDashboard() {
   const activeSlideIndexRef = useRef(0)
   const activeBirthdaySlideSlotRef = useRef<BirthdaySlideSlotId | null>(null)
   const currentContratoRef = useRef<(Contrato & { id: string }) | null>(null)
-  const overlayDelayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const overlayDelayTimerRef = useRef<BrowserTimeoutHandle | null>(null)
   const pendingContratoClaimIdRef = useRef<string | null>(null)
-  const { currentBirthdaySlideSlot, shouldShowBirthdaySlide, markBirthdaySlideShown } = useBirthdaySlideSchedule()
+  const {
+    clockSnapshot,
+    isTimeReady,
+    currentBirthdaySlideSlot,
+    shouldShowBirthdaySlide,
+    markBirthdaySlideShown,
+  } = useBirthdaySlideSchedule()
+
+  const {
+    shouldShowLookerSlides,
+    handleLookerSlideEnter,
+    handleLookerSlideExit,
+  } = useLookerSlideSchedule({ clockSnapshot, isTimeReady })
 
   const clearOverlayDelayTimer = useCallback(() => {
     if (overlayDelayTimerRef.current) {
@@ -91,12 +127,30 @@ export function TVDashboard() {
     }
   }, [])
 
+  const dismissContratoFromTVQueue = useCallback(async (contratoId: string, reason: string) => {
+    try {
+      const { doc, updateDoc } = await import('firebase/firestore')
+      const { db } = await import('@/lib/firebase')
+
+      await updateDoc(doc(db, 'contratos', contratoId), {
+        displayedOnTV: true,
+        tvOverlayLockExpiresAt: null,
+        updatedAt: new Date()
+      })
+
+      console.log(`TVDashboard: Contrato ${contratoId} removido da fila da TV (${reason})`)
+    } catch (error) {
+      console.error(`TVDashboard: Erro ao remover contrato ${contratoId} da fila da TV:`, error)
+    }
+  }, [])
+
   const claimContratoOverlay = useCallback(async (contratoId: string) => {
     try {
       const { doc, updateDoc } = await import('firebase/firestore')
       const { db } = await import('@/lib/firebase')
 
       await updateDoc(doc(db, 'contratos', contratoId), {
+        displayedOnTV: true,
         tvOverlayLockExpiresAt: new Date(Date.now() + CONTRATO_OVERLAY_LOCK_DURATION_MS),
         updatedAt: new Date()
       })
@@ -108,52 +162,64 @@ export function TVDashboard() {
     }
   }, [])
 
-  const carouselItems = useMemo(() => {
-    // Ordem: Looker1 -> PPT1-3 -> Looker2 -> PPT4 -> Looker3,4 -> aniversario agendado -> PPT5-8 -> Looker5
-    const slides = [
-      // 1. Convocação (primeiro de tudo)
-      { id: 100, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_0uqh1u4wqc" title="Painel de Gestão - Medicina | Convocação" />, duration: 170000 },
+  const carouselItems = useMemo((): DynamicCarouselItem[] => {
+    return TV_MODE_CAROUSEL_LAYOUT.flatMap((entry): DynamicCarouselItem[] => {
+      if (entry.kind === 'ppt') {
+        const SlideComponent = PPT_SLIDE_COMPONENTS[entry.slide]
+        return [{
+          id: entry.slide,
+          content: <SlideComponent />,
+          duration: 30000,
+        }]
+      }
 
-      // 2-4. PowerPoint slides 1-3
-      { id: 1, content: <PowerPointSlide1 />, duration: 30000 },
-      { id: 2, content: <PowerPointSlide2 />, duration: 30000 },
-      { id: 3, content: <PowerPointSlide3 />, duration: 30000 },
+      if (entry.kind === 'birthday') {
+        if (!shouldShowBirthdaySlide && !isBirthdaySlideActive) {
+          return []
+        }
 
-      // 5. Liberação Dados Gerais (após slide 3)
-      { id: 101, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_yh591qsi1d" title="Painel de Gestão - Medicina | Liberação Dados Gerais" />, duration: 170000 },
+        return [{
+          id: BIRTHDAY_SLIDE_ID,
+          content: <AniversariantesSlide />,
+          duration: 180000,
+        }]
+      }
 
-      // 6. PowerPoint slide 4
-      { id: 4, content: <PowerPointSlide4 />, duration: 30000 },
+      const dashboard = LOOKER_DASHBOARD_MAP[entry.dashboardId]
+      if (!dashboard || !shouldShowLookerSlides) {
+        return []
+      }
 
-      // 7-8. Agendamento + Desempenho Agendamento (antes do aniversário)
-      { id: 102, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_awpgjxuj1d" title="Painel de Gestão - Medicina | Agendamento" />, duration: 170000 },
-      { id: 103, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_r7a8jh4j1d" title="Painel de Gestão - Medicina | Desempenho Agendamento" />, duration: 170000 },
-
-      // 9. Slide especial com controle por janelas da manha e da tarde
-      ...(shouldShowBirthdaySlide || isBirthdaySlideActive
-        ? [{ id: BIRTHDAY_SLIDE_ID, content: <AniversariantesSlide />, duration: 180000 }]
-        : []),
-
-      // 10-13. PowerPoint slides 5-8
-      { id: 8, content: <PowerPointSlide5 />, duration: 30000 },
-      { id: 9, content: <PowerPointSlide6 />, duration: 30000 },
-      { id: 10, content: <PowerPointSlide7 />, duration: 30000 },
-      { id: 11, content: <PowerPointSlide8 />, duration: 30000 },
-
-      // 14. ASOs Dados Gerais (último de tudo)
-      { id: 104, content: <LookerStudioSlide url="https://lookerstudio.google.com/reporting/2de67f3b-73c4-4f68-a838-d51840abbad6/page/p_4mmpny8c0c" title="Painel de Gestão - Medicina | ASOs Dados Gerais" />, duration: 170000 },
-    ]
-    return slides
-  }, [isBirthdaySlideActive, shouldShowBirthdaySlide])
+      return [{
+        id: getLookerCarouselId(entry.dashboardId),
+        content: (
+          <LookerStudioSlide
+            url={dashboard.url}
+            title={dashboard.title}
+            refreshInterval={0}
+          />
+        ),
+        duration: dashboard.duration,
+      }]
+    })
+  }, [isBirthdaySlideActive, shouldShowBirthdaySlide, shouldShowLookerSlides])
 
   const handleSlideChange = useCallback((nextIndex: number) => {
     const previousItem = carouselItems[activeSlideIndexRef.current]
     const nextItem = carouselItems[nextIndex]
 
+    if (previousItem && isLookerCarouselId(previousItem.id)) {
+      handleLookerSlideExit(getLookerDashboardIdFromCarouselId(previousItem.id))
+    }
+
     if (previousItem?.id === BIRTHDAY_SLIDE_ID) {
       setIsBirthdaySlideActive(false)
       markBirthdaySlideShown({ slotId: activeBirthdaySlideSlotRef.current })
       activeBirthdaySlideSlotRef.current = null
+    }
+
+    if (nextItem && isLookerCarouselId(nextItem.id)) {
+      handleLookerSlideEnter(getLookerDashboardIdFromCarouselId(nextItem.id))
     }
 
     if (nextItem?.id === BIRTHDAY_SLIDE_ID) {
@@ -163,7 +229,7 @@ export function TVDashboard() {
     }
 
     activeSlideIndexRef.current = nextIndex
-  }, [carouselItems, currentBirthdaySlideSlot, markBirthdaySlideShown])
+  }, [carouselItems, currentBirthdaySlideSlot, handleLookerSlideEnter, handleLookerSlideExit, markBirthdaySlideShown])
 
   useEffect(() => {
     currentContratoRef.current = currentContrato
@@ -185,6 +251,34 @@ export function TVDashboard() {
   // Listener em tempo real para novos contratos
   useEffect(() => {
     let unsubscribe: (() => void) | undefined
+    let bootstrapTimeoutId: BrowserTimeoutHandle | undefined
+    const knownContratoIds = new Set<string>()
+    let listenerBootstrapComplete = false
+    let listenerSessionStartedAtMs = Date.now()
+
+    const completeListenerBootstrap = (reason: string) => {
+      if (listenerBootstrapComplete) {
+        return
+      }
+
+      listenerBootstrapComplete = true
+      listenerSessionStartedAtMs = Date.now()
+      if (bootstrapTimeoutId) {
+        window.clearTimeout(bootstrapTimeoutId)
+        bootstrapTimeoutId = undefined
+      }
+
+      console.log(
+        `TVDashboard: Sincronização inicial concluída (${reason}). Contratos pendentes ignorados:`,
+        knownContratoIds.size
+      )
+    }
+
+    const registerKnownContratos = (contratos: Array<Contrato & { id: string }>) => {
+      for (const contrato of contratos) {
+        knownContratoIds.add(contrato.id)
+      }
+    }
 
     const setupListener = async () => {
       try {
@@ -196,29 +290,55 @@ export function TVDashboard() {
           collection(db, 'contratos'),
           where('displayedOnTV', '==', false)
         )
-        let isInitialSnapshot = true
+
+        bootstrapTimeoutId = window.setTimeout(() => {
+          completeListenerBootstrap('timeout de segurança')
+        }, CONTRATO_LISTENER_BOOTSTRAP_TIMEOUT_MS)
 
         console.log('TVDashboard: Query configurada, iniciando listener...')
 
         unsubscribe = onSnapshot(q, (snapshot) => {
-          console.log('TVDashboard: Listener ativado, contratos pendentes na query:', snapshot.size)
+          const pendingContratos = snapshot.docs.map(
+            doc => ({ id: doc.id, ...doc.data() } as Contrato & { id: string })
+          )
 
-          if (isInitialSnapshot) {
-            isInitialSnapshot = false
-            console.log('TVDashboard: Carga inicial ignorada para evitar aviso ao abrir/reiniciar a TV')
+          console.log(
+            'TVDashboard: Listener ativado, contratos pendentes na query:',
+            snapshot.size,
+            snapshot.metadata.fromCache ? '(cache)' : '(servidor)'
+          )
+
+          if (!listenerBootstrapComplete) {
+            registerKnownContratos(pendingContratos)
+
+            for (const contrato of pendingContratos) {
+              if (isContratoTooOldToDisplay(contrato)) {
+                void dismissContratoFromTVQueue(contrato.id, 'contrato obsoleto na sincronização inicial')
+              }
+            }
+
+            if (!snapshot.metadata.fromCache) {
+              completeListenerBootstrap('snapshot do servidor')
+            }
+
             return
           }
 
           const contratosAdicionados = snapshot.docChanges()
             .filter(change => change.type === 'added')
             .map(change => ({ id: change.doc.id, ...change.doc.data() } as Contrato & { id: string }))
+            .filter(contrato => !knownContratoIds.has(contrato.id))
+            .filter(contrato => isContratoCreatedAfter(contrato, listenerSessionStartedAtMs))
             .filter(contrato => !isContratoOverlayLocked(contrato))
+            .filter(contrato => !isContratoTooOldToDisplay(contrato))
             .sort((a, b) => {
               if (a.createdAt && b.createdAt) {
                 return b.createdAt.toMillis() - a.createdAt.toMillis()
               }
               return 0
             })
+
+          registerKnownContratos(contratosAdicionados)
 
           console.log('TVDashboard: Novos contratos adicionados após a TV abrir:', contratosAdicionados.length)
 
@@ -261,11 +381,14 @@ export function TVDashboard() {
     return () => {
       pendingContratoClaimIdRef.current = null
       clearOverlayDelayTimer()
+      if (bootstrapTimeoutId) {
+        window.clearTimeout(bootstrapTimeoutId)
+      }
       if (unsubscribe) {
         unsubscribe()
       }
     }
-  }, [claimContratoOverlay, clearOverlayDelayTimer, markContratoAsDisplayed])
+  }, [claimContratoOverlay, clearOverlayDelayTimer, dismissContratoFromTVQueue, markContratoAsDisplayed])
 
   // Listener para tecla ESC
   useEffect(() => {
@@ -328,6 +451,8 @@ export function TVDashboard() {
 
 
 
+      <LookerDashboardPreloader />
+
       {/* Carousel Fullscreen para TV 55 polegadas */}
       <div className="h-screen w-screen">
         <DynamicTimerCarousel
@@ -337,7 +462,7 @@ export function TVDashboard() {
           showPagination={false}
           showProgressBar={false}
           pauseOnMouseEnter={false}
-          preloadAhead={2}
+          preloadAhead={8}
           onSlideChange={handleSlideChange}
         />
       </div>

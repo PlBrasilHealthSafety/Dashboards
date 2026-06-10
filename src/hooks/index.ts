@@ -2,4 +2,6 @@
 export { useAuth } from './useAuth'
 export { useFirestoreCRUD, useCollection, useDocument } from './useFirestore'
 export { BIRTHDAY_SLIDE_ID, useBirthdaySlideSchedule } from './useBirthdaySlideSchedule'
+export { useBusinessClock } from './useBusinessClock'
+export { useLookerSlideSchedule } from './useLookerSlideSchedule'
 export { useBuildVersionMonitor } from './useBuildVersionMonitor'

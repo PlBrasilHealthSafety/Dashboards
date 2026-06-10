@@ -1,4 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
+
+type BrowserTimeoutHandle = number
 
 interface ContratoNotificationOverlayProps {
   contrato: {
@@ -10,142 +12,169 @@ interface ContratoNotificationOverlayProps {
   onComplete: () => void
 }
 
+const INFO_PHASE_DURATION_MS = 2 * 60 * 1000
+const MAX_VIDEO_PHASE_MS = 45 * 1000
+const MAX_TOTAL_OVERLAY_MS = MAX_VIDEO_PHASE_MS + INFO_PHASE_DURATION_MS + 15 * 1000
+
 export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNotificationOverlayProps) {
   const [phase, setPhase] = useState<'video' | 'info'>('video')
-  const [videoMuted, setVideoMuted] = useState(false) // Começar sem mute
+  const [videoMuted, setVideoMuted] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
-  const safetyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const safetyTimerRef = useRef<BrowserTimeoutHandle | null>(null)
+  const videoPhaseTimerRef = useRef<BrowserTimeoutHandle | null>(null)
   const onCompleteRef = useRef(onComplete)
+  const hasCompletedRef = useRef(false)
 
   useEffect(() => {
     onCompleteRef.current = onComplete
   }, [onComplete])
 
-  // Timer de segurança dinâmico baseado na duração do vídeo
-  const setupSafetyTimer = (videoDuration?: number) => {
-    // Limpar timer anterior se existir
-    if (safetyTimerRef.current) {
-      clearTimeout(safetyTimerRef.current)
+  const clearTimer = (timerRef: { current: BrowserTimeoutHandle | null }) => {
+    if (timerRef.current) {
+      window.clearTimeout(timerRef.current)
+      timerRef.current = null
     }
-
-    // Calcular tempo de segurança: duração do vídeo + 5 segundos de margem
-    // Mínimo de 30 segundos para casos onde a duração não é detectada
-    const safetyTime = videoDuration ? (videoDuration + 5) * 1000 : 30000
-    
-    safetyTimerRef.current = setTimeout(() => {
-      console.log(`Timer de segurança ativado após ${safetyTime/1000}s - mudando para info`)
-      setPhase('info')
-    }, safetyTime)
   }
 
-  useEffect(() => {
-    // Timer inicial de segurança
-    setupSafetyTimer()
-
-    return () => {
-      if (safetyTimerRef.current) {
-        clearTimeout(safetyTimerRef.current)
-      }
+  const finishOverlay = useCallback((reason: string) => {
+    if (hasCompletedRef.current) {
+      return
     }
+
+    hasCompletedRef.current = true
+    clearTimer(safetyTimerRef)
+    clearTimer(videoPhaseTimerRef)
+    console.log(`ContratoNotificationOverlay: encerrando overlay (${reason})`)
+    onCompleteRef.current()
   }, [])
 
-  // Função para tentar reproduzir com som quando o vídeo carrega
+  const goToInfoPhase = useCallback((reason: string) => {
+    clearTimer(videoPhaseTimerRef)
+    console.log(`ContratoNotificationOverlay: indo para fase de informações (${reason})`)
+    setPhase('info')
+  }, [])
+
+  const setupSafetyTimer = useCallback((videoDuration?: number) => {
+    clearTimer(safetyTimerRef)
+
+    const safetyTime = videoDuration
+      ? Math.min((videoDuration + 5) * 1000, MAX_VIDEO_PHASE_MS)
+      : MAX_VIDEO_PHASE_MS
+
+    safetyTimerRef.current = window.setTimeout(() => {
+      goToInfoPhase(`timer de segurança após ${safetyTime / 1000}s`)
+    }, safetyTime)
+  }, [goToInfoPhase])
+
   useEffect(() => {
-    const handleVideoLoad = async () => {
-      const video = videoRef.current
-      if (!video) return
+    setupSafetyTimer()
 
-      // Configurar atributos para garantir som
-      video.volume = 1.0 // Volume máximo
-      video.muted = false // Garantir que não está mudo
-      
-      // Adicionar event listeners
-      video.addEventListener('loadeddata', () => {
-        console.log('Vídeo carregado, duração:', video.duration, 'segundos')
-      })
+    videoPhaseTimerRef.current = window.setTimeout(() => {
+      goToInfoPhase('limite máximo da fase de vídeo')
+    }, MAX_VIDEO_PHASE_MS)
 
-      video.addEventListener('canplay', async () => {
+    const absoluteExitTimer = window.setTimeout(() => {
+      finishOverlay('limite absoluto do overlay')
+    }, MAX_TOTAL_OVERLAY_MS)
+
+    return () => {
+      clearTimer(safetyTimerRef)
+      clearTimer(videoPhaseTimerRef)
+      window.clearTimeout(absoluteExitTimer)
+    }
+  }, [finishOverlay, goToInfoPhase, setupSafetyTimer])
+
+  useEffect(() => {
+    if (phase !== 'video') {
+      return
+    }
+
+    const video = videoRef.current
+    if (!video) {
+      return
+    }
+
+    video.volume = 1.0
+    video.muted = false
+
+    const handleCanPlay = async () => {
+      try {
+        video.muted = false
+        video.volume = 1.0
+        await video.play()
+      } catch {
+        video.muted = true
+        setVideoMuted(true)
         try {
-          // Forçar som habilitado
-          video.muted = false
-          video.volume = 1.0
           await video.play()
-          console.log('Vídeo reproduzindo com som - volume:', video.volume, 'muted:', video.muted, 'duração:', video.duration)
-        } catch (error) {
-          console.log('Autoplay com som bloqueado, tentando sem som:', error)
-          // Se falhar, reproduzir sem som
-          video.muted = true
-          setVideoMuted(true)
-          try {
-            await video.play()
-            console.log('Vídeo reproduzindo sem som')
-          } catch (mutedError) {
-            console.error('Erro ao reproduzir vídeo:', mutedError)
-          }
-        }
-      })
-
-      // Event listener para detectar fim do vídeo
-      video.addEventListener('ended', () => {
-        console.log('Vídeo terminou naturalmente, mudando para informações')
-        setPhase('info')
-      })
-
-      // Event listener para detectar quando está próximo do fim (últimos 0.2s)
-      // Reduzido para dar mais tempo ao vídeo antes da transição
-      video.addEventListener('timeupdate', () => {
-        if (video.duration && video.currentTime >= video.duration - 0.2) {
-          console.log('Vídeo próximo do fim (últimos 0.2s), preparando transição')
-        }
-      })
-
-      // Event listener adicional para garantir que o vídeo não seja cortado
-      video.addEventListener('loadedmetadata', () => {
-        console.log(`Metadados carregados - Duração do vídeo: ${video.duration} segundos`)
-        // Reconfigurar timer de segurança com base na duração real do vídeo
-        setupSafetyTimer(video.duration)
-        console.log(`Timer de segurança ajustado para ${video.duration + 5} segundos`)
-      })
-
-      // Tentar reproduzir imediatamente se já carregado
-      if (video.readyState >= 3) { // HAVE_FUTURE_DATA
-        try {
-          video.muted = false
-          video.volume = 1.0
-          await video.play()
-          console.log('Vídeo reproduzindo com som imediatamente')
-        } catch (error) {
-          console.log('Erro no play imediato:', error)
+        } catch (mutedError) {
+          console.error('Erro ao reproduzir vídeo:', mutedError)
+          goToInfoPhase('falha ao reproduzir vídeo')
         }
       }
     }
 
-    if (phase === 'video' && videoRef.current) {
-      handleVideoLoad()
+    const handleEnded = () => {
+      goToInfoPhase('vídeo terminou naturalmente')
     }
-  }, [phase])
 
-  // Função para ativar som com clique/toque
+    const handleTimeUpdate = () => {
+      if (video.duration && video.currentTime >= video.duration - 0.25) {
+        goToInfoPhase('vídeo próximo do fim')
+      }
+    }
+
+    const handleLoadedMetadata = () => {
+      setupSafetyTimer(video.duration)
+    }
+
+    const handleVideoError = () => {
+      goToInfoPhase('erro ao carregar vídeo')
+    }
+
+    const handleStalled = () => {
+      goToInfoPhase('vídeo travou no carregamento')
+    }
+
+    video.addEventListener('canplay', handleCanPlay)
+    video.addEventListener('ended', handleEnded)
+    video.addEventListener('timeupdate', handleTimeUpdate)
+    video.addEventListener('loadedmetadata', handleLoadedMetadata)
+    video.addEventListener('error', handleVideoError)
+    video.addEventListener('stalled', handleStalled)
+
+    if (video.readyState >= 3) {
+      void handleCanPlay()
+    }
+
+    return () => {
+      video.removeEventListener('canplay', handleCanPlay)
+      video.removeEventListener('ended', handleEnded)
+      video.removeEventListener('timeupdate', handleTimeUpdate)
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata)
+      video.removeEventListener('error', handleVideoError)
+      video.removeEventListener('stalled', handleStalled)
+    }
+  }, [goToInfoPhase, phase, setupSafetyTimer])
+
   const handleVideoClick = () => {
     if (videoRef.current && videoMuted) {
       videoRef.current.muted = false
       setVideoMuted(false)
-      console.log('Som ativado pelo usuário')
     }
   }
 
-
-
   useEffect(() => {
     if (phase === 'info') {
-      // Após 2 minutos mostrando as informações, completar
-      const infoTimer = setTimeout(() => {
-        onCompleteRef.current()
-      }, 2 * 60 * 1000) // 2 minutos
+      clearTimer(safetyTimerRef)
 
-      return () => clearTimeout(infoTimer)
+      const infoTimer = window.setTimeout(() => {
+        finishOverlay('fase de informações concluída')
+      }, INFO_PHASE_DURATION_MS)
+
+      return () => window.clearTimeout(infoTimer)
     }
-  }, [phase])
+  }, [finishOverlay, phase])
 
   return (
     <div className="fixed inset-0 z-[9999] bg-black flex items-center justify-center">
@@ -170,8 +199,7 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
             <source src="/novo-contrato-video.webm" type="video/webm" />
             Seu navegador não suporta o elemento de vídeo.
           </video>
-          
-          {/* Indicador de som quando mutado */}
+
           {videoMuted && (
             <div className="absolute bottom-8 right-8 bg-black/70 backdrop-blur-sm rounded-full p-4 animate-pulse">
               <div className="flex items-center gap-2 text-white">
@@ -188,7 +216,6 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
 
       {phase === 'info' && (
         <div className="w-full h-full relative overflow-hidden">
-          {/* Background com padrão geométrico animado */}
           <div className="absolute inset-0 bg-gradient-to-br from-[#00A298] via-[#0B5C5B] to-[#1D3C44]">
             <div className="absolute inset-0 opacity-10">
               <div className="absolute top-20 left-20 w-96 h-96 rounded-full bg-white/20 animate-pulse"></div>
@@ -197,10 +224,7 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
             </div>
           </div>
 
-          {/* Conteúdo principal */}
           <div className="relative z-10 w-full h-full flex flex-col items-center justify-center p-12">
-            
-            {/* Header principal - Com espaçamento aumentado */}
             <div className="text-center mb-20 animate-in fade-in slide-in-from-top duration-1000">
               <div className="mb-6">
                 <h1 className="text-7xl font-black text-white mb-4 tracking-tight">
@@ -213,12 +237,9 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
               <div className="w-40 h-1 bg-white/60 mx-auto rounded-full"></div>
             </div>
 
-            {/* Card único centralizado - Com fundo branco suave */}
             <div className="w-full max-w-5xl mb-20">
               <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-12 shadow-2xl border border-[#00A298]/20 animate-in fade-in slide-in-from-bottom duration-1000 delay-300">
                 <div className="text-center space-y-10">
-                  
-                  {/* Razão Social */}
                   <div className="border-b border-[#00A298]/30 pb-6">
                     <h3 className="text-2xl font-bold text-[#00A298] uppercase tracking-wider mb-4">
                       Razão Social
@@ -228,7 +249,6 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
                     </p>
                   </div>
 
-                  {/* Nome Fantasia */}
                   <div className="border-b border-[#00A298]/30 pb-6">
                     <h3 className="text-2xl font-bold text-[#00A298] uppercase tracking-wider mb-4">
                       Nome Fantasia
@@ -238,7 +258,6 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
                     </p>
                   </div>
 
-                  {/* Data de Início do Contrato */}
                   <div>
                     <h3 className="text-2xl font-bold text-[#00A298] uppercase tracking-wider mb-4">
                       Data de Início do Contrato
@@ -255,7 +274,6 @@ export function ContratoNotificationOverlay({ contrato, onComplete }: ContratoNo
               </div>
             </div>
 
-            {/* Footer com indicador de progresso - Com espaçamento aumentado */}
             <div className="text-center animate-in fade-in duration-1000 delay-1000">
               <div className="inline-flex items-center gap-4 px-8 py-4 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 shadow-lg">
                 <div className="flex space-x-2">
