@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import { fileURLToPath, URL } from 'node:url'
@@ -79,6 +80,10 @@ export default defineConfig(({ mode }) => {
     define: {
       __APP_VERSION__: JSON.stringify(appVersion),
       __APP_BUILD_ID__: JSON.stringify(appBuildId),
+    },
+    test: {
+      environment: 'node',
+      include: ['src/**/*.test.ts'],
     },
   }
 })

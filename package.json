@@ -14,7 +14,8 @@
     "preview": "vite preview",
     "preview:dist": "vite preview --port 4173",
     "clean": "rm -rf dist node_modules/.vite",
-    "test": "echo \"No tests configured yet\"",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "firebase:emulators": "firebase emulators:start",
     "firebase:deploy": "firebase deploy --only firestore:rules,firestore:indexes",
     "firebase:delete-contratos": "node scripts/delete-all-contratos.mjs",
@@ -65,6 +66,7 @@
     "terser": "^5.43.1",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.39.1",
-    "vite": "^7.1.2"
+    "vite": "^7.1.2",
+    "vitest": "^4.1.8"
   }
 }

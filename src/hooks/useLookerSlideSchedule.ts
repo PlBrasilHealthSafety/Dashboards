@@ -78,8 +78,22 @@ export function useLookerSlideSchedule({ clockSnapshot, isTimeReady }: UseLooker
 
   const shouldShowLookerSlides =
     isLookerCycleActive ||
-    activeLookerSlideIds.size > 0 ||
-    canStartNewLookerCycle
+    (currentWindow !== null && (activeLookerSlideIds.size > 0 || canStartNewLookerCycle))
+
+  useEffect(() => {
+    if (currentWindow) {
+      return
+    }
+
+    if (isLookerCycleActive) {
+      setIsLookerCycleActive(false)
+      setActiveCycleSlotId(null)
+    }
+
+    if (activeLookerSlideIds.size > 0) {
+      setActiveLookerSlideIds(new Set())
+    }
+  }, [activeLookerSlideIds.size, currentWindow, isLookerCycleActive])
 
   useEffect(() => {
     setCycleHistory(readLookerCycleHistory(clockSnapshot.dateKey))

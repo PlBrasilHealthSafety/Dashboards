@@ -9,6 +9,10 @@ interface LookerStudioSlideProps {
     title: string
     /** Intervalo de auto-refresh em ms (padrão: 5 minutos) */
     refreshInterval?: number
+    /** Tempo máximo de espera pelo iframe (0 = sem limite) */
+    loadTimeoutMs?: number
+    /** Chamado quando o dashboard não carrega (timeout ou erro) */
+    onUnavailable?: () => void
 }
 
 const LOOKER_CONNECTION_HINTS = [
@@ -44,13 +48,20 @@ const ensureConnectionHint = (rel: 'preconnect' | 'dns-prefetch', href: string) 
  * - Tudo que não cabe é cortado (overflow hidden)
  * - Auto-refresh periódico para manter dados atualizados
  */
+const TV_LOAD_TIMEOUT_MS = 25000
+
 export function LookerStudioSlide({
     url,
     title,
     refreshInterval = 300000,
+    loadTimeoutMs = 0,
+    onUnavailable,
 }: LookerStudioSlideProps) {
     const embedUrl = toEmbedUrl(url)
-    const [isLoading, setIsLoading] = useState(() => !isLookerEmbedLoaded(url))
+    const requiresLoadConfirmation = loadTimeoutMs > 0
+    const [isLoading, setIsLoading] = useState(
+        () => requiresLoadConfirmation || !isLookerEmbedLoaded(url)
+    )
     const [hasError, setHasError] = useState(false)
     const [refreshKey, setRefreshKey] = useState(0)
     const containerRef = useRef<HTMLDivElement>(null)
@@ -97,10 +108,25 @@ export function LookerStudioSlide({
     }, [refreshInterval])
 
     useEffect(() => {
-        if (isLookerEmbedLoaded(url)) {
+        if (!requiresLoadConfirmation && isLookerEmbedLoaded(url)) {
             setIsLoading(false)
         }
-    }, [url])
+    }, [requiresLoadConfirmation, url])
+
+    useEffect(() => {
+        const timeoutMs = loadTimeoutMs > 0 ? loadTimeoutMs : (refreshInterval === 0 ? TV_LOAD_TIMEOUT_MS : 0)
+        if (timeoutMs <= 0) {
+            return
+        }
+
+        const timeoutId = window.setTimeout(() => {
+            setIsLoading(false)
+            setHasError(true)
+            onUnavailable?.()
+        }, timeoutMs)
+
+        return () => window.clearTimeout(timeoutId)
+    }, [loadTimeoutMs, onUnavailable, refreshInterval, url])
 
     const handleLoad = useCallback(() => {
         markLookerEmbedLoaded(url)
@@ -111,7 +137,8 @@ export function LookerStudioSlide({
     const handleError = useCallback(() => {
         setIsLoading(false)
         setHasError(true)
-    }, [])
+        onUnavailable?.()
+    }, [onUnavailable])
 
     return (
         <div

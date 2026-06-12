@@ -117,7 +117,9 @@ export function useBirthdaySlideSchedule() {
   const hasShownCurrentSlot = currentBirthdaySlideWindow
     ? shownSlotIdsToday.includes(currentBirthdaySlideWindow.slotId)
     : true
-  const shouldShowBirthdaySlide = isBirthdaySlidePresentationInProgress || (isTimeReady && !hasShownCurrentSlot)
+  const shouldShowBirthdaySlide =
+    isBirthdaySlidePresentationInProgress ||
+    (isTimeReady && Boolean(currentBirthdaySlideWindow) && !hasShownCurrentSlot)
 
   useEffect(() => {
     const storedHistory = readBirthdaySlideHistory()

@@ -1,6 +1,10 @@
 import { useMemo, useEffect, useState, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { DynamicTimerCarousel, type DynamicCarouselItem } from '@/components/custom/DynamicTimerCarousel'
+import {
+  DynamicTimerCarousel,
+  type DynamicCarouselItem,
+  type DynamicTimerCarouselHandle,
+} from '@/components/custom/DynamicTimerCarousel'
 
 
 import {
@@ -26,6 +30,7 @@ import { useLookerSlideSchedule } from '@/hooks/useLookerSlideSchedule'
 import { getUserRoute } from '@/lib/utils'
 import type { Contrato } from '@/lib/types'
 import { isContratoCreatedAfter, isContratoTooOldToDisplay } from '@/lib/tv-contrato-guard'
+import { validateCarouselPointer } from '@/lib/carousel-pointer'
 import {
   getLookerCarouselId,
   getLookerDashboardIdFromCarouselId,
@@ -87,6 +92,7 @@ export function TVDashboard() {
   const [showOverlay, setShowOverlay] = useState(false)
   const [isBirthdaySlideActive, setIsBirthdaySlideActive] = useState(false)
   const activeSlideIndexRef = useRef(0)
+  const carouselRef = useRef<DynamicTimerCarouselHandle>(null)
   const activeBirthdaySlideSlotRef = useRef<BirthdaySlideSlotId | null>(null)
   const currentContratoRef = useRef<(Contrato & { id: string }) | null>(null)
   const overlayDelayTimerRef = useRef<BrowserTimeoutHandle | null>(null)
@@ -162,67 +168,80 @@ export function TVDashboard() {
     }
   }, [])
 
+  const skipUnavailableLookerSlide = useCallback(() => {
+    carouselRef.current?.skipToNextPlayable()
+  }, [])
+
   const carouselItems = useMemo((): DynamicCarouselItem[] => {
-    return TV_MODE_CAROUSEL_LAYOUT.flatMap((entry): DynamicCarouselItem[] => {
+    return TV_MODE_CAROUSEL_LAYOUT.map((entry): DynamicCarouselItem => {
       if (entry.kind === 'ppt') {
         const SlideComponent = PPT_SLIDE_COMPONENTS[entry.slide]
-        return [{
+        return {
           id: entry.slide,
           content: <SlideComponent />,
           duration: 30000,
-        }]
+        }
       }
 
       if (entry.kind === 'birthday') {
-        if (!shouldShowBirthdaySlide && !isBirthdaySlideActive) {
-          return []
-        }
-
-        return [{
+        const showBirthday = shouldShowBirthdaySlide || isBirthdaySlideActive
+        return {
           id: BIRTHDAY_SLIDE_ID,
-          content: <AniversariantesSlide />,
-          duration: 180000,
-        }]
+          content: showBirthday ? <AniversariantesSlide /> : null,
+          duration: showBirthday ? 180000 : 0,
+          autoSkip: !showBirthday,
+        }
       }
 
       const dashboard = LOOKER_DASHBOARD_MAP[entry.dashboardId]
-      if (!dashboard || !shouldShowLookerSlides) {
-        return []
-      }
+      const showLooker = Boolean(dashboard && shouldShowLookerSlides)
 
-      return [{
+      return {
         id: getLookerCarouselId(entry.dashboardId),
-        content: (
+        content: showLooker ? (
           <LookerStudioSlide
             url={dashboard.url}
             title={dashboard.title}
             refreshInterval={0}
+            loadTimeoutMs={15000}
+            onUnavailable={skipUnavailableLookerSlide}
           />
-        ),
-        duration: dashboard.duration,
-      }]
+        ) : null,
+        duration: showLooker ? dashboard.duration : 0,
+        autoSkip: !showLooker,
+      }
     })
-  }, [isBirthdaySlideActive, shouldShowBirthdaySlide, shouldShowLookerSlides])
+  }, [isBirthdaySlideActive, shouldShowBirthdaySlide, shouldShowLookerSlides, skipUnavailableLookerSlide])
 
   const handleSlideChange = useCallback((nextIndex: number) => {
     const previousItem = carouselItems[activeSlideIndexRef.current]
     const nextItem = carouselItems[nextIndex]
 
-    if (previousItem && isLookerCarouselId(previousItem.id) && shouldShowLookerSlides) {
+    if (
+      previousItem &&
+      !previousItem.autoSkip &&
+      isLookerCarouselId(previousItem.id) &&
+      shouldShowLookerSlides
+    ) {
       handleLookerSlideExit(getLookerDashboardIdFromCarouselId(previousItem.id))
     }
 
-    if (previousItem?.id === BIRTHDAY_SLIDE_ID) {
+    if (previousItem?.id === BIRTHDAY_SLIDE_ID && !previousItem.autoSkip) {
       setIsBirthdaySlideActive(false)
       markBirthdaySlideShown({ slotId: activeBirthdaySlideSlotRef.current })
       activeBirthdaySlideSlotRef.current = null
     }
 
-    if (nextItem && isLookerCarouselId(nextItem.id) && shouldShowLookerSlides) {
+    if (
+      nextItem &&
+      !nextItem.autoSkip &&
+      isLookerCarouselId(nextItem.id) &&
+      shouldShowLookerSlides
+    ) {
       handleLookerSlideEnter(getLookerDashboardIdFromCarouselId(nextItem.id))
     }
 
-    if (nextItem?.id === BIRTHDAY_SLIDE_ID) {
+    if (nextItem?.id === BIRTHDAY_SLIDE_ID && !nextItem.autoSkip) {
       activeBirthdaySlideSlotRef.current = currentBirthdaySlideSlot
       setIsBirthdaySlideActive(true)
       markBirthdaySlideShown({ slotId: currentBirthdaySlideSlot, updateState: false })
@@ -240,6 +259,19 @@ export function TVDashboard() {
       activeSlideIndexRef.current = 0
     }
   }, [carouselItems.length])
+
+  useEffect(() => {
+    const validation = validateCarouselPointer(carouselItems, activeSlideIndexRef.current)
+    if (!validation.valid) {
+      console.warn('TVDashboard: ponteiro do carrossel inconsistente após mudança de horário.', {
+        currentIndex: activeSlideIndexRef.current,
+        safeIndex: validation.safeIndex,
+        reason: validation.reason,
+        slideId: carouselItems[validation.safeIndex]?.id,
+      })
+      carouselRef.current?.recoverToSafeIndex()
+    }
+  }, [carouselItems])
 
   useEffect(() => {
     return () => {
@@ -456,13 +488,14 @@ export function TVDashboard() {
       {/* Carousel Fullscreen para TV 55 polegadas */}
       <div className="h-screen w-screen">
         <DynamicTimerCarousel
+          ref={carouselRef}
           items={carouselItems}
           className="w-full h-full"
           showNavigation={false}
           showPagination={false}
           showProgressBar={false}
           pauseOnMouseEnter={false}
-          preloadAhead={8}
+          preloadAhead={0}
           onSlideChange={handleSlideChange}
         />
       </div>

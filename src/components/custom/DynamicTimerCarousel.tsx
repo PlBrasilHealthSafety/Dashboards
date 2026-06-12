@@ -1,11 +1,20 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  findFirstPlayableIndex,
+  findNextPlayableIndex,
+  findPreviousPlayableIndex,
+  resolveIndexAfterItemsChange,
+  validateCarouselPointer,
+} from '@/lib/carousel-pointer';
 import { cn } from '@/lib/utils';
 
 export interface DynamicCarouselItem {
   id: string | number;
   content: React.ReactNode;
   duration?: number; // Duration in milliseconds, defaults to 30000 (30 seconds)
+  /** Avança imediatamente sem exibir o slide (ex.: Looker fora do horário) */
+  autoSkip?: boolean;
 }
 
 export interface DynamicTimerCarouselProps {
@@ -19,7 +28,21 @@ export interface DynamicTimerCarouselProps {
   onSlideChange?: (index: number) => void;
 }
 
-export const DynamicTimerCarousel: React.FC<DynamicTimerCarouselProps> = ({
+export interface DynamicTimerCarouselHandle {
+  skipToNextPlayable: () => void;
+  recoverToSafeIndex: () => void;
+}
+
+const applyCarouselIndex = (
+  nextIndex: number,
+  setCurrentIndex: React.Dispatch<React.SetStateAction<number>>,
+  onSlideChangeRef: React.MutableRefObject<((index: number) => void) | undefined>,
+) => {
+  setCurrentIndex(nextIndex);
+  onSlideChangeRef.current?.(nextIndex);
+};
+
+export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, DynamicTimerCarouselProps>(function DynamicTimerCarousel({
   items,
   className,
   showNavigation = true,
@@ -28,12 +51,12 @@ export const DynamicTimerCarousel: React.FC<DynamicTimerCarouselProps> = ({
   pauseOnMouseEnter = true,
   preloadAhead = 0,
   onSlideChange,
-}) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+}, ref) {
+  const [currentIndex, setCurrentIndex] = useState(() => findFirstPlayableIndex(items));
   const [isPaused, setIsPaused] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  
-  // Drag/swipe functionality
+  const onSlideChangeRef = useRef(onSlideChange);
+
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [currentX, setCurrentX] = useState(0);
@@ -41,137 +64,125 @@ export const DynamicTimerCarousel: React.FC<DynamicTimerCarouselProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const previousItemsRef = useRef(items);
 
-  const findRemappedIndex = (
-    previousItems: DynamicCarouselItem[],
-    previousIndex: number,
-    nextItems: DynamicCarouselItem[],
-  ) => {
-    if (nextItems.length === 0) {
-      return 0;
-    }
+  useEffect(() => {
+    onSlideChangeRef.current = onSlideChange;
+  }, [onSlideChange]);
 
-    const currentId = previousItems[previousIndex]?.id;
-    if (currentId !== undefined) {
-      const sameSlideIndex = nextItems.findIndex((item) => item.id === currentId);
-      if (sameSlideIndex >= 0) {
-        return sameSlideIndex;
-      }
-    }
+  const resolvedIndex = items.length === 0 ? 0 : Math.min(currentIndex, items.length - 1);
+  const currentItem = items[resolvedIndex];
+  const currentDuration = currentItem?.duration || 30000;
 
-    for (let index = previousIndex + 1; index < previousItems.length; index += 1) {
-      const nextSlideIndex = nextItems.findIndex((item) => item.id === previousItems[index].id);
-      if (nextSlideIndex >= 0) {
-        return nextSlideIndex;
-      }
-    }
-
-    for (let index = previousIndex - 1; index >= 0; index -= 1) {
-      const nextSlideIndex = nextItems.findIndex((item) => item.id === previousItems[index].id);
-      if (nextSlideIndex >= 0) {
-        return nextSlideIndex;
-      }
-    }
-
-    return Math.min(previousIndex, nextItems.length - 1);
-  };
-
-  const currentItem = items[currentIndex];
-  const currentDuration = currentItem?.duration || 30000; // Default 30 seconds
   const shouldRenderSlide = (index: number) => {
-    if (index === currentIndex) return true;
+    if (index === resolvedIndex) return true;
     if (preloadAhead <= 0 || items.length <= 1) return false;
 
-    const distanceAhead = (index - currentIndex + items.length) % items.length;
+    const distanceAhead = (index - resolvedIndex + items.length) % items.length;
     return distanceAhead > 0 && distanceAhead <= preloadAhead;
   };
 
-  useEffect(() => {
-    if (items.length > 0 && currentIndex >= items.length) {
-      setCurrentIndex(0);
-      onSlideChange?.(0);
+  useLayoutEffect(() => {
+    if (resolvedIndex !== currentIndex) {
+      applyCarouselIndex(resolvedIndex, setCurrentIndex, onSlideChangeRef);
     }
-  }, [currentIndex, items.length, onSlideChange]);
+  }, [currentIndex, resolvedIndex]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const previousItems = previousItemsRef.current;
-    if (previousItems === items) {
+    if (previousItems !== items) {
+      const remappedIndex = resolveIndexAfterItemsChange(previousItems, resolvedIndex, items);
+      previousItemsRef.current = items;
+
+      if (remappedIndex !== resolvedIndex) {
+        applyCarouselIndex(remappedIndex, setCurrentIndex, onSlideChangeRef);
+        return;
+      }
+    }
+
+    const validation = validateCarouselPointer(items, resolvedIndex);
+    if (!validation.valid && validation.safeIndex !== resolvedIndex) {
+      console.warn('DynamicTimerCarousel: ponteiro inválido, recuperando automaticamente.', {
+        resolvedIndex,
+        safeIndex: validation.safeIndex,
+        reason: validation.reason,
+        slideId: items[validation.safeIndex]?.id,
+      });
+      applyCarouselIndex(validation.safeIndex, setCurrentIndex, onSlideChangeRef);
+    }
+  }, [items, resolvedIndex]);
+
+  const goToIndex = (index: number) => {
+    if (items.length === 0) {
       return;
     }
 
-    const remappedIndex = findRemappedIndex(previousItems, currentIndex, items);
-    previousItemsRef.current = items;
+    const boundedIndex = Math.min(Math.max(index, 0), items.length - 1);
+    const playableIndex = items[boundedIndex]?.autoSkip
+      ? findNextPlayableIndex(items, boundedIndex === 0 ? items.length - 1 : boundedIndex - 1)
+      : boundedIndex;
 
-    if (remappedIndex !== currentIndex) {
-      setCurrentIndex(remappedIndex);
-      onSlideChange?.(remappedIndex);
-    }
-  }, [currentIndex, items, onSlideChange]);
+    applyCarouselIndex(playableIndex, setCurrentIndex, onSlideChangeRef);
+  };
 
   const goToNext = () => {
-    const nextIndex = (currentIndex + 1) % items.length;
-    console.log(`▶️ goToNext: ${currentIndex} → ${nextIndex} (total: ${items.length})`);
-    setCurrentIndex(nextIndex);
-    onSlideChange?.(nextIndex);
+    if (items.length <= 1) {
+      return;
+    }
+
+    goToIndex(findNextPlayableIndex(items, resolvedIndex));
   };
 
   const goToPrevious = () => {
-    const prevIndex = currentIndex === 0 ? items.length - 1 : currentIndex - 1;
-    console.log(`◀️ goToPrevious: ${currentIndex} → ${prevIndex} (total: ${items.length})`);
-    setCurrentIndex(prevIndex);
-    onSlideChange?.(prevIndex);
-  };
-
-  const goToSlide = (index: number) => {
-    console.log(`🎯 goToSlide: ${currentIndex} → ${index}`);
-    setCurrentIndex(index);
-    onSlideChange?.(index);
-  };
-
-  // Timer management
-  useEffect(() => {
-    console.log(`🔄 Timer effect - currentIndex: ${currentIndex}, isPaused: ${isPaused}, currentDuration: ${currentDuration}ms, items.length: ${items.length}`);
-    console.log(`🔄 Current slide item:`, currentItem);
-    
-    if (isPaused || items.length <= 1) {
-      console.log('⏸️ Timer paused or single item - not setting timer');
+    if (items.length <= 1) {
       return;
     }
 
-    // Clear existing timer
+    goToIndex(findPreviousPlayableIndex(items, resolvedIndex));
+  };
+
+  const goToSlide = (index: number) => {
+    goToIndex(index);
+  };
+
+  const skipToNextPlayableRef = useRef(() => {});
+  skipToNextPlayableRef.current = () => {
+    goToNext();
+  };
+
+  const recoverToSafeIndexRef = useRef(() => {});
+  recoverToSafeIndexRef.current = () => {
+    const { safeIndex } = validateCarouselPointer(items, resolvedIndex);
+    goToIndex(safeIndex);
+  };
+
+  useImperativeHandle(ref, () => ({
+    skipToNextPlayable: () => {
+      skipToNextPlayableRef.current();
+    },
+    recoverToSafeIndex: () => {
+      recoverToSafeIndexRef.current();
+    },
+  }), []);
+
+  useEffect(() => {
+    if (isPaused || items.length <= 1 || !currentItem || currentItem.autoSkip) {
+      return;
+    }
+
     if (timerRef.current) {
       clearTimeout(timerRef.current);
-      console.log('🗑️ Cleared existing timer');
     }
 
-    if (currentDuration <= 200) {
-      console.log(`⏭️ Slide ${currentIndex} com duração curta (${currentDuration}ms) - avançando`);
-      timerRef.current = setTimeout(() => {
-        goToNext();
-      }, currentDuration);
-
-      return () => {
-        if (timerRef.current) {
-          clearTimeout(timerRef.current);
-        }
-      };
-    }
-
-    // Set new timer with current slide's duration
-    console.log(`⏰ Setting timer for ${currentDuration}ms for slide ${currentIndex} (${Math.round(currentDuration/1000)} seconds)`);
     timerRef.current = setTimeout(() => {
-      console.log(`⏰ Timer expired for slide ${currentIndex} - moving to next`);
       goToNext();
     }, currentDuration);
 
     return () => {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
-        console.log('🧹 Cleanup timer on unmount/change');
       }
     };
-  }, [currentIndex, isPaused, currentDuration, items.length]);
+  }, [resolvedIndex, isPaused, currentDuration, items.length, currentItem]);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (timerRef.current) {
@@ -192,17 +203,16 @@ export const DynamicTimerCarousel: React.FC<DynamicTimerCarouselProps> = ({
     }
   };
 
-  // Drag handlers
   const handleDragStart = (clientX: number) => {
     setIsDragging(true);
     setStartX(clientX);
     setCurrentX(clientX);
-    setIsPaused(true); // Pause timer while dragging
+    setIsPaused(true);
   };
 
   const handleDragMove = (clientX: number) => {
     if (!isDragging) return;
-    
+
     setCurrentX(clientX);
     const diff = clientX - startX;
     setDragOffset(diff);
@@ -210,42 +220,33 @@ export const DynamicTimerCarousel: React.FC<DynamicTimerCarouselProps> = ({
 
   const handleDragEnd = () => {
     if (!isDragging) return;
-    
+
     const diff = currentX - startX;
-    const threshold = 50; // Minimum drag distance to trigger slide change
-    
+    const threshold = 50;
+
     if (Math.abs(diff) > threshold) {
       if (diff > 0) {
-        // Dragged right - go to previous slide
         goToPrevious();
       } else {
-        // Dragged left - go to next slide
         goToNext();
       }
     }
-    
-    // Reset drag state
+
     setIsDragging(false);
     setStartX(0);
     setCurrentX(0);
     setDragOffset(0);
-    
-    // Resume timer if not hovering
+
     if (pauseOnMouseEnter) {
       setIsPaused(false);
     }
   };
 
-  // Mouse events
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
     handleDragStart(e.clientX);
   };
 
-  // Mouse move and up handlers are handled by global event listeners
-  // when dragging is active (see useEffect below)
-
-  // Touch events for mobile
   const handleTouchStart = (e: React.TouchEvent) => {
     handleDragStart(e.touches[0].clientX);
   };
@@ -258,7 +259,6 @@ export const DynamicTimerCarousel: React.FC<DynamicTimerCarouselProps> = ({
     handleDragEnd();
   };
 
-  // Global mouse events for dragging
   useEffect(() => {
     if (isDragging) {
       const handleGlobalMouseMove = (e: MouseEvent) => {
@@ -280,15 +280,17 @@ export const DynamicTimerCarousel: React.FC<DynamicTimerCarouselProps> = ({
   }, [isDragging, currentX, startX]);
 
   if (items.length === 0) {
-    return <div className={cn('w-full h-full flex items-center justify-center', className)}>
-      <p className="text-gray-500">No slides available</p>
-    </div>;
+    return (
+      <div className={cn('w-full h-full flex items-center justify-center bg-black', className)}>
+        <p className="text-white/60">Nenhum slide disponível</p>
+      </div>
+    );
   }
 
   return (
-    <div 
+    <div
       ref={containerRef}
-      className={cn('relative w-full h-full overflow-hidden', className)}
+      className={cn('relative w-full h-full overflow-hidden bg-black', className)}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onMouseDown={handleMouseDown}
@@ -297,20 +299,19 @@ export const DynamicTimerCarousel: React.FC<DynamicTimerCarouselProps> = ({
       onTouchEnd={handleTouchEnd}
       style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
     >
-      {/* Slide Content */}
-      <div 
+      <div
         className="relative w-full h-full transition-transform duration-200 ease-out"
         style={{
           transform: isDragging ? `translateX(${dragOffset}px)` : 'translateX(0)',
-          userSelect: 'none'
+          userSelect: 'none',
         }}
       >
         {items.map((item, index) => {
-          if (!shouldRenderSlide(index)) {
+          if (!shouldRenderSlide(index) || item.autoSkip) {
             return null;
           }
 
-          const isActive = index === currentIndex;
+          const isActive = index === resolvedIndex;
 
           return (
             <div
@@ -329,7 +330,6 @@ export const DynamicTimerCarousel: React.FC<DynamicTimerCarouselProps> = ({
         })}
       </div>
 
-      {/* Navigation Arrows */}
       {showNavigation && items.length > 1 && (
         <>
           <button
@@ -349,7 +349,6 @@ export const DynamicTimerCarousel: React.FC<DynamicTimerCarouselProps> = ({
         </>
       )}
 
-      {/* Pagination Dots */}
       {showPagination && items.length > 1 && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2">
           {items.map((_, index) => (
@@ -358,7 +357,7 @@ export const DynamicTimerCarousel: React.FC<DynamicTimerCarouselProps> = ({
               onClick={() => goToSlide(index)}
               className={cn(
                 'w-3 h-3 rounded-full transition-all duration-200',
-                index === currentIndex
+                index === resolvedIndex
                   ? 'bg-white shadow-lg'
                   : 'bg-white/50 hover:bg-white/70'
               )}
@@ -368,14 +367,13 @@ export const DynamicTimerCarousel: React.FC<DynamicTimerCarouselProps> = ({
         </div>
       )}
 
-      {/* Timer Progress Bar (optional visual indicator) */}
       {!isPaused && items.length > 1 && showProgressBar && (
         <div className="absolute bottom-0 left-0 w-full h-1 bg-black/20 z-10">
-          <div 
+          <div
             className="h-full bg-white/80 transition-all ease-linear"
             style={{
               width: '0%',
-              animation: `progress ${currentDuration}ms linear forwards`
+              animation: `progress ${currentDuration}ms linear forwards`,
             }}
           />
         </div>
@@ -389,6 +387,6 @@ export const DynamicTimerCarousel: React.FC<DynamicTimerCarouselProps> = ({
       `}</style>
     </div>
   );
-};
+});
 
 export default DynamicTimerCarousel;
