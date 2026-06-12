@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect, useRef, useImperativeHandle, forwardRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useImperativeHandle, forwardRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   findFirstPlayableIndex,
@@ -33,14 +33,7 @@ export interface DynamicTimerCarouselHandle {
   recoverToSafeIndex: () => void;
 }
 
-const applyCarouselIndex = (
-  nextIndex: number,
-  setCurrentIndex: React.Dispatch<React.SetStateAction<number>>,
-  onSlideChangeRef: React.MutableRefObject<((index: number) => void) | undefined>,
-) => {
-  setCurrentIndex(nextIndex);
-  onSlideChangeRef.current?.(nextIndex);
-};
+const DEFAULT_SLIDE_DURATION_MS = 30000;
 
 export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, DynamicTimerCarouselProps>(function DynamicTimerCarousel({
   items,
@@ -56,132 +49,156 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
   const [isPaused, setIsPaused] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onSlideChangeRef = useRef(onSlideChange);
+  const itemsRef = useRef(items);
+  const previousItemsRef = useRef(items);
 
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [currentX, setCurrentX] = useState(0);
   const [dragOffset, setDragOffset] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
-  const previousItemsRef = useRef(items);
+
+  itemsRef.current = items;
 
   useEffect(() => {
     onSlideChangeRef.current = onSlideChange;
   }, [onSlideChange]);
 
-  const resolvedIndex = items.length === 0 ? 0 : Math.min(currentIndex, items.length - 1);
-  const currentItem = items[resolvedIndex];
-  const currentDuration = currentItem?.duration || 30000;
+  const boundedIndex = items.length === 0 ? 0 : Math.min(Math.max(currentIndex, 0), items.length - 1);
+  const activeIndex = validateCarouselPointer(items, boundedIndex).safeIndex;
+  const activeItem = items[activeIndex];
+  const activeDuration = activeItem?.duration && activeItem.duration > 0
+    ? activeItem.duration
+    : DEFAULT_SLIDE_DURATION_MS;
 
-  const shouldRenderSlide = (index: number) => {
-    if (index === resolvedIndex) return true;
-    if (preloadAhead <= 0 || items.length <= 1) return false;
-
-    const distanceAhead = (index - resolvedIndex + items.length) % items.length;
-    return distanceAhead > 0 && distanceAhead <= preloadAhead;
-  };
+  const commitIndex = useCallback((nextIndex: number) => {
+    const safeIndex = validateCarouselPointer(itemsRef.current, nextIndex).safeIndex;
+    setCurrentIndex(safeIndex);
+    onSlideChangeRef.current?.(safeIndex);
+  }, []);
 
   useLayoutEffect(() => {
-    if (resolvedIndex !== currentIndex) {
-      applyCarouselIndex(resolvedIndex, setCurrentIndex, onSlideChangeRef);
+    if (activeIndex !== boundedIndex) {
+      setCurrentIndex(activeIndex);
+      onSlideChangeRef.current?.(activeIndex);
     }
-  }, [currentIndex, resolvedIndex]);
+  }, [activeIndex, boundedIndex]);
 
   useLayoutEffect(() => {
     const previousItems = previousItemsRef.current;
-    if (previousItems !== items) {
-      const remappedIndex = resolveIndexAfterItemsChange(previousItems, resolvedIndex, items);
-      previousItemsRef.current = items;
-
-      if (remappedIndex !== resolvedIndex) {
-        applyCarouselIndex(remappedIndex, setCurrentIndex, onSlideChangeRef);
-        return;
-      }
-    }
-
-    const validation = validateCarouselPointer(items, resolvedIndex);
-    if (!validation.valid && validation.safeIndex !== resolvedIndex) {
-      console.warn('DynamicTimerCarousel: ponteiro inválido, recuperando automaticamente.', {
-        resolvedIndex,
-        safeIndex: validation.safeIndex,
-        reason: validation.reason,
-        slideId: items[validation.safeIndex]?.id,
-      });
-      applyCarouselIndex(validation.safeIndex, setCurrentIndex, onSlideChangeRef);
-    }
-  }, [items, resolvedIndex]);
-
-  const goToIndex = (index: number) => {
-    if (items.length === 0) {
+    if (previousItems === items) {
       return;
     }
 
-    const boundedIndex = Math.min(Math.max(index, 0), items.length - 1);
-    const playableIndex = items[boundedIndex]?.autoSkip
-      ? findNextPlayableIndex(items, boundedIndex === 0 ? items.length - 1 : boundedIndex - 1)
+    const remappedIndex = resolveIndexAfterItemsChange(previousItems, boundedIndex, items);
+    previousItemsRef.current = items;
+
+    if (remappedIndex !== boundedIndex) {
+      setCurrentIndex(remappedIndex);
+      onSlideChangeRef.current?.(remappedIndex);
+    }
+  }, [items, boundedIndex]);
+
+  const goToIndex = useCallback((index: number) => {
+    const currentItems = itemsRef.current;
+    if (currentItems.length === 0) {
+      return;
+    }
+
+    const boundedIndex = Math.min(Math.max(index, 0), currentItems.length - 1);
+    const targetIndex = currentItems[boundedIndex]?.autoSkip
+      ? findNextPlayableIndex(currentItems, boundedIndex)
       : boundedIndex;
 
-    applyCarouselIndex(playableIndex, setCurrentIndex, onSlideChangeRef);
-  };
+    commitIndex(targetIndex);
+  }, [commitIndex]);
 
-  const goToNext = () => {
-    if (items.length <= 1) {
+  const goToNext = useCallback(() => {
+    const currentItems = itemsRef.current;
+    if (currentItems.length <= 1) {
       return;
     }
 
-    goToIndex(findNextPlayableIndex(items, resolvedIndex));
-  };
+    const current = validateCarouselPointer(
+      currentItems,
+      Math.min(Math.max(currentIndex, 0), currentItems.length - 1),
+    ).safeIndex;
 
-  const goToPrevious = () => {
-    if (items.length <= 1) {
+    commitIndex(findNextPlayableIndex(currentItems, current));
+  }, [commitIndex, currentIndex]);
+
+  const goToPrevious = useCallback(() => {
+    const currentItems = itemsRef.current;
+    if (currentItems.length <= 1) {
       return;
     }
 
-    goToIndex(findPreviousPlayableIndex(items, resolvedIndex));
-  };
+    const current = validateCarouselPointer(
+      currentItems,
+      Math.min(Math.max(currentIndex, 0), currentItems.length - 1),
+    ).safeIndex;
 
-  const goToSlide = (index: number) => {
-    goToIndex(index);
-  };
+    commitIndex(findPreviousPlayableIndex(currentItems, current));
+  }, [commitIndex, currentIndex]);
 
-  const skipToNextPlayableRef = useRef(() => {});
-  skipToNextPlayableRef.current = () => {
+  const skipToNextPlayable = useCallback(() => {
     goToNext();
-  };
+  }, [goToNext]);
 
-  const recoverToSafeIndexRef = useRef(() => {});
-  recoverToSafeIndexRef.current = () => {
-    const { safeIndex } = validateCarouselPointer(items, resolvedIndex);
-    goToIndex(safeIndex);
-  };
+  const recoverToSafeIndex = useCallback(() => {
+    const currentItems = itemsRef.current;
+    const current = Math.min(Math.max(currentIndex, 0), currentItems.length - 1);
+    commitIndex(validateCarouselPointer(currentItems, current).safeIndex);
+  }, [commitIndex, currentIndex]);
 
   useImperativeHandle(ref, () => ({
-    skipToNextPlayable: () => {
-      skipToNextPlayableRef.current();
-    },
-    recoverToSafeIndex: () => {
-      recoverToSafeIndexRef.current();
-    },
-  }), []);
+    skipToNextPlayable,
+    recoverToSafeIndex,
+  }), [recoverToSafeIndex, skipToNextPlayable]);
 
   useEffect(() => {
-    if (isPaused || items.length <= 1 || !currentItem || currentItem.autoSkip) {
-      return;
-    }
-
     if (timerRef.current) {
       clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+
+    if (isPaused || items.length <= 1 || !activeItem || activeItem.autoSkip) {
+      return;
     }
 
     timerRef.current = setTimeout(() => {
-      goToNext();
-    }, currentDuration);
+      const currentItems = itemsRef.current;
+      const current = validateCarouselPointer(
+        currentItems,
+        Math.min(Math.max(currentIndex, 0), currentItems.length - 1),
+      ).safeIndex;
+
+      const nextIndex = findNextPlayableIndex(currentItems, current);
+      setCurrentIndex(nextIndex);
+      onSlideChangeRef.current?.(nextIndex);
+    }, activeDuration);
 
     return () => {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
+        timerRef.current = null;
       }
     };
-  }, [resolvedIndex, isPaused, currentDuration, items.length, currentItem]);
+  }, [activeIndex, activeDuration, activeItem, currentIndex, isPaused, items.length]);
+
+  useEffect(() => {
+    if (!activeItem || !activeItem.autoSkip) {
+      return;
+    }
+
+    const recoveryTimer = window.setTimeout(() => {
+      goToNext();
+    }, 0);
+
+    return () => {
+      window.clearTimeout(recoveryTimer);
+    };
+  }, [activeIndex, activeItem, goToNext]);
 
   useEffect(() => {
     return () => {
@@ -190,6 +207,19 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
       }
     };
   }, []);
+
+  const shouldRenderSlide = (index: number) => {
+    if (index === activeIndex) {
+      return true;
+    }
+
+    if (preloadAhead <= 0 || items.length <= 1) {
+      return false;
+    }
+
+    const distanceAhead = (index - activeIndex + items.length) % items.length;
+    return distanceAhead > 0 && distanceAhead <= preloadAhead;
+  };
 
   const handleMouseEnter = () => {
     if (pauseOnMouseEnter) {
@@ -287,6 +317,14 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
     );
   }
 
+  if (!activeItem || activeItem.autoSkip) {
+    return (
+      <div className={cn('w-full h-full flex items-center justify-center bg-black', className)}>
+        <p className="text-white/60">Recuperando exibição...</p>
+      </div>
+    );
+  }
+
   return (
     <div
       ref={containerRef}
@@ -307,11 +345,11 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
         }}
       >
         {items.map((item, index) => {
-          if (!shouldRenderSlide(index) || item.autoSkip) {
+          if (!shouldRenderSlide(index)) {
             return null;
           }
 
-          const isActive = index === resolvedIndex;
+          const isActive = index === activeIndex;
 
           return (
             <div
@@ -354,10 +392,10 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
           {items.map((_, index) => (
             <button
               key={index}
-              onClick={() => goToSlide(index)}
+              onClick={() => goToIndex(index)}
               className={cn(
                 'w-3 h-3 rounded-full transition-all duration-200',
-                index === resolvedIndex
+                index === activeIndex
                   ? 'bg-white shadow-lg'
                   : 'bg-white/50 hover:bg-white/70'
               )}
@@ -373,7 +411,7 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
             className="h-full bg-white/80 transition-all ease-linear"
             style={{
               width: '0%',
-              animation: `progress ${currentDuration}ms linear forwards`,
+              animation: `progress ${activeDuration}ms linear forwards`,
             }}
           />
         </div>

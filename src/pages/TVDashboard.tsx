@@ -22,6 +22,7 @@ import { LookerStudioSlide } from '@/components/slides/LookerStudioSlide'
 import { LookerDashboardPreloader } from '@/components/slides/LookerDashboardPreloader'
 import { ContratoNotificationOverlay } from '@/components/custom/ContratoNotificationOverlay'
 import { ImageNotificationOverlay } from '@/components/custom/ImageNotificationOverlay'
+import { TVCarouselGuard } from '@/components/custom/TVCarouselGuard'
 import { X } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { BIRTHDAY_SLIDE_ID, useBirthdaySlideSchedule } from '@/hooks/useBirthdaySlideSchedule'
@@ -30,7 +31,6 @@ import { useLookerSlideSchedule } from '@/hooks/useLookerSlideSchedule'
 import { getUserRoute } from '@/lib/utils'
 import type { Contrato } from '@/lib/types'
 import { isContratoCreatedAfter, isContratoTooOldToDisplay } from '@/lib/tv-contrato-guard'
-import { validateCarouselPointer } from '@/lib/carousel-pointer'
 import {
   getLookerCarouselId,
   getLookerDashboardIdFromCarouselId,
@@ -91,6 +91,7 @@ export function TVDashboard() {
   const [currentContrato, setCurrentContrato] = useState<(Contrato & { id: string }) | null>(null)
   const [showOverlay, setShowOverlay] = useState(false)
   const [isBirthdaySlideActive, setIsBirthdaySlideActive] = useState(false)
+  const [activeSlideIndex, setActiveSlideIndex] = useState(0)
   const activeSlideIndexRef = useRef(0)
   const carouselRef = useRef<DynamicTimerCarouselHandle>(null)
   const activeBirthdaySlideSlotRef = useRef<BirthdaySlideSlotId | null>(null)
@@ -248,6 +249,7 @@ export function TVDashboard() {
     }
 
     activeSlideIndexRef.current = nextIndex
+    setActiveSlideIndex(nextIndex)
   }, [carouselItems, currentBirthdaySlideSlot, handleLookerSlideEnter, handleLookerSlideExit, markBirthdaySlideShown, shouldShowLookerSlides])
 
   useEffect(() => {
@@ -259,19 +261,6 @@ export function TVDashboard() {
       activeSlideIndexRef.current = 0
     }
   }, [carouselItems.length])
-
-  useEffect(() => {
-    const validation = validateCarouselPointer(carouselItems, activeSlideIndexRef.current)
-    if (!validation.valid) {
-      console.warn('TVDashboard: ponteiro do carrossel inconsistente após mudança de horário.', {
-        currentIndex: activeSlideIndexRef.current,
-        safeIndex: validation.safeIndex,
-        reason: validation.reason,
-        slideId: carouselItems[validation.safeIndex]?.id,
-      })
-      carouselRef.current?.recoverToSafeIndex()
-    }
-  }, [carouselItems])
 
   useEffect(() => {
     return () => {
@@ -486,19 +475,25 @@ export function TVDashboard() {
       <LookerDashboardPreloader />
 
       {/* Carousel Fullscreen para TV 55 polegadas */}
-      <div className="h-screen w-screen">
-        <DynamicTimerCarousel
-          ref={carouselRef}
-          items={carouselItems}
-          className="w-full h-full"
-          showNavigation={false}
-          showPagination={false}
-          showProgressBar={false}
-          pauseOnMouseEnter={false}
-          preloadAhead={0}
-          onSlideChange={handleSlideChange}
-        />
-      </div>
+      <TVCarouselGuard
+        items={carouselItems}
+        activeIndex={activeSlideIndex}
+        carouselRef={carouselRef}
+      >
+        <div className="h-screen w-screen">
+          <DynamicTimerCarousel
+            ref={carouselRef}
+            items={carouselItems}
+            className="w-full h-full"
+            showNavigation={false}
+            showPagination={false}
+            showProgressBar={false}
+            pauseOnMouseEnter={false}
+            preloadAhead={0}
+            onSlideChange={handleSlideChange}
+          />
+        </div>
+      </TVCarouselGuard>
 
       {/* Overlay de notificação de contrato */}
       {currentContrato && showOverlay && (

@@ -202,6 +202,29 @@ describe('TV carousel pointer model', () => {
     })
   })
 
+  describe('regressão: 3º slide visível (após PPT1 e PPT2)', () => {
+    it('fora do horário Looker: 3º slide exibido é PPT3 no índice 3', () => {
+      const items = buildTvCarouselPointerItems({ showLooker: false, showBirthday: false })
+      const afterPpt1 = findNextPlayableIndex(items, 0)
+      const afterPpt2 = findNextPlayableIndex(items, afterPpt1)
+      expect(items[afterPpt1]?.id).toBe(2)
+      expect(items[afterPpt2]?.id).toBe(3)
+      expect(afterPpt2).toBe(3)
+      expectPlayable(items, afterPpt2)
+    })
+
+    it('nunca deixa o ponteiro no Looker autoSkip após sair do PPT2', () => {
+      const inWindow = buildTvCarouselPointerItems({ showLooker: true, showBirthday: false })
+      const outWindow = buildTvCarouselPointerItems({ showLooker: false, showBirthday: false })
+      const lookerIndex = TV_LOOKER_LAYOUT_INDICES[0]
+      const nextAfterPpt2 = findNextPlayableIndex(outWindow, 1)
+      expect(nextAfterPpt2).not.toBe(lookerIndex)
+      const afterScheduleEndsOnLooker = resolveIndexAfterItemsChange(inWindow, lookerIndex, outWindow)
+      expect(afterScheduleEndsOnLooker).toBe(3)
+      expect(validateCarouselPointer(outWindow, afterScheduleEndsOnLooker).valid).toBe(true)
+    })
+  })
+
   describe('regressão: bug do flatMap (ponteiro no vazio após PPT2)', () => {
     it('PPT2 → próximo é PPT3, não Looker, fora do horário', () => {
       const items = buildTvCarouselPointerItems({ showLooker: false, showBirthday: false })

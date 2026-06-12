@@ -139,9 +139,14 @@ export const validateCarouselPointer = (
     return { valid: true, safeIndex: boundedIndex }
   }
 
-  const safeIndex = findFirstPlayableIndex(items)
-  if (isPlayableIndex(items, safeIndex)) {
-    return { valid: false, safeIndex, reason: 'autoSkip' }
+  const nextPlayableIndex = findNextPlayableIndex(items, boundedIndex)
+  if (isPlayableIndex(items, nextPlayableIndex)) {
+    return { valid: false, safeIndex: nextPlayableIndex, reason: 'autoSkip' }
+  }
+
+  const fallbackIndex = findFirstPlayableIndex(items)
+  if (isPlayableIndex(items, fallbackIndex)) {
+    return { valid: false, safeIndex: fallbackIndex, reason: 'autoSkip' }
   }
 
   return { valid: false, safeIndex: 0, reason: 'no_playable' }
