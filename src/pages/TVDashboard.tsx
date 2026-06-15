@@ -42,6 +42,7 @@ import {
   LOOKER_DASHBOARD_MAP,
   TV_MODE_CAROUSEL_LAYOUT,
 } from '@/lib/lookerConfig'
+import { TV_PPT_LAYOUT_INDICES } from '@/lib/tv-carousel-pointer-model'
 
 type BrowserTimeoutHandle = number
 
@@ -511,6 +512,7 @@ export function TVDashboard() {
           <DynamicTimerCarousel
             ref={carouselRef}
             items={carouselItems}
+            pptFallbackIndices={TV_PPT_LAYOUT_INDICES}
             className="w-full h-full"
             showNavigation={false}
             showPagination={false}

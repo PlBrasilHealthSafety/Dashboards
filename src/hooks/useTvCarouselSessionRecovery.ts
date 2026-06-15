@@ -77,7 +77,7 @@ export function useTvCarouselSessionRecovery({
         safeIndex: report.safeIndex,
         issues: report.issues,
       })
-      carouselRef.current?.recoverToSafeIndex()
+      carouselRef.current?.recoverToPptFallback()
     }
 
     if (options?.escalateToReload) {

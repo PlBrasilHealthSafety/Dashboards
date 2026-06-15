@@ -8,6 +8,12 @@ import {
   resolveRenderableIndexAfterItemsChange,
   validateRenderablePointer,
 } from '@/lib/carousel-pointer';
+import {
+  findFirstRenderablePptIndex,
+  findNextRenderablePptIndex,
+  resolveTvIndexAfterItemsChange,
+  validateTvCarouselPointer,
+} from '@/lib/tv-ppt-fallback';
 import { cn } from '@/lib/utils';
 
 export interface DynamicCarouselItem {
@@ -27,11 +33,14 @@ export interface DynamicTimerCarouselProps {
   pauseOnMouseEnter?: boolean;
   preloadAhead?: number;
   onSlideChange?: (index: number) => void;
+  /** Índices dos 8 PPTs no layout da TV — força retorno aos slides institucionais em nós vazios */
+  pptFallbackIndices?: number[];
 }
 
 export interface DynamicTimerCarouselHandle {
   skipToNextPlayable: () => void;
   recoverToSafeIndex: () => void;
+  recoverToPptFallback: () => void;
   getActiveIndex: () => number;
 }
 
@@ -46,8 +55,26 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
   pauseOnMouseEnter = true,
   preloadAhead = 0,
   onSlideChange,
+  pptFallbackIndices,
 }, ref) {
-  const [currentIndex, setCurrentIndex] = useState(() => findFirstRenderableIndex(items));
+  const pptFallbackRef = useRef(pptFallbackIndices);
+  pptFallbackRef.current = pptFallbackIndices;
+
+  const resolvePointer = useCallback((carouselItems: DynamicCarouselItem[], index: number) => {
+    if (pptFallbackRef.current?.length) {
+      return validateTvCarouselPointer(carouselItems, index, pptFallbackRef.current);
+    }
+    return validateRenderablePointer(carouselItems, index);
+  }, []);
+
+  const resolveInitialIndex = useCallback((carouselItems: DynamicCarouselItem[]) => {
+    if (pptFallbackRef.current?.length) {
+      return findFirstRenderablePptIndex(carouselItems, pptFallbackRef.current);
+    }
+    return findFirstRenderableIndex(carouselItems);
+  }, []);
+
+  const [currentIndex, setCurrentIndex] = useState(() => resolveInitialIndex(items));
   const [isPaused, setIsPaused] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onSlideChangeRef = useRef(onSlideChange);
@@ -67,17 +94,17 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
   }, [onSlideChange]);
 
   const boundedIndex = items.length === 0 ? 0 : Math.min(Math.max(currentIndex, 0), items.length - 1);
-  const activeIndex = validateRenderablePointer(items, boundedIndex).safeIndex;
+  const activeIndex = resolvePointer(items, boundedIndex).safeIndex;
   const activeItem = items[activeIndex];
   const activeDuration = activeItem?.duration && activeItem.duration > 0
     ? activeItem.duration
     : DEFAULT_SLIDE_DURATION_MS;
 
   const commitIndex = useCallback((nextIndex: number) => {
-    const safeIndex = validateRenderablePointer(itemsRef.current, nextIndex).safeIndex;
+    const safeIndex = resolvePointer(itemsRef.current, nextIndex).safeIndex;
     setCurrentIndex(safeIndex);
     onSlideChangeRef.current?.(safeIndex);
-  }, []);
+  }, [resolvePointer]);
 
   const commitIndexRef = useRef(commitIndex);
   commitIndexRef.current = commitIndex;
@@ -95,7 +122,9 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
       return;
     }
 
-    const remappedIndex = resolveRenderableIndexAfterItemsChange(previousItems, boundedIndex, items);
+    const remappedIndex = pptFallbackRef.current?.length
+      ? resolveTvIndexAfterItemsChange(previousItems, boundedIndex, items, pptFallbackRef.current)
+      : resolveRenderableIndexAfterItemsChange(previousItems, boundedIndex, items);
     previousItemsRef.current = items;
 
     if (remappedIndex !== boundedIndex) {
@@ -113,7 +142,9 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
     const boundedTarget = Math.min(Math.max(index, 0), currentItems.length - 1);
     const targetIndex = isRenderableCarouselItem(currentItems[boundedTarget])
       ? boundedTarget
-      : findNextRenderableIndex(currentItems, boundedTarget);
+      : pptFallbackRef.current?.length
+        ? findNextRenderablePptIndex(currentItems, boundedTarget, pptFallbackRef.current)
+        : findNextRenderableIndex(currentItems, boundedTarget);
 
     commitIndex(targetIndex);
   }, [commitIndex]);
@@ -124,13 +155,37 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
       return;
     }
 
-    const current = validateRenderablePointer(
+    const current = resolvePointer(
       currentItems,
       Math.min(Math.max(currentIndex, 0), currentItems.length - 1),
     ).safeIndex;
 
-    commitIndex(findNextRenderableIndex(currentItems, current));
-  }, [commitIndex, currentIndex]);
+    if (pptFallbackRef.current?.length && !isRenderableCarouselItem(currentItems[current])) {
+      commitIndex(findNextRenderablePptIndex(currentItems, current, pptFallbackRef.current));
+      return;
+    }
+
+    let nextIndex = findNextRenderableIndex(currentItems, current);
+    if (!isRenderableCarouselItem(currentItems[nextIndex])) {
+      nextIndex = pptFallbackRef.current?.length
+        ? findNextRenderablePptIndex(currentItems, current, pptFallbackRef.current)
+        : resolvePointer(currentItems, nextIndex).safeIndex;
+    }
+
+    commitIndex(nextIndex);
+  }, [commitIndex, currentIndex, resolvePointer]);
+
+  const recoverToPptFallback = useCallback(() => {
+    const currentItems = itemsRef.current;
+    const current = Math.min(Math.max(currentIndex, 0), currentItems.length - 1);
+
+    if (pptFallbackRef.current?.length) {
+      commitIndex(findNextRenderablePptIndex(currentItems, current, pptFallbackRef.current));
+      return;
+    }
+
+    commitIndex(resolvePointer(currentItems, current).safeIndex);
+  }, [commitIndex, currentIndex, resolvePointer]);
 
   const goToPrevious = useCallback(() => {
     const currentItems = itemsRef.current;
@@ -138,29 +193,34 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
       return;
     }
 
-    const current = validateRenderablePointer(
+    const current = resolvePointer(
       currentItems,
       Math.min(Math.max(currentIndex, 0), currentItems.length - 1),
     ).safeIndex;
 
     commitIndex(findPreviousPlayableIndex(currentItems, current));
-  }, [commitIndex, currentIndex]);
+  }, [commitIndex, currentIndex, resolvePointer]);
 
   const skipToNextPlayable = useCallback(() => {
+    if (pptFallbackRef.current?.length) {
+      recoverToPptFallback();
+      return;
+    }
     goToNext();
-  }, [goToNext]);
+  }, [goToNext, recoverToPptFallback]);
 
   const recoverToSafeIndex = useCallback(() => {
     const currentItems = itemsRef.current;
     const current = Math.min(Math.max(currentIndex, 0), currentItems.length - 1);
-    commitIndex(validateRenderablePointer(currentItems, current).safeIndex);
-  }, [commitIndex, currentIndex]);
+    commitIndex(resolvePointer(currentItems, current).safeIndex);
+  }, [commitIndex, currentIndex, resolvePointer]);
 
   useImperativeHandle(ref, () => ({
     skipToNextPlayable,
     recoverToSafeIndex,
+    recoverToPptFallback,
     getActiveIndex: () => activeIndex,
-  }), [activeIndex, recoverToSafeIndex, skipToNextPlayable]);
+  }), [activeIndex, recoverToPptFallback, recoverToSafeIndex, skipToNextPlayable]);
 
   useEffect(() => {
     if (timerRef.current) {
@@ -174,12 +234,19 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
 
     timerRef.current = setTimeout(() => {
       const currentItems = itemsRef.current;
-      const current = validateRenderablePointer(
+      const current = resolvePointer(
         currentItems,
         Math.min(Math.max(currentIndex, 0), currentItems.length - 1),
       ).safeIndex;
 
-      commitIndexRef.current(findNextRenderableIndex(currentItems, current));
+      let nextIndex = findNextRenderableIndex(currentItems, current);
+      if (!isRenderableCarouselItem(currentItems[nextIndex])) {
+        nextIndex = pptFallbackRef.current?.length
+          ? findNextRenderablePptIndex(currentItems, current, pptFallbackRef.current)
+          : resolvePointer(currentItems, nextIndex).safeIndex;
+      }
+
+      commitIndexRef.current(nextIndex);
     }, activeDuration);
 
     return () => {
@@ -188,7 +255,7 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
         timerRef.current = null;
       }
     };
-  }, [activeIndex, activeDuration, activeItem, currentIndex, isPaused, items.length]);
+  }, [activeIndex, activeDuration, activeItem, currentIndex, isPaused, items.length, resolvePointer]);
 
   useEffect(() => {
     const watchdogId = window.setInterval(() => {
@@ -201,10 +268,10 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
       const currentItem = currentItems[bounded];
 
       if (!isRenderableCarouselItem(currentItem)) {
-        const validation = validateRenderablePointer(currentItems, bounded);
+        const validation = resolvePointer(currentItems, bounded);
         commitIndexRef.current(validation.safeIndex);
       }
-    }, 1000);
+    }, 500);
 
     return () => {
       window.clearInterval(watchdogId);
@@ -217,13 +284,17 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
     }
 
     const recoveryTimer = window.setTimeout(() => {
+      if (pptFallbackRef.current?.length) {
+        recoverToPptFallback();
+        return;
+      }
       goToNext();
     }, 0);
 
     return () => {
       window.clearTimeout(recoveryTimer);
     };
-  }, [activeIndex, activeItem, goToNext]);
+  }, [activeIndex, activeItem, goToNext, recoverToPptFallback]);
 
   useEffect(() => {
     return () => {

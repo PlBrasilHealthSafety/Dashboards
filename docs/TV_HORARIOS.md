@@ -8,8 +8,9 @@ A TV exibe um carrossel em loop com **14 posições fixas**. Slides fora do hor�
 
 Componentes de segurança em runtime:
 
-- `carousel-pointer.ts` — lógica de ponteiros (252+ testes automatizados)
-- `TVCarouselGuard` — auditoria a cada 4s e recuperação automática se detectar travamento
+- `carousel-pointer.ts` — lógica de ponteiros (270+ testes automatizados)
+- `tv-ppt-fallback.ts` — **garantia absoluta**: nó vazio → salta direto para um dos 8 PPTs
+- `TVCarouselGuard` — auditoria a cada 4s e recuperação automática para PPT se detectar travamento
 
 ## Horários
 

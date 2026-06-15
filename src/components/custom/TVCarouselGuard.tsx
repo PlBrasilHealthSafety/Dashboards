@@ -52,7 +52,7 @@ export function TVCarouselGuard({
       return
     }
 
-    carouselRef.current?.recoverToSafeIndex()
+      carouselRef.current?.recoverToPptFallback()
     lastProgressAtRef.current = Date.now()
   }
 

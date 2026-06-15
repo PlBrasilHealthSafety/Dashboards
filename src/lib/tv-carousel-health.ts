@@ -1,4 +1,5 @@
-import { isRenderableCarouselItem, validateRenderablePointer } from '@/lib/carousel-pointer'
+import { isRenderableCarouselItem } from '@/lib/carousel-pointer'
+import { validateTvCarouselPointer } from '@/lib/tv-ppt-fallback'
 import { TV_MODE_CAROUSEL_LAYOUT } from '@/lib/lookerConfig'
 
 export interface TvCarouselHealthItem {
@@ -42,7 +43,7 @@ export const auditTvCarouselHealth = (
     ? 0
     : Math.min(Math.max(activeIndex, 0), items.length - 1)
 
-  const pointer = validateRenderablePointer(items, boundedActiveIndex)
+  const pointer = validateTvCarouselPointer(items, boundedActiveIndex)
 
   if (boundedActiveIndex !== pointer.safeIndex) {
     issues.push(
