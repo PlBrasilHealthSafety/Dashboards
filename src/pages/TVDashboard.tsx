@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState, useCallback, useRef } from 'react'
+import { useMemo, useEffect, useState, useCallback, useRef, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   DynamicTimerCarousel,
@@ -23,11 +23,15 @@ import { LookerDashboardPreloader } from '@/components/slides/LookerDashboardPre
 import { ContratoNotificationOverlay } from '@/components/custom/ContratoNotificationOverlay'
 import { ImageNotificationOverlay } from '@/components/custom/ImageNotificationOverlay'
 import { TVCarouselGuard } from '@/components/custom/TVCarouselGuard'
+import { TvErrorBoundary } from '@/components/custom/TvErrorBoundary'
+import { useTvKioskShield } from '@/hooks/useTvKioskShield'
 import { X } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { BIRTHDAY_SLIDE_ID, useBirthdaySlideSchedule } from '@/hooks/useBirthdaySlideSchedule'
 import type { BirthdaySlideSlotId } from '@/hooks/useBirthdaySlideSchedule'
 import { useLookerSlideSchedule } from '@/hooks/useLookerSlideSchedule'
+import { useTvCarouselSessionRecovery } from '@/hooks/useTvCarouselSessionRecovery'
+import { getTvStationId } from '@/lib/tv-station'
 import { getUserRoute } from '@/lib/utils'
 import type { Contrato } from '@/lib/types'
 import { isContratoCreatedAfter, isContratoTooOldToDisplay } from '@/lib/tv-contrato-guard'
@@ -84,6 +88,17 @@ const PPT_SLIDE_COMPONENTS = {
   7: PowerPointSlide7,
   8: PowerPointSlide8,
 } as const
+
+const STABLE_PPT_CONTENT: Record<keyof typeof PPT_SLIDE_COMPONENTS, ReactNode> = {
+  1: <PowerPointSlide1 key="tv-ppt-1" />,
+  2: <PowerPointSlide2 key="tv-ppt-2" />,
+  3: <PowerPointSlide3 key="tv-ppt-3" />,
+  4: <PowerPointSlide4 key="tv-ppt-4" />,
+  5: <PowerPointSlide5 key="tv-ppt-5" />,
+  6: <PowerPointSlide6 key="tv-ppt-6" />,
+  7: <PowerPointSlide7 key="tv-ppt-7" />,
+  8: <PowerPointSlide8 key="tv-ppt-8" />,
+}
 
 export function TVDashboard() {
   const navigate = useNavigate()
@@ -176,10 +191,9 @@ export function TVDashboard() {
   const carouselItems = useMemo((): DynamicCarouselItem[] => {
     return TV_MODE_CAROUSEL_LAYOUT.map((entry): DynamicCarouselItem => {
       if (entry.kind === 'ppt') {
-        const SlideComponent = PPT_SLIDE_COMPONENTS[entry.slide]
         return {
           id: entry.slide,
-          content: <SlideComponent />,
+          content: STABLE_PPT_CONTENT[entry.slide],
           duration: 30000,
         }
       }
@@ -214,16 +228,28 @@ export function TVDashboard() {
     })
   }, [isBirthdaySlideActive, shouldShowBirthdaySlide, shouldShowLookerSlides, skipUnavailableLookerSlide])
 
+  useTvCarouselSessionRecovery({
+    carouselRef,
+    items: carouselItems,
+    activeIndex: activeSlideIndex,
+  })
+
+  useTvKioskShield({
+    activeIndex: activeSlideIndex,
+    items: carouselItems,
+    carouselRef,
+    isPlaybackPaused: showOverlay,
+  })
+
+  useEffect(() => {
+    console.info('TVDashboard: estacao TV ativa.', { stationId: getTvStationId() })
+  }, [])
+
   const handleSlideChange = useCallback((nextIndex: number) => {
     const previousItem = carouselItems[activeSlideIndexRef.current]
     const nextItem = carouselItems[nextIndex]
 
-    if (
-      previousItem &&
-      !previousItem.autoSkip &&
-      isLookerCarouselId(previousItem.id) &&
-      shouldShowLookerSlides
-    ) {
+    if (previousItem && isLookerCarouselId(previousItem.id)) {
       handleLookerSlideExit(getLookerDashboardIdFromCarouselId(previousItem.id))
     }
 
@@ -454,6 +480,7 @@ export function TVDashboard() {
   }
 
   return (
+    <TvErrorBoundary>
     <div className="fixed inset-0 bg-black overflow-hidden">
       {/* Botão flutuante discreto para voltar */}
       <button
@@ -511,5 +538,6 @@ export function TVDashboard() {
       {/* Overlay de imagem fixa */}
       <ImageNotificationOverlay />
     </div>
+    </TvErrorBoundary>
   )
 }

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useBusinessClock } from '@/hooks/useBusinessClock'
+import { readScopedTvStorage, writeScopedTvStorage } from '@/lib/tv-station'
 
 export const BIRTHDAY_SLIDE_ID = 'aniversariantes'
 
@@ -81,7 +82,7 @@ const parseBirthdaySlideHistory = (storedValue: string | null): BirthdaySlideHis
 
 const readBirthdaySlideHistory = () => {
   try {
-    return parseBirthdaySlideHistory(window.localStorage.getItem(BIRTHDAY_SLIDE_STORAGE_KEY))
+    return parseBirthdaySlideHistory(readScopedTvStorage(BIRTHDAY_SLIDE_STORAGE_KEY))
   } catch (error) {
     console.warn('Nao foi possivel ler o registro local do slide de aniversariantes.', error)
     return createEmptyBirthdaySlideHistory()
@@ -90,7 +91,7 @@ const readBirthdaySlideHistory = () => {
 
 const writeBirthdaySlideHistory = (history: BirthdaySlideHistory) => {
   try {
-    window.localStorage.setItem(BIRTHDAY_SLIDE_STORAGE_KEY, JSON.stringify(history))
+    writeScopedTvStorage(BIRTHDAY_SLIDE_STORAGE_KEY, JSON.stringify(history))
   } catch (error) {
     console.warn('Nao foi possivel salvar o registro local do slide de aniversariantes.', error)
   }
@@ -128,6 +129,19 @@ export function useBirthdaySlideSchedule() {
       setBirthdaySlideHistory(storedHistory)
     }
   }, [currentDateKey, birthdaySlideHistory])
+
+  useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (!event.key?.startsWith(BIRTHDAY_SLIDE_STORAGE_KEY)) {
+        return
+      }
+
+      setBirthdaySlideHistory(readBirthdaySlideHistory())
+    }
+
+    window.addEventListener('storage', onStorage)
+    return () => window.removeEventListener('storage', onStorage)
+  }, [])
 
   const markBirthdaySlidePresentationStarted = useCallback(() => {
     if (!currentBirthdaySlideWindow) {

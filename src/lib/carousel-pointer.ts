@@ -117,6 +117,74 @@ export interface CarouselPointerValidation {
   reason?: 'empty' | 'autoSkip' | 'outOfBounds' | 'no_playable'
 }
 
+export const findFirstRenderableIndex = (
+  items: Array<CarouselPointerItem & { content?: unknown }>,
+): number => {
+  if (items.length === 0) {
+    return 0
+  }
+
+  for (let index = 0; index < items.length; index += 1) {
+    if (isRenderableCarouselItem(items[index])) {
+      return index
+    }
+  }
+
+  return findFirstPlayableIndex(items)
+}
+
+export const isRenderableCarouselItem = (
+  item: CarouselPointerItem & { content?: unknown },
+): boolean => {
+  return Boolean(item && !item.autoSkip && item.content != null)
+}
+
+export const findNextRenderableIndex = (
+  items: Array<CarouselPointerItem & { content?: unknown }>,
+  fromIndex: number,
+): number => {
+  if (items.length === 0) {
+    return 0
+  }
+
+  if (items.length === 1) {
+    return 0
+  }
+
+  let nextIndex = (fromIndex + 1) % items.length
+  let steps = 0
+
+  while (steps < items.length) {
+    if (isRenderableCarouselItem(items[nextIndex])) {
+      return nextIndex
+    }
+
+    nextIndex = (nextIndex + 1) % items.length
+    steps += 1
+  }
+
+  return findFirstRenderableIndex(items)
+}
+
+export const validateRenderablePointer = (
+  items: Array<CarouselPointerItem & { content?: unknown }>,
+  index: number,
+): CarouselPointerValidation => {
+  const pointer = validateCarouselPointer(items, index)
+  const candidate = items[pointer.safeIndex]
+
+  if (isRenderableCarouselItem(candidate)) {
+    return { valid: true, safeIndex: pointer.safeIndex }
+  }
+
+  const nextRenderableIndex = findNextRenderableIndex(items, pointer.safeIndex)
+  if (isRenderableCarouselItem(items[nextRenderableIndex])) {
+    return { valid: false, safeIndex: nextRenderableIndex, reason: 'autoSkip' }
+  }
+
+  return { valid: false, safeIndex: findFirstRenderableIndex(items), reason: 'no_playable' }
+}
+
 export const validateCarouselPointer = (
   items: CarouselPointerItem[],
   index: number,
@@ -168,6 +236,23 @@ export const resolveIndexAfterItemsChange = (
   }
 
   return validateCarouselPointer(nextItems, remappedIndex).safeIndex
+}
+
+export const resolveRenderableIndexAfterItemsChange = (
+  previousItems: Array<CarouselPointerItem & { content?: unknown }>,
+  previousIndex: number,
+  nextItems: Array<CarouselPointerItem & { content?: unknown }>,
+): number => {
+  if (nextItems.length === 0) {
+    return 0
+  }
+
+  let remappedIndex = findRemappedIndex(previousItems, previousIndex, nextItems)
+  if (!isRenderableCarouselItem(nextItems[remappedIndex])) {
+    remappedIndex = findNextRenderableIndex(nextItems, remappedIndex)
+  }
+
+  return validateRenderablePointer(nextItems, remappedIndex).safeIndex
 }
 
 /** Simula avanços do timer para testes de ciclo completo. */

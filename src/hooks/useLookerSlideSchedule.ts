@@ -7,6 +7,8 @@ import {
   type LookerCycleSlotId,
 } from '@/lib/looker-schedule'
 
+import { readScopedTvStorage, writeScopedTvStorage } from '@/lib/tv-station'
+
 const LOOKER_CYCLE_STORAGE_KEY = 'plbrasil:looker-cycle-history'
 
 interface LookerCycleHistory {
@@ -23,7 +25,7 @@ const createEmptyLookerCycleHistory = (dateKey: string): LookerCycleHistory => (
 
 const readLookerCycleHistory = (dateKey: string) => {
   try {
-    const raw = window.localStorage.getItem(LOOKER_CYCLE_STORAGE_KEY)
+    const raw = readScopedTvStorage(LOOKER_CYCLE_STORAGE_KEY)
     if (!raw) {
       return createEmptyLookerCycleHistory(dateKey)
     }
@@ -45,7 +47,7 @@ const readLookerCycleHistory = (dateKey: string) => {
 
 const writeLookerCycleHistory = (history: LookerCycleHistory) => {
   try {
-    window.localStorage.setItem(LOOKER_CYCLE_STORAGE_KEY, JSON.stringify(history))
+    writeScopedTvStorage(LOOKER_CYCLE_STORAGE_KEY, JSON.stringify(history))
   } catch (error) {
     console.warn('Nao foi possivel salvar o historico de ciclos Looker.', error)
   }
@@ -76,9 +78,10 @@ export function useLookerSlideSchedule({ clockSnapshot, isTimeReady }: UseLooker
     cyclesShownInCurrentWindow < currentWindow.maxCycles
   )
 
-  const shouldShowLookerSlides =
-    isLookerCycleActive ||
-    (currentWindow !== null && (activeLookerSlideIds.size > 0 || canStartNewLookerCycle))
+  const shouldShowLookerSlides = Boolean(
+    currentWindow &&
+    (isLookerCycleActive || activeLookerSlideIds.size > 0 || canStartNewLookerCycle),
+  )
 
   useEffect(() => {
     if (currentWindow) {
@@ -96,7 +99,28 @@ export function useLookerSlideSchedule({ clockSnapshot, isTimeReady }: UseLooker
   }, [activeLookerSlideIds.size, currentWindow, isLookerCycleActive])
 
   useEffect(() => {
+    if (!currentWindow || isLookerCycleActive || activeLookerSlideIds.size > 0 || canStartNewLookerCycle) {
+      return
+    }
+
+    setActiveCycleSlotId(null)
+  }, [activeLookerSlideIds.size, canStartNewLookerCycle, currentWindow, isLookerCycleActive])
+
+  useEffect(() => {
     setCycleHistory(readLookerCycleHistory(clockSnapshot.dateKey))
+  }, [clockSnapshot.dateKey])
+
+  useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (!event.key?.startsWith(LOOKER_CYCLE_STORAGE_KEY)) {
+        return
+      }
+
+      setCycleHistory(readLookerCycleHistory(clockSnapshot.dateKey))
+    }
+
+    window.addEventListener('storage', onStorage)
+    return () => window.removeEventListener('storage', onStorage)
   }, [clockSnapshot.dateKey])
 
   const incrementCycleCount = useCallback((slotId: LookerCycleSlotId) => {

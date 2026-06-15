@@ -4,10 +4,14 @@ import {
   findNextPlayableIndex,
   findPreviousPlayableIndex,
   findRemappedIndex,
+  findNextRenderableIndex,
   isPlayableIndex,
+  isRenderableCarouselItem,
   resolveIndexAfterItemsChange,
+  resolveRenderableIndexAfterItemsChange,
   simulateCarouselAdvances,
   validateCarouselPointer,
+  validateRenderablePointer,
   type CarouselPointerItem,
 } from '@/lib/carousel-pointer'
 import {
@@ -333,6 +337,35 @@ describe('TV carousel pointer model', () => {
       ]
       expect(findRemappedIndex(before, 2, after)).toBe(2)
       expect(resolveIndexAfterItemsChange(before, 2, after)).toBe(0)
+    })
+  })
+
+  describe('validateRenderablePointer', () => {
+    it('pula slot sem conteúdo mesmo quando autoSkip é false', () => {
+      const items = [
+        { id: 1, content: 'ppt-1' },
+        { id: 'looker-a', autoSkip: false, content: null },
+        { id: 2, content: 'ppt-2' },
+      ]
+
+      expect(isRenderableCarouselItem(items[1])).toBe(false)
+      expect(validateRenderablePointer(items, 1).safeIndex).toBe(2)
+      expect(findNextRenderableIndex(items, 1)).toBe(2)
+    })
+
+    it('recalcula ponteiro após looker perder conteúdo no meio da rotação', () => {
+      const before = [
+        { id: 1, content: 'ppt-1' },
+        { id: 'looker-a', autoSkip: false, content: 'looker' },
+        { id: 2, content: 'ppt-2' },
+      ]
+      const after = [
+        { id: 1, content: 'ppt-1' },
+        { id: 'looker-a', autoSkip: true, content: null },
+        { id: 2, content: 'ppt-2' },
+      ]
+
+      expect(resolveRenderableIndexAfterItemsChange(before, 1, after)).toBe(2)
     })
   })
 })

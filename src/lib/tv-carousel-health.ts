@@ -1,4 +1,4 @@
-import { validateCarouselPointer } from '@/lib/carousel-pointer'
+import { isRenderableCarouselItem, validateRenderablePointer } from '@/lib/carousel-pointer'
 import { TV_MODE_CAROUSEL_LAYOUT } from '@/lib/lookerConfig'
 
 export interface TvCarouselHealthItem {
@@ -38,9 +38,23 @@ export const auditTvCarouselHealth = (
     issues.push('Nenhum slide jogável na lista — a TV ficaria travada.')
   }
 
-  const pointer = validateCarouselPointer(items, activeIndex)
-  if (!pointer.valid) {
-    issues.push(`Ponteiro inválido no índice ${activeIndex} (${pointer.reason ?? 'desconhecido'}).`)
+  const boundedActiveIndex = items.length === 0
+    ? 0
+    : Math.min(Math.max(activeIndex, 0), items.length - 1)
+
+  const pointer = validateRenderablePointer(items, boundedActiveIndex)
+
+  if (boundedActiveIndex !== pointer.safeIndex) {
+    issues.push(
+      `Ponteiro inválido no índice ${boundedActiveIndex} (${pointer.reason ?? 'autoSkip'}) — corrigir para ${pointer.safeIndex}.`,
+    )
+  }
+
+  const displayedItem = items[boundedActiveIndex]
+  if (displayedItem?.autoSkip) {
+    issues.push(`Slide ativo ${String(displayedItem.id)} está marcado como autoSkip.`)
+  } else if (displayedItem && !isRenderableCarouselItem(displayedItem)) {
+    issues.push(`Slide ativo ${String(displayedItem.id)} não tem conteúdo renderizável.`)
   }
 
   const activeItem = items[pointer.safeIndex]

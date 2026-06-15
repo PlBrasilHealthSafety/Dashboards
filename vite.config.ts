@@ -82,7 +82,7 @@ export default defineConfig(({ mode }) => {
       __APP_BUILD_ID__: JSON.stringify(appBuildId),
     },
     test: {
-      environment: 'node',
+      environment: 'happy-dom',
       include: ['src/**/*.test.ts'],
     },
   }

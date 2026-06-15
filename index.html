@@ -7,6 +7,31 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Proteção TV: roda ANTES do React ao clicar "continuar sessão" / bfcache -->
+    <script>
+      (function () {
+        var TV_PATH = '/tv-dashboard';
+        function isTvRoute() {
+          return window.location.pathname.indexOf(TV_PATH) !== -1;
+        }
+        function hardReloadTv(reason) {
+          if (!isTvRoute()) return;
+          var url = new URL(window.location.href);
+          url.searchParams.set('_tv', String(Date.now()));
+          url.searchParams.set('_r', reason);
+          window.location.replace(url.toString());
+        }
+        window.addEventListener('pageshow', function (event) {
+          if (event.persisted) hardReloadTv('early_pageshow');
+        });
+        document.addEventListener('resume', function () {
+          hardReloadTv('early_resume');
+        });
+        if (document.wasDiscarded) {
+          hardReloadTv('early_discarded');
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
