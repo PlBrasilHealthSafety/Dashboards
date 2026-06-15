@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { toEmbedUrl } from '@/lib/lookerConfig'
-import { isLookerEmbedLoaded, markLookerEmbedLoaded, prefetchLookerEmbed } from '@/lib/looker-preload-cache'
+import { prefetchLookerEmbed } from '@/lib/looker-preload-cache'
 
 interface LookerStudioSlideProps {
     /** URL do relatório no Looker Studio */
@@ -11,6 +11,8 @@ interface LookerStudioSlideProps {
     refreshInterval?: number
     /** Tempo máximo de espera pelo iframe (0 = sem limite) */
     loadTimeoutMs?: number
+    /** Modo TV: ignora cache de preload e força timeout agressivo */
+    tvMode?: boolean
     /** Chamado quando o dashboard não carrega (timeout ou erro) */
     onUnavailable?: () => void
 }
@@ -20,6 +22,8 @@ const LOOKER_CONNECTION_HINTS = [
     'https://www.gstatic.com',
     'https://accounts.google.com',
 ]
+
+const TV_LOAD_TIMEOUT_MS = 8000
 
 const ensureConnectionHint = (rel: 'preconnect' | 'dns-prefetch', href: string) => {
     const selector = `link[rel="${rel}"][href="${href}"]`
@@ -41,34 +45,46 @@ const ensureConnectionHint = (rel: 'preconnect' | 'dns-prefetch', href: string) 
 
 /**
  * Componente de slide que exibe um dashboard do Looker Studio via iframe.
- * 
- * Otimizado para TV:
- * - Renderiza o iframe em 1920x1080 e escala para caber na tela
- * - Mostra apenas a parte superior do dashboard (sem scroll)
- * - Tudo que não cabe é cortado (overflow hidden)
- * - Auto-refresh periódico para manter dados atualizados
  */
-const TV_LOAD_TIMEOUT_MS = 25000
-
 export function LookerStudioSlide({
     url,
     title,
     refreshInterval = 300000,
     loadTimeoutMs = 0,
+    tvMode = false,
     onUnavailable,
 }: LookerStudioSlideProps) {
     const embedUrl = toEmbedUrl(url)
-    const requiresLoadConfirmation = loadTimeoutMs > 0
-    const [isLoading, setIsLoading] = useState(
-        () => requiresLoadConfirmation || !isLookerEmbedLoaded(url)
-    )
+    const onUnavailableRef = useRef(onUnavailable)
+    onUnavailableRef.current = onUnavailable
+
+    const [isLoading, setIsLoading] = useState(true)
     const [hasError, setHasError] = useState(false)
     const [refreshKey, setRefreshKey] = useState(0)
     const containerRef = useRef<HTMLDivElement>(null)
     const [scale, setScale] = useState(1)
+    const hasReportedUnavailableRef = useRef(false)
 
     const iframeWidth = 1920
     const iframeHeight = 1080
+
+    const reportUnavailable = useCallback((reason: string) => {
+        if (hasReportedUnavailableRef.current) {
+            return
+        }
+
+        hasReportedUnavailableRef.current = true
+        console.warn('LookerStudioSlide: dashboard indisponivel na TV.', { title, reason })
+        setIsLoading(false)
+        setHasError(true)
+        onUnavailableRef.current?.()
+    }, [title])
+
+    useEffect(() => {
+        hasReportedUnavailableRef.current = false
+        setIsLoading(true)
+        setHasError(false)
+    }, [url, refreshKey])
 
     useEffect(() => {
         LOOKER_CONNECTION_HINTS.forEach(href => {
@@ -78,7 +94,6 @@ export function LookerStudioSlide({
         prefetchLookerEmbed(url)
     }, [url])
 
-    // Calcula escala para caber na largura da TV
     useEffect(() => {
         const updateScale = () => {
             if (containerRef.current) {
@@ -92,7 +107,6 @@ export function LookerStudioSlide({
         return () => window.removeEventListener('resize', updateScale)
     }, [])
 
-    // Auto-refresh (desligado no Modo TV com refreshInterval={0})
     useEffect(() => {
         if (refreshInterval <= 0) {
             return
@@ -108,45 +122,46 @@ export function LookerStudioSlide({
     }, [refreshInterval])
 
     useEffect(() => {
-        if (!requiresLoadConfirmation && isLookerEmbedLoaded(url)) {
-            setIsLoading(false)
-        }
-    }, [requiresLoadConfirmation, url])
+        const timeoutMs = tvMode
+            ? TV_LOAD_TIMEOUT_MS
+            : loadTimeoutMs > 0
+                ? loadTimeoutMs
+                : 0
 
-    useEffect(() => {
-        const timeoutMs = loadTimeoutMs > 0 ? loadTimeoutMs : (refreshInterval === 0 ? TV_LOAD_TIMEOUT_MS : 0)
         if (timeoutMs <= 0) {
             return
         }
 
         const timeoutId = window.setTimeout(() => {
-            setIsLoading(false)
-            setHasError(true)
-            onUnavailable?.()
+            reportUnavailable('load_timeout')
         }, timeoutMs)
 
         return () => window.clearTimeout(timeoutId)
-    }, [loadTimeoutMs, onUnavailable, refreshInterval, url])
+    }, [loadTimeoutMs, reportUnavailable, refreshKey, tvMode, url])
 
     const handleLoad = useCallback(() => {
-        markLookerEmbedLoaded(url)
+        if (tvMode) {
+            window.setTimeout(() => {
+                setIsLoading(false)
+                setHasError(false)
+            }, 400)
+            return
+        }
+
         setIsLoading(false)
         setHasError(false)
-    }, [url])
+    }, [tvMode])
 
     const handleError = useCallback(() => {
-        setIsLoading(false)
-        setHasError(true)
-        onUnavailable?.()
-    }, [onUnavailable])
+        reportUnavailable('iframe_error')
+    }, [reportUnavailable])
 
     return (
         <div
             ref={containerRef}
             className="relative w-full h-full overflow-hidden"
-            style={{ backgroundColor: '#f8f9fa' }}
+            style={{ backgroundColor: '#0a1628' }}
         >
-            {/* Loading overlay */}
             {isLoading && (
                 <div className="absolute inset-0 z-10 flex flex-col items-center justify-center" style={{ backgroundColor: '#0a1628' }}>
                     <div className="relative mb-8">
@@ -159,45 +174,24 @@ export function LookerStudioSlide({
                                 borderTopColor: '#00A298',
                             }}
                         />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <div
-                                className="rounded-full animate-pulse"
-                                style={{
-                                    width: '32px',
-                                    height: '32px',
-                                    backgroundColor: 'rgba(0, 162, 152, 0.2)',
-                                }}
-                            />
-                        </div>
                     </div>
                     <h2 style={{ color: 'white', fontSize: '24px', fontWeight: 600, marginBottom: '12px', textAlign: 'center', padding: '0 32px' }}>
                         {title}
                     </h2>
                     <p className="animate-pulse" style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px' }}>
-                        Carregando dashboard em tempo real...
+                        Carregando dashboard...
                     </p>
                 </div>
             )}
 
-            {/* Error state */}
             {hasError && !isLoading && (
                 <div className="absolute inset-0 z-10 flex flex-col items-center justify-center" style={{ backgroundColor: '#0a1628' }}>
-                    <div style={{
-                        width: '64px', height: '64px', marginBottom: '24px', borderRadius: '50%',
-                        backgroundColor: 'rgba(239, 68, 68, 0.1)', display: 'flex',
-                        alignItems: 'center', justifyContent: 'center',
-                    }}>
-                        <svg style={{ width: '32px', height: '32px', color: '#f87171' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                        </svg>
-                    </div>
-                    <h2 style={{ color: 'white', fontSize: '20px', fontWeight: 600, marginBottom: '8px' }}>Erro ao carregar dashboard</h2>
-                    <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', marginBottom: '4px' }}>{title}</p>
-                    <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '12px' }}>Verifique se o embedding está habilitado no Looker Studio</p>
+                    <h2 style={{ color: 'white', fontSize: '20px', fontWeight: 600, marginBottom: '8px' }}>Dashboard indisponível</h2>
+                    <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px' }}>{title}</p>
+                    <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '12px', marginTop: '8px' }}>Avançando para o próximo slide...</p>
                 </div>
             )}
 
-            {/* Iframe fixo — mostra apenas o que cabe na tela, sem scroll */}
             <div
                 style={{
                     position: 'absolute',
@@ -221,6 +215,7 @@ export function LookerStudioSlide({
                         opacity: isLoading ? 0 : 1,
                         transition: 'opacity 0.35s ease-in-out',
                         display: 'block',
+                        backgroundColor: '#0a1628',
                     }}
                     allowFullScreen
                     loading="eager"

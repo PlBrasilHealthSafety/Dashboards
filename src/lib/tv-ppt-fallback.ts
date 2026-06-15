@@ -93,23 +93,52 @@ export const validateTvCarouselPointer = (
   items: TvCarouselRenderableItem[],
   index: number,
   pptIndices: number[] = TV_PPT_FALLBACK_INDICES,
+  isIndexAllowed?: (slideIndex: number) => boolean,
 ): CarouselPointerValidation => {
   if (items.length === 0) {
     return { valid: false, safeIndex: 0, reason: 'empty' }
   }
 
   const boundedIndex = Math.min(Math.max(index, 0), items.length - 1)
-  const safeIndex = resolveTvPptFallbackIndex(items, boundedIndex, pptIndices)
+  const allowed = isIndexAllowed?.(boundedIndex) ?? true
+  const candidate = items[boundedIndex]
 
-  if (boundedIndex === safeIndex && isRenderableCarouselItem(items[safeIndex])) {
-    return { valid: true, safeIndex }
+  if (allowed && isRenderableCarouselItem(candidate)) {
+    return { valid: true, safeIndex: boundedIndex }
   }
 
   return {
     valid: false,
-    safeIndex,
-    reason: isRenderableCarouselItem(items[boundedIndex]) ? 'outOfBounds' : 'autoSkip',
+    safeIndex: findNextRenderablePptIndex(items, boundedIndex, pptIndices),
+    reason: 'autoSkip',
   }
+}
+
+/** Avanço do timer na TV: nunca para em slot bloqueado ou vazio — volta aos PPTs. */
+export const findNextTvSlideIndex = (
+  items: TvCarouselRenderableItem[],
+  fromIndex: number,
+  pptIndices: number[] = TV_PPT_FALLBACK_INDICES,
+  isIndexAllowed?: (slideIndex: number) => boolean,
+): number => {
+  if (items.length <= 1) {
+    return fromIndex
+  }
+
+  let nextIndex = (fromIndex + 1) % items.length
+  let steps = 0
+
+  while (steps < items.length) {
+    const allowed = isIndexAllowed?.(nextIndex) ?? true
+    if (allowed && isRenderableCarouselItem(items[nextIndex])) {
+      return nextIndex
+    }
+
+    nextIndex = (nextIndex + 1) % items.length
+    steps += 1
+  }
+
+  return findNextRenderablePptIndex(items, fromIndex, pptIndices)
 }
 
 export const resolveTvIndexAfterItemsChange = (
@@ -117,6 +146,7 @@ export const resolveTvIndexAfterItemsChange = (
   previousIndex: number,
   nextItems: TvCarouselRenderableItem[],
   pptIndices: number[] = TV_PPT_FALLBACK_INDICES,
+  isIndexAllowed?: (slideIndex: number) => boolean,
 ): number => {
   if (nextItems.length === 0) {
     return 0
@@ -133,7 +163,7 @@ export const resolveTvIndexAfterItemsChange = (
     }
   }
 
-  return validateTvCarouselPointer(nextItems, remappedIndex, pptIndices).safeIndex
+  return validateTvCarouselPointer(nextItems, remappedIndex, pptIndices, isIndexAllowed).safeIndex
 }
 
 export const isPptLayoutIndex = (

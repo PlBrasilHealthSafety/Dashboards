@@ -19,7 +19,6 @@ import {
 } from '@/components/custom/PowerPointSlides'
 import { AniversariantesSlide } from '@/components/slides/AniversariantesSlide'
 import { LookerStudioSlide } from '@/components/slides/LookerStudioSlide'
-import { LookerDashboardPreloader } from '@/components/slides/LookerDashboardPreloader'
 import { ContratoNotificationOverlay } from '@/components/custom/ContratoNotificationOverlay'
 import { ImageNotificationOverlay } from '@/components/custom/ImageNotificationOverlay'
 import { TVCarouselGuard } from '@/components/custom/TVCarouselGuard'
@@ -186,8 +185,29 @@ export function TVDashboard() {
   }, [])
 
   const skipUnavailableLookerSlide = useCallback(() => {
-    carouselRef.current?.skipToNextPlayable()
+    carouselRef.current?.recoverToPptFallback()
   }, [])
+
+  const isTvSlideIndexAllowed = useCallback((index: number) => {
+    const entry = TV_MODE_CAROUSEL_LAYOUT[index]
+    if (!entry) {
+      return false
+    }
+
+    if (entry.kind === 'ppt') {
+      return true
+    }
+
+    if (entry.kind === 'looker') {
+      return shouldShowLookerSlides
+    }
+
+    if (entry.kind === 'birthday') {
+      return shouldShowBirthdaySlide || isBirthdaySlideActive
+    }
+
+    return false
+  }, [isBirthdaySlideActive, shouldShowBirthdaySlide, shouldShowLookerSlides])
 
   const carouselItems = useMemo((): DynamicCarouselItem[] => {
     return TV_MODE_CAROUSEL_LAYOUT.map((entry): DynamicCarouselItem => {
@@ -219,7 +239,7 @@ export function TVDashboard() {
             url={dashboard.url}
             title={dashboard.title}
             refreshInterval={0}
-            loadTimeoutMs={15000}
+            tvMode
             onUnavailable={skipUnavailableLookerSlide}
           />
         ) : null,
@@ -500,8 +520,6 @@ export function TVDashboard() {
 
 
 
-      <LookerDashboardPreloader />
-
       {/* Carousel Fullscreen para TV 55 polegadas */}
       <TVCarouselGuard
         items={carouselItems}
@@ -513,6 +531,7 @@ export function TVDashboard() {
             ref={carouselRef}
             items={carouselItems}
             pptFallbackIndices={TV_PPT_LAYOUT_INDICES}
+            isSlideIndexAllowed={isTvSlideIndexAllowed}
             className="w-full h-full"
             showNavigation={false}
             showPagination={false}

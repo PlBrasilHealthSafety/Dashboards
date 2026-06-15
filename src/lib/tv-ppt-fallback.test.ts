@@ -4,6 +4,7 @@ import {
   findFirstRenderablePptIndex,
   findNextPptLayoutIndex,
   findNextRenderablePptIndex,
+  findNextTvSlideIndex,
   resolveTvPptFallbackIndex,
   validateTvCarouselPointer,
 } from '@/lib/tv-ppt-fallback'
@@ -40,9 +41,24 @@ describe('tv-ppt-fallback', () => {
     const items = buildTvItems(true, false)
     const lookerIndex = 2
 
-    const pointer = validateTvCarouselPointer(items, lookerIndex)
+    const pointer = validateTvCarouselPointer(items, lookerIndex, TV_PPT_LAYOUT_INDICES, () => true)
     expect(pointer.valid).toBe(true)
     expect(pointer.safeIndex).toBe(lookerIndex)
+  })
+
+  it('bloqueia looker fora do horário mesmo com conteúdo montado', () => {
+    const items = buildTvItems(true, false)
+
+    const pointer = validateTvCarouselPointer(items, 2, TV_PPT_LAYOUT_INDICES, () => false)
+    expect(pointer.valid).toBe(false)
+    expect(pointer.safeIndex).toBe(3)
+  })
+
+  it('timer após PPT2 fora do horário Looker vai direto ao PPT3', () => {
+    const items = buildTvItems(true, false)
+    const nextIndex = findNextTvSlideIndex(items, 1, TV_PPT_LAYOUT_INDICES, () => false)
+
+    expect(nextIndex).toBe(3)
   })
 
   it('avança entre PPTs no ciclo de recuperação', () => {
