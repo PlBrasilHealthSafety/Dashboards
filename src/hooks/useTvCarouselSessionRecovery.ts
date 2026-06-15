@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, type RefObject } from 'react'
 import type { DynamicCarouselItem, DynamicTimerCarouselHandle } from '@/components/custom/DynamicTimerCarousel'
 import { auditTvCarouselHealth } from '@/lib/tv-carousel-health'
-import { getTvStationId } from '@/lib/tv-station'
+import { getTvStationId, hasExplicitTvStationParam } from '@/lib/tv-station'
 import {
   buildTvHardReloadUrl,
   isDuplicateTvSessionMessage,
@@ -104,12 +104,15 @@ export function useTvCarouselSessionRecovery({
 
     const tabId = readOrCreateTabId()
     const stationId = getTvStationId()
+    const multiTvMode = hasExplicitTvStationParam()
     let broadcastChannel: BroadcastChannel | null = null
 
-    try {
-      broadcastChannel = new BroadcastChannel(TV_SESSION_BROADCAST_CHANNEL)
-    } catch {
-      broadcastChannel = null
+    if (multiTvMode) {
+      try {
+        broadcastChannel = new BroadcastChannel(TV_SESSION_BROADCAST_CHANNEL)
+      } catch {
+        broadcastChannel = null
+      }
     }
 
     const announcePresence = (type: TvSessionPeerMessage['type']) => {
@@ -122,6 +125,10 @@ export function useTvCarouselSessionRecovery({
     }
 
     const onPeerMessage = (event: MessageEvent<TvSessionPeerMessage>) => {
+      if (!multiTvMode) {
+        return
+      }
+
       if (!event.data || !isDuplicateTvSessionMessage(event.data, stationId, tabId)) {
         return
       }
@@ -137,12 +144,16 @@ export function useTvCarouselSessionRecovery({
       }, DUPLICATE_TAB_RELOAD_DELAY_MS)
     }
 
-    broadcastChannel?.addEventListener('message', onPeerMessage)
-    announcePresence('hello')
+    let peerHeartbeatId: ReturnType<typeof window.setInterval> | undefined
 
-    const peerHeartbeatId = window.setInterval(() => {
-      announcePresence('ping')
-    }, 5000)
+    if (broadcastChannel) {
+      broadcastChannel.addEventListener('message', onPeerMessage)
+      announcePresence('hello')
+
+      peerHeartbeatId = window.setInterval(() => {
+        announcePresence('ping')
+      }, 5000)
+    }
 
     const onPageShow = (event: PageTransitionEvent) => {
       if (event.persisted) {
@@ -184,7 +195,9 @@ export function useTvCarouselSessionRecovery({
     tryRecover('inicializacao', { escalateToReload: true })
 
     return () => {
-      window.clearInterval(peerHeartbeatId)
+      if (peerHeartbeatId !== undefined) {
+        window.clearInterval(peerHeartbeatId)
+      }
       broadcastChannel?.removeEventListener('message', onPeerMessage)
       broadcastChannel?.close()
       window.removeEventListener('pageshow', onPageShow)

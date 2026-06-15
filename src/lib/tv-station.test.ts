@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
+  DEFAULT_TV_STATION_ID,
   getTvStationId,
+  hasExplicitTvStationParam,
   readScopedTvStorage,
   scopeStorageKeyForTv,
   writeScopedTvStorage,
@@ -12,27 +14,27 @@ describe('tv-station', () => {
     localStorage.clear()
   })
 
-  it('usa o parametro tv da URL como id da estacao', () => {
-    vi.stubGlobal('location', {
-      ...window.location,
-      search: '?tv=recepcao-a',
-    })
-
-    expect(getTvStationId()).toBe('recepcao-a')
-    expect(scopeStorageKeyForTv('plbrasil:test')).toBe('plbrasil:test:recepcao-a')
-  })
-
-  it('gera ids diferentes para estacoes sem parametro tv', () => {
+  it('usa id fixo principal quando nao ha parametro tv na URL', () => {
     vi.stubGlobal('location', {
       ...window.location,
       search: '',
     })
 
-    const first = getTvStationId()
-    localStorage.clear()
+    expect(hasExplicitTvStationParam()).toBe(false)
+    expect(getTvStationId()).toBe(DEFAULT_TV_STATION_ID)
+    expect(getTvStationId()).toBe(DEFAULT_TV_STATION_ID)
+    expect(scopeStorageKeyForTv('plbrasil:test')).toBe(`plbrasil:test:${DEFAULT_TV_STATION_ID}`)
+  })
 
-    const second = getTvStationId()
-    expect(first).not.toBe(second)
+  it('usa o parametro tv da URL quando informado (multiplas TVs)', () => {
+    vi.stubGlobal('location', {
+      ...window.location,
+      search: '?tv=recepcao-a',
+    })
+
+    expect(hasExplicitTvStationParam()).toBe(true)
+    expect(getTvStationId()).toBe('recepcao-a')
+    expect(scopeStorageKeyForTv('plbrasil:test')).toBe('plbrasil:test:recepcao-a')
   })
 
   it('migra valor legado para chave com escopo da estacao', () => {
@@ -48,10 +50,23 @@ describe('tv-station', () => {
     expect(localStorage.getItem('plbrasil:looker-cycle-history:sala-b')).toBe(value)
   })
 
+  it('migra historico de id aleatorio anterior para principal', () => {
+    vi.stubGlobal('location', {
+      ...window.location,
+      search: '',
+    })
+
+    localStorage.setItem('plbrasil:tv-station-id', 'tv-antigo-uuid')
+    localStorage.setItem('plbrasil:looker-cycle-history:tv-antigo-uuid', '{"dateKey":"2026-06-12"}')
+
+    expect(getTvStationId()).toBe(DEFAULT_TV_STATION_ID)
+    expect(readScopedTvStorage('plbrasil:looker-cycle-history')).toBe('{"dateKey":"2026-06-12"}')
+  })
+
   it('grava e le na chave com escopo', () => {
     vi.stubGlobal('location', {
       ...window.location,
-      search: '?tv=sala-c',
+      search: '',
     })
 
     writeScopedTvStorage('plbrasil:birthday', '{"ok":true}')

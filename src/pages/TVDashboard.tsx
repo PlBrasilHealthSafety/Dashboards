@@ -263,7 +263,7 @@ export function TVDashboard() {
   })
 
   useEffect(() => {
-    console.info('TVDashboard: estacao TV ativa.', { stationId: getTvStationId() })
+    console.info('TVDashboard: modo TV ativo.', { stationId: getTvStationId() })
   }, [])
 
   const handleSlideChange = useCallback((nextIndex: number) => {

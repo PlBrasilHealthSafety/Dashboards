@@ -98,20 +98,28 @@ Independente do carrossel:
 - **Novo contrato** — vídeo + dados do contrato (listener Firestore em tempo real)
 - **Imagem fixa** — overlay configurável (`ImageNotificationOverlay`)
 
-## Duas TVs (ou mais) na mesma rede
+## Uma TV (configuração padrão)
 
-O aviso do navegador **"deseja continuar usando a outra"** restaura a sessão/cache de outra aba ou TV. Isso pode trazer o carrossel **travado no slide errado** (estado antigo + horário que mudou).
+Use apenas:
 
-### Configuração recomendada (obrigatória para 2+ TVs)
+```
+https://seu-dominio.vercel.app/tv-dashboard
+```
 
-Abra cada TV com um **ID fixo na URL**, para não compartilhar histórico de ciclos Looker e aniversário:
+**Sem `?tv=` na URL.** O sistema usa o id fixo interno `principal` para histórico de Looker e aniversário. Não é necessário configurar nada extra.
+
+Salve essa URL como favorito em tela cheia / modo quiosque.
+
+## Duas TVs ou mais (opcional)
+
+Só use `?tv=` se tiver **mais de um aparelho** exibindo o dashboard ao mesmo tempo:
 
 | TV | URL de favorito |
 |----|-----------------|
 | TV 1 | `https://seu-dominio.vercel.app/tv-dashboard?tv=sala-a` |
 | TV 2 | `https://seu-dominio.vercel.app/tv-dashboard?tv=sala-b` |
 
-Substitua `sala-a` / `sala-b` por nomes que identifiquem cada aparelho.
+Isso isola o histórico de ciclos Looker e aniversário entre aparelhos.
 
 ### Se aparecer "continuar sessão / continuar de onde parou"
 
@@ -120,11 +128,12 @@ Pode clicar **Sim** — o sistema foi preparado para isso. Ao restaurar sessão 
 1. **Script em `index.html`** (antes do React) — recarrega a página imediatamente se detectar cache (`pageshow` / `resume`).
 2. **`useTvCarouselSessionRecovery`** — segunda camada: reload se ainda estiver instável.
 3. **`TVCarouselGuard`** — se falhar 3 vezes em 45s, força reload completo.
-4. **Detecção de aba duplicada** — duas abas com o mesmo `?tv=sala-a` na mesma máquina: uma recarrega para não disputar estado.
+4. **Detecção de aba duplicada** — só ativa quando a URL tem `?tv=` (várias TVs). Com uma TV só (`/tv-dashboard`), não há essa verificação.
 
-Ainda assim, o ideal é usar **favoritos com `?tv=` diferentes** em cada aparelho.
+O ideal com **uma TV** é usar `/tv-dashboard` sem parâmetros e **uma única aba** em modo quiosque.
 
-- **Não use a mesma URL sem `?tv=`** nas duas TVs — elas disputam o mesmo `localStorage`.
+- Com **uma TV**, não precisa de `?tv=` — o sistema já usa id fixo `principal`.
+- Com **duas TVs**, use `?tv=` diferentes para não disputar histórico.
 
 ### O que o sistema faz automaticamente (software)
 
@@ -136,7 +145,7 @@ Ainda assim, o ideal é usar **favoritos com `?tv=` diferentes** em cada aparelh
 | `useTvKioskShield` | Erro JS, internet volta, slide parado tempo demais, reload 3h |
 | `TvErrorBoundary` | Qualquer crash React → reload |
 | Wake Lock | Tenta manter a tela ligada (se o navegador permitir) |
-| `?tv=sala-a` / `?tv=sala-b` | Histórico Looker/aniversário isolado por TV |
+| `?tv=` (opcional) | Só necessário com 2+ TVs; uma TV usa `/tv-dashboard` |
 
 ### Travas recomendadas no aparelho (hardware / navegador)
 
@@ -144,7 +153,7 @@ Estas não estão no código, mas **evitam 90% dos problemas em TV**:
 
 | Trava | Como fazer |
 |-------|------------|
-| **Favorito fixo com `?tv=`** | Uma URL por aparelho, abrir em tela cheia |
+| **Favorito fixo** | `https://seu-dominio/tv-dashboard` (sem parâmetros) |
 | **Modo quiosque** | Chrome Kiosk / Fully Kiosk / iniciar navegador em `--kiosk` |
 | **Desligar suspensão da TV** | Configurações da TV → Energia → Nunca desligar |
 | **Desligar "continuar de onde parou"** | Nas configurações do navegador da TV, se existir |
@@ -178,4 +187,4 @@ npm run type-check  # Verificação TypeScript
 | `src/hooks/useTvKioskShield.ts` | Erros, rede, stall, reload noturno |
 | `src/components/custom/TvErrorBoundary.tsx` | Crash React |
 | `src/lib/tv-session-shield.ts` | Reload por sessão/bfcache |
-| `src/lib/tv-station.ts` | ID por TV (`?tv=`) |
+| `src/lib/tv-station.ts` | Id da estação (`principal` por padrão; `?tv=` opcional) |

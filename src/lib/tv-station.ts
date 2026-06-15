@@ -1,14 +1,43 @@
 /**
- * Identidade da estação TV — evita que duas TVs compartilhem o mesmo
- * localStorage de ciclos Looker / aniversário.
+ * Identidade da estação TV para isolar localStorage (ciclos Looker / aniversário).
  *
- * Configure cada TV com um ID fixo na URL:
- *   TV 1: /tv-dashboard?tv=sala-a
- *   TV 2: /tv-dashboard?tv=sala-b
+ * Uso padrão (uma TV): abra apenas `/tv-dashboard` — sem parâmetros na URL.
+ * Várias TVs na mesma rede: use `?tv=sala-a`, `?tv=sala-b`, etc.
  */
 
 const TV_STATION_QUERY_PARAM = 'tv'
 const TV_STATION_STORAGE_KEY = 'plbrasil:tv-station-id'
+export const DEFAULT_TV_STATION_ID = 'principal'
+
+const SCOPED_STORAGE_BASE_KEYS = [
+  'plbrasil:looker-cycle-history',
+  'plbrasil:birthday-slide-shown-date',
+] as const
+
+export const hasExplicitTvStationParam = (): boolean => {
+  const fromUrl = new URLSearchParams(window.location.search).get(TV_STATION_QUERY_PARAM)?.trim()
+  return Boolean(fromUrl)
+}
+
+const migrateStationStorageToDefault = (previousStationId: string) => {
+  if (previousStationId === DEFAULT_TV_STATION_ID) {
+    return
+  }
+
+  try {
+    for (const baseKey of SCOPED_STORAGE_BASE_KEYS) {
+      const previousScopedKey = `${baseKey}:${previousStationId}`
+      const defaultScopedKey = `${baseKey}:${DEFAULT_TV_STATION_ID}`
+      const previousValue = localStorage.getItem(previousScopedKey)
+
+      if (previousValue !== null && localStorage.getItem(defaultScopedKey) === null) {
+        localStorage.setItem(defaultScopedKey, previousValue)
+      }
+    }
+  } catch {
+    // ignora
+  }
+}
 
 export const getTvStationId = (): string => {
   const fromUrl = new URLSearchParams(window.location.search).get(TV_STATION_QUERY_PARAM)?.trim()
@@ -23,32 +52,22 @@ export const getTvStationId = (): string => {
 
   try {
     const stored = localStorage.getItem(TV_STATION_STORAGE_KEY)
-    if (stored) {
-      return stored
+    if (stored && stored !== DEFAULT_TV_STATION_ID) {
+      migrateStationStorageToDefault(stored)
     }
+    localStorage.setItem(TV_STATION_STORAGE_KEY, DEFAULT_TV_STATION_ID)
   } catch {
     // ignora
   }
 
-  const generated =
-    typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-      ? crypto.randomUUID()
-      : `tv-${Date.now()}`
-
-  try {
-    localStorage.setItem(TV_STATION_STORAGE_KEY, generated)
-  } catch {
-    // ignora
-  }
-
-  return generated
+  return DEFAULT_TV_STATION_ID
 }
 
 export const scopeStorageKeyForTv = (baseKey: string): string => {
   return `${baseKey}:${getTvStationId()}`
 }
 
-/** Lê valor com fallback na chave legada (compartilhada entre TVs). */
+/** Lê valor com fallback na chave legada (sem sufixo de estação). */
 export const readScopedTvStorage = (baseKey: string): string | null => {
   const scopedKey = scopeStorageKeyForTv(baseKey)
 
