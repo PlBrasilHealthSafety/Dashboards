@@ -144,7 +144,7 @@ export function useTvCarouselSessionRecovery({
       }, DUPLICATE_TAB_RELOAD_DELAY_MS)
     }
 
-    let peerHeartbeatId: ReturnType<typeof window.setInterval> | undefined
+    let peerHeartbeatId: number | undefined
 
     if (broadcastChannel) {
       broadcastChannel.addEventListener('message', onPeerMessage)
