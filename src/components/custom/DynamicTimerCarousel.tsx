@@ -44,6 +44,8 @@ export interface DynamicTimerCarouselHandle {
   skipToNextPlayable: () => void;
   recoverToSafeIndex: () => void;
   recoverToPptFallback: () => void;
+  /** Avança para o próximo slide agendado (Looker/aniversário) dentro da janela de horário */
+  advanceToNextScheduledSlide: () => void;
   getActiveIndex: () => number;
 }
 
@@ -227,12 +229,8 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
   }, [commitIndex, currentIndex, resolvePointer]);
 
   const skipToNextPlayable = useCallback(() => {
-    if (pptFallbackRef.current?.length) {
-      recoverToPptFallback();
-      return;
-    }
     goToNext();
-  }, [goToNext, recoverToPptFallback]);
+  }, [goToNext]);
 
   const recoverToSafeIndex = useCallback(() => {
     const currentItems = itemsRef.current;
@@ -240,12 +238,57 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
     commitIndex(resolvePointer(currentItems, current).safeIndex);
   }, [commitIndex, currentIndex, resolvePointer]);
 
+  const advanceToNextScheduledSlide = useCallback(() => {
+    const currentItems = itemsRef.current;
+    if (currentItems.length <= 1 || !pptFallbackRef.current?.length) {
+      goToNext();
+      return;
+    }
+
+    const current = resolvePointer(
+      currentItems,
+      Math.min(Math.max(currentIndex, 0), currentItems.length - 1),
+    ).safeIndex;
+    const pptIndices = pptFallbackRef.current;
+    let walkFrom = current;
+
+    for (let step = 0; step < currentItems.length; step += 1) {
+      const candidate = findNextTvSlideIndex(
+        currentItems,
+        walkFrom,
+        pptIndices,
+        isSlideIndexAllowedRef.current,
+      );
+
+      const isScheduledSlot = !pptIndices.includes(candidate);
+      const allowed = isSlideIndexAllowedRef.current?.(candidate) ?? true;
+
+      if (
+        isScheduledSlot &&
+        allowed &&
+        isRenderableCarouselItem(currentItems[candidate])
+      ) {
+        commitIndex(candidate);
+        return;
+      }
+
+      if (candidate === current) {
+        break;
+      }
+
+      walkFrom = candidate;
+    }
+
+    goToNext();
+  }, [commitIndex, currentIndex, goToNext, resolvePointer]);
+
   useImperativeHandle(ref, () => ({
     skipToNextPlayable,
     recoverToSafeIndex,
     recoverToPptFallback,
+    advanceToNextScheduledSlide,
     getActiveIndex: () => activeIndex,
-  }), [activeIndex, recoverToPptFallback, recoverToSafeIndex, skipToNextPlayable]);
+  }), [activeIndex, advanceToNextScheduledSlide, recoverToPptFallback, recoverToSafeIndex, skipToNextPlayable]);
 
   useEffect(() => {
     if (timerRef.current) {
@@ -320,7 +363,7 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
 
     const recoveryTimer = window.setTimeout(() => {
       if (pptFallbackRef.current?.length) {
-        recoverToPptFallback();
+        recoverToSafeIndex();
         return;
       }
       goToNext();
@@ -329,7 +372,7 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
     return () => {
       window.clearTimeout(recoveryTimer);
     };
-  }, [activeIndex, activeItem, goToNext, recoverToPptFallback]);
+  }, [activeIndex, activeItem, goToNext, recoverToSafeIndex]);
 
   useEffect(() => {
     return () => {

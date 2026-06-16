@@ -13,7 +13,7 @@ type BrowserTimeoutHandle = number
 export function useBusinessClock() {
   const [now, setNow] = useState(() => new Date())
   const [timeSource, setTimeSource] = useState<BusinessClockTimeSource>('local')
-  const [isTimeReady, setIsTimeReady] = useState(false)
+  const [isTimeReady, setIsTimeReady] = useState(true)
   const serverTimeOffsetRef = useRef<number | null>(null)
 
   const readEffectiveNow = useCallback(() => {

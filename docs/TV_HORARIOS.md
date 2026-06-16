@@ -18,8 +18,8 @@ Componentes de segurança em runtime:
 
 | Período     | Horário        | Ciclos máximos/dia |
 |------------|----------------|--------------------|
-| Manhã      | **08:00–10:00** | 5 ciclos completos |
-| Tarde      | **14:00–17:00** | 7 ciclos completos |
+| Manhã      | **08:00–11:00** | 7 ciclos completos |
+| Tarde      | **14:00–18:00** | 10 ciclos completos |
 
 **Fora dessas janelas:** os 5 painéis Looker são pulados. A TV exibe apenas os 8 slides PPT em loop (~4 min por volta).
 
@@ -33,8 +33,8 @@ Configuração em `src/lib/looker-schedule.ts`.
 
 | Período | Horário        | Frequência   |
 |---------|----------------|--------------|
-| Manhã   | **10:00–10:30** | 1x por dia  |
-| Tarde   | **15:00–15:30** | 1x por dia  |
+| Manhã   | **10:00–11:30** | 1x por dia  |
+| Tarde   | **15:00–16:30** | 1x por dia  |
 
 **Fora dessas janelas:** o slot de aniversariantes é pulado.
 
@@ -79,7 +79,7 @@ PPT 1 → PPT 2 → *(pula Looker)* → PPT 3 → PPT 4 → *(pula 3 Lookers)* �
 
 **Exemplo — 09:00 (janela Looker manhã):**
 
-Todos os slots são exibidos na ordem acima, incluindo gráficos e (se dentro de 10:00–10:30) aniversariantes.
+Todos os slots são exibidos na ordem acima, incluindo gráficos e (se dentro de 10:00–11:30) aniversariantes.
 
 **Exemplo — 15:15 (tarde, Looker + aniversário):**
 
@@ -89,7 +89,7 @@ Carrossel completo com gráficos e slide de aniversariantes (se ainda não exibi
 
 Um **ciclo** começa ao entrar no primeiro painel Looker (`medicina-convocacao`) e termina ao sair do último (`medicina-asos`). O contador de ciclos é salvo em `localStorage` (`plbrasil:looker-cycle-history`) e reinicia a cada dia.
 
-Quando o horário Looker termina (10:00 ou 17:00), qualquer ciclo em andamento é encerrado e os gráficos passam a ser pulados imediatamente.
+Quando o horário Looker termina (11:00 ou 18:00), qualquer ciclo em andamento é encerrado e os gráficos passam a ser pulados imediatamente.
 
 ## Notificações sobrepostas
 

@@ -16,17 +16,17 @@ export const LAST_LOOKER_DASHBOARD_ID = 'medicina-asos'
 export const LOOKER_CYCLE_WINDOWS: LookerCycleWindow[] = [
   {
     slotId: 'morning',
-    startMinute: createDisplayWindow(8, 0, 10, 0).startMinute,
-    endMinute: createDisplayWindow(8, 0, 10, 0).endMinute,
-    // 5 ciclos × ~24 min ≈ 120 min — preenche a janela de 8h–10h (≥ 110 min de conteúdo)
-    maxCycles: 5,
+    startMinute: createDisplayWindow(8, 0, 11, 0).startMinute,
+    endMinute: createDisplayWindow(8, 0, 11, 0).endMinute,
+    // 7 ciclos × ~24 min ≈ 168 min — preenche a janela de 8h–11h
+    maxCycles: 7,
   },
   {
     slotId: 'afternoon',
-    startMinute: createDisplayWindow(14, 0, 17, 0).startMinute,
-    endMinute: createDisplayWindow(14, 0, 17, 0).endMinute,
-    // 7 ciclos × ~24 min ≈ 168 min — usa boa parte das 3h (14h–17h), com folga até 17h
-    maxCycles: 7,
+    startMinute: createDisplayWindow(14, 0, 18, 0).startMinute,
+    endMinute: createDisplayWindow(14, 0, 18, 0).endMinute,
+    // 10 ciclos × ~24 min ≈ 240 min — preenche a janela de 14h–18h
+    maxCycles: 10,
   },
 ]
 

@@ -12,6 +12,7 @@ interface TVCarouselGuardProps {
   items: DynamicCarouselItem[]
   activeIndex: number
   carouselRef: RefObject<DynamicTimerCarouselHandle | null>
+  isSlideIndexAllowed?: (slideIndex: number) => boolean
   children: ReactNode
 }
 
@@ -23,6 +24,7 @@ export function TVCarouselGuard({
   items,
   activeIndex,
   carouselRef,
+  isSlideIndexAllowed,
   children,
 }: TVCarouselGuardProps) {
   const lastHealthyAtRef = useRef(Date.now())
@@ -30,6 +32,8 @@ export function TVCarouselGuard({
   const lastProgressAtRef = useRef(Date.now())
   const recoveryCountRef = useRef(0)
   const recoveryWindowStartedAtRef = useRef(Date.now())
+  const isSlideIndexAllowedRef = useRef(isSlideIndexAllowed)
+  isSlideIndexAllowedRef.current = isSlideIndexAllowed
 
   const recover = (reason: string, reportIssues: string[]) => {
     const now = Date.now()
@@ -52,13 +56,13 @@ export function TVCarouselGuard({
       return
     }
 
-      carouselRef.current?.recoverToPptFallback()
+    carouselRef.current?.recoverToSafeIndex()
     lastProgressAtRef.current = Date.now()
   }
 
   useEffect(() => {
     const resolvedIndex = carouselRef.current?.getActiveIndex() ?? activeIndex
-    const report = auditTvCarouselHealth(items, resolvedIndex)
+    const report = auditTvCarouselHealth(items, resolvedIndex, isSlideIndexAllowedRef.current)
 
     if (report.healthy) {
       lastHealthyAtRef.current = Date.now()
@@ -78,7 +82,7 @@ export function TVCarouselGuard({
   useEffect(() => {
     const intervalId = window.setInterval(() => {
       const resolvedIndex = carouselRef.current?.getActiveIndex() ?? activeIndex
-      const report = auditTvCarouselHealth(items, resolvedIndex)
+      const report = auditTvCarouselHealth(items, resolvedIndex, isSlideIndexAllowedRef.current)
 
       if (!report.healthy) {
         recover('verificação periódica', report.issues)

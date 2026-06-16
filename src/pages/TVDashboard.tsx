@@ -123,9 +123,10 @@ export function TVDashboard() {
 
   const {
     shouldShowLookerSlides,
+    currentLookerWindow,
     handleLookerSlideEnter,
     handleLookerSlideExit,
-  } = useLookerSlideSchedule({ clockSnapshot, isTimeReady })
+  } = useLookerSlideSchedule({ clockSnapshot })
 
   const clearOverlayDelayTimer = useCallback(() => {
     if (overlayDelayTimerRef.current) {
@@ -185,7 +186,7 @@ export function TVDashboard() {
   }, [])
 
   const skipUnavailableLookerSlide = useCallback(() => {
-    carouselRef.current?.recoverToPptFallback()
+    carouselRef.current?.skipToNextPlayable()
   }, [])
 
   const isTvSlideIndexAllowed = useCallback((index: number) => {
@@ -265,6 +266,55 @@ export function TVDashboard() {
   useEffect(() => {
     console.info('TVDashboard: modo TV ativo.', { stationId: getTvStationId() })
   }, [])
+
+  const prevShouldShowLookerRef = useRef(shouldShowLookerSlides)
+  const prevShouldShowBirthdayRef = useRef(shouldShowBirthdaySlide)
+
+  useEffect(() => {
+    const hour = Math.floor(clockSnapshot.minutesFromStartOfDay / 60)
+    const minute = clockSnapshot.minutesFromStartOfDay % 60
+    console.info('TVDashboard: estado do horário.', {
+      horario: `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`,
+      dateKey: clockSnapshot.dateKey,
+      looker: shouldShowLookerSlides,
+      lookerJanela: currentLookerWindow?.slotId ?? null,
+      aniversario: shouldShowBirthdaySlide,
+      aniversarioSlot: currentBirthdaySlideSlot,
+      isTimeReady,
+    })
+  }, [
+    clockSnapshot.dateKey,
+    clockSnapshot.minutesFromStartOfDay,
+    currentBirthdaySlideSlot,
+    currentLookerWindow?.slotId,
+    isTimeReady,
+    shouldShowBirthdaySlide,
+    shouldShowLookerSlides,
+  ])
+
+  useEffect(() => {
+    const lookerOpened = shouldShowLookerSlides && !prevShouldShowLookerRef.current
+    const birthdayOpened = shouldShowBirthdaySlide && !prevShouldShowBirthdayRef.current
+    prevShouldShowLookerRef.current = shouldShowLookerSlides
+    prevShouldShowBirthdayRef.current = shouldShowBirthdaySlide
+
+    if (!shouldShowLookerSlides && !shouldShowBirthdaySlide) {
+      return
+    }
+
+    const delayMs = lookerOpened || birthdayOpened ? 500 : 2000
+    const timerId = window.setTimeout(() => {
+      console.info('TVDashboard: conteúdo agendado ativo — sincronizando carrossel.', {
+        lookerOpened,
+        birthdayOpened,
+      })
+      carouselRef.current?.advanceToNextScheduledSlide()
+    }, delayMs)
+
+    return () => {
+      window.clearTimeout(timerId)
+    }
+  }, [shouldShowBirthdaySlide, shouldShowLookerSlides])
 
   const handleSlideChange = useCallback((nextIndex: number) => {
     const previousItem = carouselItems[activeSlideIndexRef.current]
@@ -525,6 +575,7 @@ export function TVDashboard() {
         items={carouselItems}
         activeIndex={activeSlideIndex}
         carouselRef={carouselRef}
+        isSlideIndexAllowed={isTvSlideIndexAllowed}
       >
         <div className="h-screen w-screen">
           <DynamicTimerCarousel

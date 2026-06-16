@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useBusinessClock } from '@/hooks/useBusinessClock'
+import { createDisplayWindow } from '@/lib/slide-schedule'
 import { readScopedTvStorage, writeScopedTvStorage } from '@/lib/tv-station'
 
 export const BIRTHDAY_SLIDE_ID = 'aniversariantes'
@@ -25,13 +26,11 @@ const BIRTHDAY_SLIDE_STORAGE_KEY = 'plbrasil:birthday-slide-shown-date'
 const BIRTHDAY_SLIDE_WINDOWS = [
   {
     slotId: 'morning' as const,
-    startMinute: 10 * 60,
-    endMinute: 10 * 60 + 30,
+    ...createDisplayWindow(10, 0, 11, 30),
   },
   {
     slotId: 'afternoon' as const,
-    startMinute: 15 * 60,
-    endMinute: 15 * 60 + 30,
+    ...createDisplayWindow(15, 0, 16, 30),
   },
 ]
 
@@ -120,7 +119,7 @@ export function useBirthdaySlideSchedule() {
     : true
   const shouldShowBirthdaySlide =
     isBirthdaySlidePresentationInProgress ||
-    (isTimeReady && Boolean(currentBirthdaySlideWindow) && !hasShownCurrentSlot)
+    (Boolean(currentBirthdaySlideWindow) && !hasShownCurrentSlot)
 
   useEffect(() => {
     const storedHistory = readBirthdaySlideHistory()

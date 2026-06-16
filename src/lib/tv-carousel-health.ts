@@ -1,5 +1,6 @@
 import { isRenderableCarouselItem } from '@/lib/carousel-pointer'
 import { validateTvCarouselPointer } from '@/lib/tv-ppt-fallback'
+import { TV_PPT_LAYOUT_INDICES } from '@/lib/tv-carousel-pointer-model'
 import { TV_MODE_CAROUSEL_LAYOUT } from '@/lib/lookerConfig'
 
 export interface TvCarouselHealthItem {
@@ -23,6 +24,7 @@ const EXPECTED_PPT_COUNT = TV_MODE_CAROUSEL_LAYOUT.filter((entry) => entry.kind 
 export const auditTvCarouselHealth = (
   items: TvCarouselHealthItem[],
   activeIndex: number,
+  isIndexAllowed?: (slideIndex: number) => boolean,
 ): TvCarouselHealthReport => {
   const issues: string[] = []
 
@@ -43,7 +45,12 @@ export const auditTvCarouselHealth = (
     ? 0
     : Math.min(Math.max(activeIndex, 0), items.length - 1)
 
-  const pointer = validateTvCarouselPointer(items, boundedActiveIndex)
+  const pointer = validateTvCarouselPointer(
+    items,
+    boundedActiveIndex,
+    TV_PPT_LAYOUT_INDICES,
+    isIndexAllowed,
+  )
 
   if (boundedActiveIndex !== pointer.safeIndex) {
     issues.push(
@@ -70,12 +77,13 @@ export const auditTvCarouselHealth = (
   }
 
   for (const [index, item] of items.entries()) {
-    const shouldPlay = !item.autoSkip
+    const allowedBySchedule = isIndexAllowed?.(index) ?? !item.autoSkip
+    const shouldPlay = allowedBySchedule && !item.autoSkip
     const hasContent = item.content != null
     if (shouldPlay && !hasContent) {
       issues.push(`Slot ${index} (${String(item.id)}) deveria exibir conteúdo, mas está vazio.`)
     }
-    if (!shouldPlay && hasContent) {
+    if (!allowedBySchedule && hasContent) {
       issues.push(`Slot ${index} (${String(item.id)}) está fora do horário mas ainda tem conteúdo montado.`)
     }
   }

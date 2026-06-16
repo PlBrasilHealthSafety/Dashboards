@@ -59,10 +59,9 @@ const readCyclesShownForSlot = (history: LookerCycleHistory, slotId: LookerCycle
 
 interface UseLookerSlideScheduleOptions {
   clockSnapshot: BusinessClockSnapshot
-  isTimeReady: boolean
 }
 
-export function useLookerSlideSchedule({ clockSnapshot, isTimeReady }: UseLookerSlideScheduleOptions) {
+export function useLookerSlideSchedule({ clockSnapshot }: UseLookerSlideScheduleOptions) {
   const [cycleHistory, setCycleHistory] = useState(() => readLookerCycleHistory(clockSnapshot.dateKey))
   const [isLookerCycleActive, setIsLookerCycleActive] = useState(false)
   const [activeLookerSlideIds, setActiveLookerSlideIds] = useState<Set<string>>(new Set())
@@ -73,15 +72,12 @@ export function useLookerSlideSchedule({ clockSnapshot, isTimeReady }: UseLooker
     ? readCyclesShownForSlot(cycleHistory, currentWindow.slotId)
     : 0
   const canStartNewLookerCycle = Boolean(
-    isTimeReady &&
     currentWindow &&
     cyclesShownInCurrentWindow < currentWindow.maxCycles
   )
 
-  const shouldShowLookerSlides = Boolean(
-    currentWindow &&
-    (isLookerCycleActive || activeLookerSlideIds.size > 0 || canStartNewLookerCycle),
-  )
+  /** Dentro da janela de horário → exibe gráficos Looker (sem bloquear por ciclos ou sync de relógio). */
+  const shouldShowLookerSlides = Boolean(currentWindow)
 
   useEffect(() => {
     if (currentWindow) {
