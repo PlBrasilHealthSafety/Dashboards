@@ -19,6 +19,7 @@ interface UseTvCarouselSessionRecoveryOptions {
   carouselRef: RefObject<DynamicTimerCarouselHandle | null>
   items: DynamicCarouselItem[]
   activeIndex: number
+  isSlideIndexAllowed?: (slideIndex: number) => boolean
 }
 
 const readOrCreateTabId = (): string => {
@@ -47,10 +48,13 @@ export function useTvCarouselSessionRecovery({
   carouselRef,
   items,
   activeIndex,
+  isSlideIndexAllowed,
 }: UseTvCarouselSessionRecoveryOptions) {
   const itemsRef = useRef(items)
   const activeIndexRef = useRef(activeIndex)
   const hardReloadScheduledRef = useRef(false)
+  const isSlideIndexAllowedRef = useRef(isSlideIndexAllowed)
+  isSlideIndexAllowedRef.current = isSlideIndexAllowed
 
   itemsRef.current = items
   activeIndexRef.current = activeIndex
@@ -68,7 +72,11 @@ export function useTvCarouselSessionRecovery({
 
   const tryRecover = useCallback((reason: string, options?: { escalateToReload?: boolean }) => {
     const resolvedIndex = carouselRef.current?.getActiveIndex() ?? activeIndexRef.current
-    const report = auditTvCarouselHealth(itemsRef.current, resolvedIndex)
+    const report = auditTvCarouselHealth(
+      itemsRef.current,
+      resolvedIndex,
+      isSlideIndexAllowedRef.current,
+    )
 
     if (!report.healthy) {
       console.warn('TVDashboard: recuperando sessao da TV.', {
@@ -77,13 +85,17 @@ export function useTvCarouselSessionRecovery({
         safeIndex: report.safeIndex,
         issues: report.issues,
       })
-      carouselRef.current?.recoverToPptFallback()
+      carouselRef.current?.recoverToSafeIndex()
     }
 
     if (options?.escalateToReload) {
       window.setTimeout(() => {
         const followUpIndex = carouselRef.current?.getActiveIndex() ?? activeIndexRef.current
-        const followUp = auditTvCarouselHealth(itemsRef.current, followUpIndex)
+        const followUp = auditTvCarouselHealth(
+          itemsRef.current,
+          followUpIndex,
+          isSlideIndexAllowedRef.current,
+        )
         if (!followUp.healthy) {
           hardReload(reason)
         }

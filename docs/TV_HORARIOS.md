@@ -19,7 +19,7 @@ Componentes de segurança em runtime:
 | Período     | Horário        | Ciclos máximos/dia |
 |------------|----------------|--------------------|
 | Manhã      | **08:00–11:00** | 7 ciclos completos |
-| Tarde      | **14:00–18:00** | 10 ciclos completos |
+| Tarde      | **14:00–17:00** | 7 ciclos completos |
 
 **Fora dessas janelas:** os 5 painéis Looker são pulados. A TV exibe apenas os 8 slides PPT em loop (~4 min por volta).
 
@@ -89,7 +89,7 @@ Carrossel completo com gráficos e slide de aniversariantes (se ainda não exibi
 
 Um **ciclo** começa ao entrar no primeiro painel Looker (`medicina-convocacao`) e termina ao sair do último (`medicina-asos`). O contador de ciclos é salvo em `localStorage` (`plbrasil:looker-cycle-history`) e reinicia a cada dia.
 
-Quando o horário Looker termina (11:00 ou 18:00), qualquer ciclo em andamento é encerrado e os gráficos passam a ser pulados imediatamente.
+Quando o horário Looker termina (11:00 ou 17:00), qualquer ciclo em andamento é encerrado e os gráficos passam a ser pulados imediatamente.
 
 ## Notificações sobrepostas
 

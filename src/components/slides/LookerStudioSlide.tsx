@@ -23,7 +23,7 @@ const LOOKER_CONNECTION_HINTS = [
     'https://accounts.google.com',
 ]
 
-const TV_LOAD_TIMEOUT_MS = 8000
+const TV_LOAD_TIMEOUT_MS = 90000
 
 const ensureConnectionHint = (rel: 'preconnect' | 'dns-prefetch', href: string) => {
     const selector = `link[rel="${rel}"][href="${href}"]`
@@ -122,11 +122,11 @@ export function LookerStudioSlide({
     }, [refreshInterval])
 
     useEffect(() => {
-        const timeoutMs = tvMode
-            ? TV_LOAD_TIMEOUT_MS
-            : loadTimeoutMs > 0
-                ? loadTimeoutMs
-                : 0
+        if (tvMode) {
+            return
+        }
+
+        const timeoutMs = loadTimeoutMs > 0 ? loadTimeoutMs : 0
 
         if (timeoutMs <= 0) {
             return
@@ -138,6 +138,22 @@ export function LookerStudioSlide({
 
         return () => window.clearTimeout(timeoutId)
     }, [loadTimeoutMs, reportUnavailable, refreshKey, tvMode, url])
+
+    useEffect(() => {
+        if (!tvMode) {
+            return
+        }
+
+        const timeoutId = window.setTimeout(() => {
+            if (hasReportedUnavailableRef.current) {
+                return
+            }
+
+            setIsLoading(false)
+        }, TV_LOAD_TIMEOUT_MS)
+
+        return () => window.clearTimeout(timeoutId)
+    }, [refreshKey, title, tvMode, url])
 
     const handleLoad = useCallback(() => {
         if (tvMode) {
@@ -153,8 +169,13 @@ export function LookerStudioSlide({
     }, [tvMode])
 
     const handleError = useCallback(() => {
+        if (tvMode) {
+            setIsLoading(false)
+            return
+        }
+
         reportUnavailable('iframe_error')
-    }, [reportUnavailable])
+    }, [reportUnavailable, title, tvMode])
 
     return (
         <div
@@ -221,7 +242,12 @@ export function LookerStudioSlide({
                     loading="eager"
                     onLoad={handleLoad}
                     onError={handleError}
-                    sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-storage-access-by-user-activation"
+                    {...(tvMode
+                        ? {}
+                        : {
+                            sandbox:
+                              'allow-scripts allow-same-origin allow-popups allow-forms allow-storage-access-by-user-activation',
+                          })}
                 />
             </div>
         </div>

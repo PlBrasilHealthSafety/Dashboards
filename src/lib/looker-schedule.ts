@@ -23,10 +23,10 @@ export const LOOKER_CYCLE_WINDOWS: LookerCycleWindow[] = [
   },
   {
     slotId: 'afternoon',
-    startMinute: createDisplayWindow(14, 0, 18, 0).startMinute,
-    endMinute: createDisplayWindow(14, 0, 18, 0).endMinute,
-    // 10 ciclos × ~24 min ≈ 240 min — preenche a janela de 14h–18h
-    maxCycles: 10,
+    startMinute: createDisplayWindow(14, 0, 17, 0).startMinute,
+    endMinute: createDisplayWindow(14, 0, 17, 0).endMinute,
+    // 7 ciclos × ~24 min ≈ 168 min — preenche a janela de 14h–17h
+    maxCycles: 7,
   },
 ]
 

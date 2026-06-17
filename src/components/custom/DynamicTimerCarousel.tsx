@@ -46,6 +46,8 @@ export interface DynamicTimerCarouselHandle {
   recoverToPptFallback: () => void;
   /** Avança para o próximo slide agendado (Looker/aniversário) dentro da janela de horário */
   advanceToNextScheduledSlide: () => void;
+  /** Vai direto para um índice do layout (ex.: primeiro Looker) se permitido e renderizável */
+  goToLayoutIndex: (index: number) => void;
   getActiveIndex: () => number;
 }
 
@@ -282,13 +284,33 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
     goToNext();
   }, [commitIndex, currentIndex, goToNext, resolvePointer]);
 
+  const goToLayoutIndex = useCallback((targetIndex: number) => {
+    const currentItems = itemsRef.current;
+    if (currentItems.length === 0) {
+      return;
+    }
+
+    const boundedTarget = Math.min(Math.max(targetIndex, 0), currentItems.length - 1);
+    const allowed = isSlideIndexAllowedRef.current?.(boundedTarget) ?? true;
+
+    if (allowed && isRenderableCarouselItem(currentItems[boundedTarget])) {
+      commitIndex(boundedTarget);
+      return;
+    }
+
+    if (pptFallbackRef.current?.length) {
+      goToNext();
+    }
+  }, [commitIndex, goToNext]);
+
   useImperativeHandle(ref, () => ({
     skipToNextPlayable,
     recoverToSafeIndex,
     recoverToPptFallback,
     advanceToNextScheduledSlide,
+    goToLayoutIndex,
     getActiveIndex: () => activeIndex,
-  }), [activeIndex, advanceToNextScheduledSlide, recoverToPptFallback, recoverToSafeIndex, skipToNextPlayable]);
+  }), [activeIndex, advanceToNextScheduledSlide, goToLayoutIndex, recoverToPptFallback, recoverToSafeIndex, skipToNextPlayable]);
 
   useEffect(() => {
     if (timerRef.current) {

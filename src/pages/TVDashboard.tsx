@@ -30,7 +30,6 @@ import { BIRTHDAY_SLIDE_ID, useBirthdaySlideSchedule } from '@/hooks/useBirthday
 import type { BirthdaySlideSlotId } from '@/hooks/useBirthdaySlideSchedule'
 import { useLookerSlideSchedule } from '@/hooks/useLookerSlideSchedule'
 import { useTvCarouselSessionRecovery } from '@/hooks/useTvCarouselSessionRecovery'
-import { getTvStationId } from '@/lib/tv-station'
 import { getUserRoute } from '@/lib/utils'
 import type { Contrato } from '@/lib/types'
 import { isContratoCreatedAfter, isContratoTooOldToDisplay } from '@/lib/tv-contrato-guard'
@@ -39,9 +38,10 @@ import {
   getLookerDashboardIdFromCarouselId,
   isLookerCarouselId,
   LOOKER_DASHBOARD_MAP,
+  LOOKER_DASHBOARDS,
   TV_MODE_CAROUSEL_LAYOUT,
 } from '@/lib/lookerConfig'
-import { TV_PPT_LAYOUT_INDICES } from '@/lib/tv-carousel-pointer-model'
+import { TV_BIRTHDAY_LAYOUT_INDEX, TV_LOOKER_LAYOUT_INDICES, TV_PPT_LAYOUT_INDICES } from '@/lib/tv-carousel-pointer-model'
 
 type BrowserTimeoutHandle = number
 
@@ -100,6 +100,19 @@ const STABLE_PPT_CONTENT: Record<keyof typeof PPT_SLIDE_COMPONENTS, ReactNode> =
   8: <PowerPointSlide8 key="tv-ppt-8" />,
 }
 
+const STABLE_LOOKER_CONTENT: Record<string, ReactNode> = Object.fromEntries(
+  LOOKER_DASHBOARDS.map((dashboard) => [
+    dashboard.id,
+    <LookerStudioSlide
+      key={`tv-looker-${dashboard.id}`}
+      url={dashboard.url}
+      title={dashboard.title}
+      refreshInterval={0}
+      tvMode
+    />,
+  ]),
+)
+
 export function TVDashboard() {
   const navigate = useNavigate()
   const { user } = useAuth()
@@ -115,7 +128,6 @@ export function TVDashboard() {
   const pendingContratoClaimIdRef = useRef<string | null>(null)
   const {
     clockSnapshot,
-    isTimeReady,
     currentBirthdaySlideSlot,
     shouldShowBirthdaySlide,
     markBirthdaySlideShown,
@@ -123,7 +135,6 @@ export function TVDashboard() {
 
   const {
     shouldShowLookerSlides,
-    currentLookerWindow,
     handleLookerSlideEnter,
     handleLookerSlideExit,
   } = useLookerSlideSchedule({ clockSnapshot })
@@ -185,10 +196,6 @@ export function TVDashboard() {
     }
   }, [])
 
-  const skipUnavailableLookerSlide = useCallback(() => {
-    carouselRef.current?.skipToNextPlayable()
-  }, [])
-
   const isTvSlideIndexAllowed = useCallback((index: number) => {
     const entry = TV_MODE_CAROUSEL_LAYOUT[index]
     if (!entry) {
@@ -235,25 +242,18 @@ export function TVDashboard() {
 
       return {
         id: getLookerCarouselId(entry.dashboardId),
-        content: showLooker ? (
-          <LookerStudioSlide
-            url={dashboard.url}
-            title={dashboard.title}
-            refreshInterval={0}
-            tvMode
-            onUnavailable={skipUnavailableLookerSlide}
-          />
-        ) : null,
+        content: showLooker ? STABLE_LOOKER_CONTENT[entry.dashboardId] ?? null : null,
         duration: showLooker ? dashboard.duration : 0,
         autoSkip: !showLooker,
       }
     })
-  }, [isBirthdaySlideActive, shouldShowBirthdaySlide, shouldShowLookerSlides, skipUnavailableLookerSlide])
+  }, [isBirthdaySlideActive, shouldShowBirthdaySlide, shouldShowLookerSlides])
 
   useTvCarouselSessionRecovery({
     carouselRef,
     items: carouselItems,
     activeIndex: activeSlideIndex,
+    isSlideIndexAllowed: isTvSlideIndexAllowed,
   })
 
   useTvKioskShield({
@@ -263,34 +263,8 @@ export function TVDashboard() {
     isPlaybackPaused: showOverlay,
   })
 
-  useEffect(() => {
-    console.info('TVDashboard: modo TV ativo.', { stationId: getTvStationId() })
-  }, [])
-
   const prevShouldShowLookerRef = useRef(shouldShowLookerSlides)
   const prevShouldShowBirthdayRef = useRef(shouldShowBirthdaySlide)
-
-  useEffect(() => {
-    const hour = Math.floor(clockSnapshot.minutesFromStartOfDay / 60)
-    const minute = clockSnapshot.minutesFromStartOfDay % 60
-    console.info('TVDashboard: estado do horário.', {
-      horario: `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`,
-      dateKey: clockSnapshot.dateKey,
-      looker: shouldShowLookerSlides,
-      lookerJanela: currentLookerWindow?.slotId ?? null,
-      aniversario: shouldShowBirthdaySlide,
-      aniversarioSlot: currentBirthdaySlideSlot,
-      isTimeReady,
-    })
-  }, [
-    clockSnapshot.dateKey,
-    clockSnapshot.minutesFromStartOfDay,
-    currentBirthdaySlideSlot,
-    currentLookerWindow?.slotId,
-    isTimeReady,
-    shouldShowBirthdaySlide,
-    shouldShowLookerSlides,
-  ])
 
   useEffect(() => {
     const lookerOpened = shouldShowLookerSlides && !prevShouldShowLookerRef.current
@@ -304,11 +278,14 @@ export function TVDashboard() {
 
     const delayMs = lookerOpened || birthdayOpened ? 500 : 2000
     const timerId = window.setTimeout(() => {
-      console.info('TVDashboard: conteúdo agendado ativo — sincronizando carrossel.', {
-        lookerOpened,
-        birthdayOpened,
-      })
-      carouselRef.current?.advanceToNextScheduledSlide()
+      if (shouldShowLookerSlides) {
+        carouselRef.current?.goToLayoutIndex(TV_LOOKER_LAYOUT_INDICES[0])
+        return
+      }
+
+      if (shouldShowBirthdaySlide) {
+        carouselRef.current?.goToLayoutIndex(TV_BIRTHDAY_LAYOUT_INDEX)
+      }
     }, delayMs)
 
     return () => {
