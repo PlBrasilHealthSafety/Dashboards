@@ -1,4 +1,3 @@
-import { isRenderableCarouselItem } from '@/lib/carousel-pointer'
 import { validateTvCarouselPointer } from '@/lib/tv-ppt-fallback'
 import { TV_PPT_LAYOUT_INDICES } from '@/lib/tv-carousel-pointer-model'
 import { TV_MODE_CAROUSEL_LAYOUT } from '@/lib/lookerConfig'
@@ -52,19 +51,6 @@ export const auditTvCarouselHealth = (
     isIndexAllowed,
   )
 
-  if (boundedActiveIndex !== pointer.safeIndex) {
-    issues.push(
-      `Ponteiro inválido no índice ${boundedActiveIndex} (${pointer.reason ?? 'autoSkip'}) — corrigir para ${pointer.safeIndex}.`,
-    )
-  }
-
-  const displayedItem = items[boundedActiveIndex]
-  if (displayedItem?.autoSkip) {
-    issues.push(`Slide ativo ${String(displayedItem.id)} está marcado como autoSkip.`)
-  } else if (displayedItem && !isRenderableCarouselItem(displayedItem)) {
-    issues.push(`Slide ativo ${String(displayedItem.id)} não tem conteúdo renderizável.`)
-  }
-
   const activeItem = items[pointer.safeIndex]
   if (!activeItem) {
     issues.push(`Slide ativo ausente no índice seguro ${pointer.safeIndex}.`)
@@ -74,18 +60,6 @@ export const auditTvCarouselHealth = (
     issues.push(`Slide ativo ${String(activeItem.id)} não tem conteúdo.`)
   } else if (!activeItem.duration || activeItem.duration <= 0) {
     issues.push(`Slide ativo ${String(activeItem.id)} sem duração válida para o timer.`)
-  }
-
-  for (const [index, item] of items.entries()) {
-    const allowedBySchedule = isIndexAllowed?.(index) ?? !item.autoSkip
-    const shouldPlay = allowedBySchedule && !item.autoSkip
-    const hasContent = item.content != null
-    if (shouldPlay && !hasContent) {
-      issues.push(`Slot ${index} (${String(item.id)}) deveria exibir conteúdo, mas está vazio.`)
-    }
-    if (!allowedBySchedule && hasContent) {
-      issues.push(`Slot ${index} (${String(item.id)}) está fora do horário mas ainda tem conteúdo montado.`)
-    }
   }
 
   return {

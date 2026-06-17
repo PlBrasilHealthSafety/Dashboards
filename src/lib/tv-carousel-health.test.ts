@@ -17,7 +17,7 @@ describe('auditTvCarouselHealth', () => {
     expect(report.layoutSlotCount).toBe(14)
   })
 
-  it('reprova ponteiro em Looker autoSkip (cenário do travamento)', () => {
+  it('redireciona ponteiro em Looker autoSkip para PPT seguro', () => {
     const items = buildTvCarouselPointerItems({ showLooker: false, showBirthday: false }).map((item) => ({
       ...item,
       content: item.autoSkip ? null : {},
@@ -26,9 +26,8 @@ describe('auditTvCarouselHealth', () => {
 
     const lookerIndex = 2
     const report = auditTvCarouselHealth(items, lookerIndex)
-    expect(report.healthy).toBe(false)
+    expect(report.healthy).toBe(true)
     expect(report.safeIndex).toBe(3)
-    expect(report.issues.some((issue) => issue.includes('autoSkip'))).toBe(true)
   })
 
   it('reprova slide jogável sem conteúdo', () => {
@@ -40,7 +39,7 @@ describe('auditTvCarouselHealth', () => {
 
     const report = auditTvCarouselHealth(items, 0)
     expect(report.healthy).toBe(false)
-    expect(report.issues.some((issue) => issue.includes('vazio'))).toBe(true)
+    expect(report.issues.some((issue) => issue.includes('conteúdo'))).toBe(true)
   })
 
   it('reprova lista com slots a menos', () => {

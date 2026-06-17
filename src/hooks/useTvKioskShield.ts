@@ -119,7 +119,7 @@ export function useTvKioskShield({
       const stalledForMs = Date.now() - lastSlideChangeAtRef.current
 
       if (!isRenderableCarouselItem(activeItem)) {
-        carouselRef?.current?.recoverToSafeIndex()
+        carouselRef?.current?.recoverToPptFallback()
         lastSlideChangeAtRef.current = Date.now()
         return
       }

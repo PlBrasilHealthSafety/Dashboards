@@ -109,6 +109,7 @@ const STABLE_LOOKER_CONTENT: Record<string, ReactNode> = Object.fromEntries(
       title={dashboard.title}
       refreshInterval={0}
       tvMode
+      loadTimeoutMs={0}
     />,
   ]),
 )
@@ -272,21 +273,20 @@ export function TVDashboard() {
     prevShouldShowLookerRef.current = shouldShowLookerSlides
     prevShouldShowBirthdayRef.current = shouldShowBirthdaySlide
 
-    if (!shouldShowLookerSlides && !shouldShowBirthdaySlide) {
+    if (!lookerOpened && !birthdayOpened) {
       return
     }
 
-    const delayMs = lookerOpened || birthdayOpened ? 500 : 2000
     const timerId = window.setTimeout(() => {
-      if (shouldShowLookerSlides) {
+      if (lookerOpened) {
         carouselRef.current?.goToLayoutIndex(TV_LOOKER_LAYOUT_INDICES[0])
         return
       }
 
-      if (shouldShowBirthdaySlide) {
+      if (birthdayOpened) {
         carouselRef.current?.goToLayoutIndex(TV_BIRTHDAY_LAYOUT_INDEX)
       }
-    }, delayMs)
+    }, 500)
 
     return () => {
       window.clearTimeout(timerId)

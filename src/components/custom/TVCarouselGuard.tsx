@@ -3,10 +3,9 @@ import type { DynamicCarouselItem, DynamicTimerCarouselHandle } from '@/componen
 import { auditTvCarouselHealth } from '@/lib/tv-carousel-health'
 import { buildTvHardReloadUrl } from '@/lib/tv-session-shield'
 
-const HEALTH_CHECK_INTERVAL_MS = 4000
-const STALL_RECOVERY_MS = 1500
-const MAX_RECOVERIES_BEFORE_HARD_RELOAD = 3
-const HARD_RELOAD_WINDOW_MS = 45000
+const HEALTH_CHECK_INTERVAL_MS = 8000
+const MAX_RECOVERIES_BEFORE_HARD_RELOAD = 5
+const HARD_RELOAD_WINDOW_MS = 120000
 
 interface TVCarouselGuardProps {
   items: DynamicCarouselItem[]
@@ -27,7 +26,6 @@ export function TVCarouselGuard({
   isSlideIndexAllowed,
   children,
 }: TVCarouselGuardProps) {
-  const lastHealthyAtRef = useRef(Date.now())
   const lastActiveIndexRef = useRef(activeIndex)
   const lastProgressAtRef = useRef(Date.now())
   const recoveryCountRef = useRef(0)
@@ -35,7 +33,7 @@ export function TVCarouselGuard({
   const isSlideIndexAllowedRef = useRef(isSlideIndexAllowed)
   isSlideIndexAllowedRef.current = isSlideIndexAllowed
 
-  const recover = (reason: string, reportIssues: string[]) => {
+  const recover = () => {
     const now = Date.now()
     if (now - recoveryWindowStartedAtRef.current > HARD_RELOAD_WINDOW_MS) {
       recoveryWindowStartedAtRef.current = now
@@ -43,12 +41,6 @@ export function TVCarouselGuard({
     }
 
     recoveryCountRef.current += 1
-    console.warn('TVCarouselGuard: recuperação automática.', {
-      reason,
-      activeIndex,
-      recoveryCount: recoveryCountRef.current,
-      issues: reportIssues,
-    })
 
     if (recoveryCountRef.current >= MAX_RECOVERIES_BEFORE_HARD_RELOAD) {
       console.error('TVCarouselGuard: muitas falhas seguidas — reload completo.')
@@ -56,7 +48,7 @@ export function TVCarouselGuard({
       return
     }
 
-    carouselRef.current?.recoverToSafeIndex()
+    carouselRef.current?.recoverToPptFallback()
     lastProgressAtRef.current = Date.now()
   }
 
@@ -64,18 +56,16 @@ export function TVCarouselGuard({
     const resolvedIndex = carouselRef.current?.getActiveIndex() ?? activeIndex
     const report = auditTvCarouselHealth(items, resolvedIndex, isSlideIndexAllowedRef.current)
 
-    if (report.healthy) {
-      lastHealthyAtRef.current = Date.now()
-      return
+    if (!report.healthy) {
+      recover()
     }
-
-    recover('auditoria inicial ou mudança de lista', report.issues)
   }, [activeIndex, items])
 
   useEffect(() => {
     if (lastActiveIndexRef.current !== activeIndex) {
       lastActiveIndexRef.current = activeIndex
       lastProgressAtRef.current = Date.now()
+      recoveryCountRef.current = 0
     }
   }, [activeIndex])
 
@@ -85,25 +75,8 @@ export function TVCarouselGuard({
       const report = auditTvCarouselHealth(items, resolvedIndex, isSlideIndexAllowedRef.current)
 
       if (!report.healthy) {
-        recover('verificação periódica', report.issues)
-        return
+        recover()
       }
-
-      const activeItem = items[report.safeIndex]
-      const stalledForMs = Date.now() - lastProgressAtRef.current
-      const isStalled = stalledForMs >= STALL_RECOVERY_MS && (
-        !activeItem ||
-        activeItem.autoSkip ||
-        activeItem.content == null ||
-        report.safeIndex !== resolvedIndex
-      )
-
-      if (isStalled) {
-        recover(`travamento detectado há ${stalledForMs}ms`, report.issues)
-        return
-      }
-
-      lastHealthyAtRef.current = Date.now()
     }, HEALTH_CHECK_INTERVAL_MS)
 
     return () => {

@@ -85,7 +85,7 @@ export function useTvCarouselSessionRecovery({
         safeIndex: report.safeIndex,
         issues: report.issues,
       })
-      carouselRef.current?.recoverToSafeIndex()
+      carouselRef.current?.recoverToPptFallback()
     }
 
     if (options?.escalateToReload) {
@@ -204,7 +204,7 @@ export function useTvCarouselSessionRecovery({
     window.addEventListener('storage', onStorage)
     document.addEventListener('visibilitychange', onVisibility)
 
-    tryRecover('inicializacao', { escalateToReload: true })
+    tryRecover('inicializacao')
 
     return () => {
       if (peerHeartbeatId !== undefined) {

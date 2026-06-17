@@ -378,23 +378,23 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
   }, [currentIndex]);
 
   useEffect(() => {
-    const allowed = isSlideIndexAllowedRef.current?.(activeIndex) ?? true;
+    const allowed = isSlideIndexAllowedRef.current?.(activeIndex) ?? true
     if (activeItem && isRenderableCarouselItem(activeItem) && allowed) {
-      return;
+      return
     }
 
     const recoveryTimer = window.setTimeout(() => {
       if (pptFallbackRef.current?.length) {
-        recoverToSafeIndex();
-        return;
+        commitIndex(findFirstRenderablePptIndex(itemsRef.current, pptFallbackRef.current))
+        return
       }
-      goToNext();
-    }, 0);
+      recoverToSafeIndex()
+    }, 0)
 
     return () => {
-      window.clearTimeout(recoveryTimer);
-    };
-  }, [activeIndex, activeItem, goToNext, recoverToSafeIndex]);
+      window.clearTimeout(recoveryTimer)
+    }
+  }, [activeIndex, activeItem, commitIndex, recoverToSafeIndex])
 
   useEffect(() => {
     return () => {
@@ -405,7 +405,7 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
   }, []);
 
   const shouldRenderSlide = (index: number) => {
-    if (index === activeIndex) {
+    if (index === renderIndex) {
       return true;
     }
 
@@ -413,7 +413,7 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
       return false;
     }
 
-    const distanceAhead = (index - activeIndex + items.length) % items.length;
+    const distanceAhead = (index - renderIndex + items.length) % items.length;
     return distanceAhead > 0 && distanceAhead <= preloadAhead;
   };
 
@@ -505,6 +505,11 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
     }
   }, [isDragging, currentX, startX]);
 
+  const renderIndex = activeItem && isRenderableCarouselItem(activeItem)
+    ? activeIndex
+    : resolvePointer(items, boundedIndex).safeIndex
+  const renderItem = items[renderIndex]
+
   if (items.length === 0) {
     return (
       <div className={cn('w-full h-full flex items-center justify-center bg-black', className)}>
@@ -513,7 +518,7 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
     );
   }
 
-  if (!activeItem || !isRenderableCarouselItem(activeItem)) {
+  if (!renderItem || !isRenderableCarouselItem(renderItem)) {
     return (
       <div className={cn('w-full h-full flex items-center justify-center bg-black', className)}>
         <p className="text-white/60">Recuperando exibição...</p>
@@ -545,7 +550,7 @@ export const DynamicTimerCarousel = forwardRef<DynamicTimerCarouselHandle, Dynam
             return null;
           }
 
-          const isActive = index === activeIndex;
+          const isActive = index === renderIndex;
 
           return (
             <div
